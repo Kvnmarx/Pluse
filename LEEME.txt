@@ -1,0 +1,146 @@
+PLUSE EN TU IPHONE — con GitHub, gratis y sin caducidad
+========================================================
+
+No hace falta descargar ninguna aplicación. Ni GitHub Desktop, ni
+Xcode, ni nada. Todo se hace desde el navegador, en unos 5 minutos.
+
+En esta carpeta hay 6 archivos. Son la app entera.
+
+
+════════════════════════════════════════
+PARTE 1 · SUBIR LOS ARCHIVOS  (computadora)
+════════════════════════════════════════
+
+1. Entrá a  https://github.com/new
+   (si te pide, iniciá sesión con la cuenta que te creaste)
+
+2. Completá así:
+
+      Repository name .... pluse
+      Description ........ (dejalo vacío)
+      Público / Privado .. PÚBLICO  ← importante, si no, no funciona
+      Add a README ....... NO lo marques
+
+   Y apretá el botón verde  "Create repository"
+
+3. En la pantalla que aparece, buscá el renglón que dice
+   "uploading an existing file" (es un link azul, en el medio).
+   Tocalo.
+
+4. Ahora abrí esta carpeta en tu Mac y:
+      · Seleccioná los 6 ARCHIVOS  (clic en uno y después Cmd+A)
+      · Arrastralos a la zona del navegador que dice
+        "Drag files here to add them to your repository"
+
+   ⚠️ Los ARCHIVOS, no la carpeta. Si arrastrás la carpeta entera,
+      la dirección te queda mal y la app no carga.
+
+   Tenés que ver los 6 nombres listados: index.html, sw.js,
+   manifest.webmanifest y los tres .png
+
+5. Abajo de todo, apretá el botón verde  "Commit changes"
+
+
+════════════════════════════════════════
+PARTE 2 · ENCENDER LA PÁGINA
+════════════════════════════════════════
+
+6. Arriba, en la barra del repositorio, tocá  "Settings"
+   (es la última opción, tiene un engranaje)
+
+7. En la columna de la izquierda, tocá  "Pages"
+
+8. Donde dice "Branch" vas a ver un desplegable que dice "None".
+   Cambialo a  main.  Al lado dejá  / (root).
+   Apretá  "Save"
+
+9. Esperá entre 1 y 2 minutos y recargá esa misma página.
+   Arriba te va a aparecer un cartel verde con tu dirección:
+
+      https://TUUSUARIO.github.io/pluse/
+
+   ESA es tu app. Copiala.
+   (Si todavía no aparece, esperá un minuto más y recargá.)
+
+10. Comprobá: pegá esa dirección en el navegador de la computadora.
+    Tenés que ver Pluse funcionando. Si la ves, ya está lo difícil.
+
+
+════════════════════════════════════════
+PARTE 3 · INSTALARLA EN EL IPHONE
+════════════════════════════════════════
+
+11. Mandate esa dirección al teléfono: mail a vos mismo, WhatsApp,
+    Mensajes, lo que te resulte más fácil.
+
+12. ⚠️ ABRILA EN SAFARI. No en Chrome. No en el navegador que abre
+    WhatsApp por dentro. Si la abriste desde WhatsApp, tocá los
+    tres puntos de arriba a la derecha → "Abrir en Safari".
+
+13. Tocá el botón COMPARTIR: el cuadradito con la flecha para
+    arriba, abajo en el centro de la pantalla.
+
+14. Deslizá la lista hacia abajo hasta  "Agregar a pantalla de inicio"
+
+15. Mirá bien lo que muestra:
+
+       ✅ ÍCONO ROJO CON UN RAYO + el nombre "Pluse"   → perfecto
+       ❌ una fotito de la página                       → estás en la
+          dirección equivocada, volvé al paso 9
+
+16. Tocá  "Agregar"  (arriba a la derecha)
+
+
+════════════════════════════════════════
+PARTE 4 · COMPROBAR QUE QUEDÓ BIEN
+════════════════════════════════════════
+
+17. Cerrá Safari del todo: deslizá desde abajo hacia arriba y tirá
+    la tarjeta de Safari para arriba.
+
+18. Abrí Pluse desde el ícono de la pantalla de inicio.
+    Tiene que abrir a pantalla completa: SIN la barra de direcciones
+    arriba y SIN las flechitas de navegación abajo.
+
+19. Dentro de Pluse tocá  Ajustes.  La primera línea dice
+    "Instalación":
+
+       "Instalada como app · funciona sin conexión"  ✅ listo
+       "Abierta en el navegador"                     ❌ algo falló
+
+    Si dice lo segundo, mandame la dirección de github.io que te
+    quedó y esa frase exacta.
+
+
+════════════════════════════════════════
+PARTE 5 · TRAER TUS DATOS
+════════════════════════════════════════
+
+Pluse instalada guarda todo en el teléfono, aparte de la versión
+de claude.ai. Para no arrancar de cero:
+
+  a) En Pluse de claude.ai:  Ajustes → Exportar
+     Te baja un archivo  pluse-2026-09-17.json
+  b) Mandátelo al iPhone (mail a vos mismo o AirDrop)
+  c) En la app instalada:  Ajustes → Importar → elegí ese archivo
+
+
+════════════════════════════════════════
+PARA ACTUALIZARLA MÁS ADELANTE
+════════════════════════════════════════
+Cuando yo mejore algo, entrás al repositorio, tocás "Add file" →
+"Upload files", arrastrás el index.html nuevo y confirmás.
+La app te avisa sola con un cartel "Hay una versión nueva".
+Tus datos no se tocan.
+
+
+════════════════════════════════════════
+DUDAS FRECUENTES
+════════════════════════════════════════
+¿Caduca?               No. Nunca.
+¿Se paga algo?         No. Ni ahora ni después.
+¿Descargo GitHub?      No. Todo desde el navegador.
+¿Anda sin señal?       Sí, después de abrirla una vez con internet.
+¿Público es peligroso? Se ve el código de la app, que es el mismo que
+                       te di acá. Tus hábitos y tus datos NO: esos
+                       viven solo en tu teléfono, nunca se suben.
