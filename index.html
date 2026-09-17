@@ -11,23 +11,14 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- "black" deja la barra de estado por encima del contenido, en vez de
+     que la app se meta abajo de la isla dinámica -->
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="Pluse">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
 <style>
 img{max-width:100%}
-.rail{padding-bottom:calc(14px + env(safe-area-inset-bottom))}
-.content{padding-bottom:calc(60px + env(safe-area-inset-bottom))}
-.topbar{padding-top:calc(20px + env(safe-area-inset-top))}
-#nueva-version{
-  position:fixed; left:50%; bottom:22px; transform:translateX(-50%); z-index:300;
-  display:flex; align-items:center; gap:14px; padding:11px 16px; border-radius:99px;
-  background:var(--surface); border:1px solid var(--border2); box-shadow:var(--shadow);
-  font-size:14px; font-weight:600;
-}
-#nueva-version button{color:var(--accent-text); font-weight:700; font-size:12.5px;
-  text-transform:uppercase; letter-spacing:.06em}
 
 :root{
   --ground:#131211;
@@ -829,6 +820,43 @@ a{color:inherit}
 /* el ranking de estadísticas, en naranja */
 .rank .rbar i{background:var(--orange)}
 
+
+/* ---------- la barra superior en pantallas de teléfono ---------- */
+@media (max-width:820px){
+  .topbar{align-items:center; gap:8px}
+  .topbar > div:first-child{min-width:0; overflow:hidden}
+  .topbar h1{font-size:17px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .topbar .sub{display:none}
+  .top-acts{gap:6px}
+  .round{width:32px; height:32px}
+}
+@media (max-width:430px){
+  /* sólo el signo: el título del panel ya dice qué se agrega */
+  #add-btn{
+    width:34px; height:34px; padding:0; border-radius:50%;
+    font-size:0; justify-content:center;
+  }
+  #add-btn::after{content:"＋"; font-size:19px; font-weight:700; line-height:1}
+}
+
+
+/* ---------- espacio para la isla dinámica y la barra de gestos ---------- */
+.topbar{padding-top:calc(14px + env(safe-area-inset-top))}
+.rail{padding-bottom:calc(14px + env(safe-area-inset-bottom))}
+.content{padding-bottom:calc(60px + env(safe-area-inset-bottom))}
+@media (max-width:820px){
+  .topbar{padding-top:calc(10px + env(safe-area-inset-top))}
+  .rail{padding-top:calc(12px + env(safe-area-inset-top))}
+}
+#nueva-version{
+  position:fixed; left:50%; bottom:calc(22px + env(safe-area-inset-bottom));
+  transform:translateX(-50%); z-index:300;
+  display:flex; align-items:center; gap:14px; padding:11px 16px; border-radius:99px;
+  background:var(--surface); border:1px solid var(--border2); box-shadow:var(--shadow);
+  font-size:14px; font-weight:600;
+}
+#nueva-version button{color:var(--accent-text); font-weight:700; font-size:12.5px;
+  text-transform:uppercase; letter-spacing:.06em}
 
 </style>
 </head>

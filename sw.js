@@ -1,4 +1,4 @@
-const CACHE = 'pluse-v1';
+const CACHE = 'pluse-v2';
 const BASE = ['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png','./apple-touch-icon.png'];
 self.addEventListener('install', e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(BASE))));
 self.addEventListener('message', e => { if(e.data && e.data.type === 'SKIP_WAITING') self.skipWaiting(); });
