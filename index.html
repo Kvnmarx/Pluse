@@ -6,7 +6,7 @@
 <title>Pluse</title>
 <meta name="description" content="Pluse — tu sistema personal: hábitos, tareas, proyectos, entrenamiento y revisión semanal.">
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#131211">
+<meta name="theme-color" content="#0A1E47">
 <link rel="icon" href="icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -21,37 +21,40 @@
 img{max-width:100%}
 
 :root{
-  --ground:#131211;
-  --rail:#191716;
-  --surface:#201E1C;
-  --surface2:#282523;
-  --surface3:#322E2B;
-  --border:#2E2A27;
-  --border2:#3E3936;
+  --ground:#0A1E47;
+  --rail:#071736;
+  --surface:#102A5C;
+  --surface2:#16356E;
+  --surface3:#1E4283;
+  --border:#1C3A73;
+  --border2:#2B4F92;
   --text:#FFFFFF;
-  --muted:#A09892;
-  --faint:#928A84;
-  --line:rgba(255,255,255,.06);
-  --accent:#D93A2F;
-  --accent-2:#E85449;
-  --accent-soft:rgba(217,58,47,.15);
-  --accent-text:#F0796E;
+  --muted:#A8B8D8;
+  --faint:#8296BD;
+  --line:rgba(255,255,255,.07);
+  --accent:#2F7BFF;
+  --accent-2:#5595FF;
+  --accent-soft:rgba(47,123,255,.18);
+  --accent-text:#8AB8FF;
   --accent-ink:#FFFFFF;
-  --good:#5FB055; --good-soft:rgba(95,176,85,.15);
-  --bad:#D2417E;  --bad-soft:rgba(210,65,126,.15);
-  --info:#5B94E0; --info-soft:rgba(91,148,224,.15);
-  --purple:#8A4FE0;
+  --good:#34C77B; --good-soft:rgba(52,199,123,.16);
+  --bad:#FF6B8A;  --bad-soft:rgba(255,107,138,.16);
+  --info:#22C7E0; --info-soft:rgba(34,199,224,.16);
+  --purple:#A78BFA;
+  /* dorado: los íconos azules sobre fondo azul no se distinguían */
+  --gold:#F5C242;    --gold-soft:rgba(245,194,66,.16);
 
   /* joyas: oscuras y vivas como el rojo, para que cada sección tenga la suya.
      La variante -t es la misma joya aclarada, para cuando pinta texto chico. */
-  --blue:#2E6FD9;    --blue-soft:rgba(46,111,217,.16);   --blue-t:#7CA6F2;
-  --teal:#10938F;    --teal-soft:rgba(16,147,143,.16);   --teal-t:#4FC9C4;
-  --green:#268A47;   --green-soft:rgba(38,138,71,.16);   --green-t:#5FC57E;
-  --amber:#C08A1E;   --amber-soft:rgba(192,138,30,.16);  --amber-t:#E5B54A;
-  --violet:#8A4FE0;  --violet-soft:rgba(138,79,224,.16); --violet-t:#B48CF0;
-  --magenta:#C42A6E; --magenta-soft:rgba(196,42,110,.16);--magenta-t:#EE6FA3;
-  --orange:#D9691F;  --orange-soft:rgba(217,105,31,.16); --orange-t:#F09A5C;
-  --indigo:#4757D9;  --indigo-soft:rgba(71,87,217,.16);  --indigo-t:#8B96EE;
+  /* las joyas ahora tienen que brillar sobre el azul marino */
+  --blue:#22C7E0;    --blue-soft:rgba(34,199,224,.16);   --blue-t:#6FE0F2;
+  --teal:#19C2A8;    --teal-soft:rgba(25,194,168,.16);   --teal-t:#5FE0CB;
+  --green:#34C77B;   --green-soft:rgba(52,199,123,.16);  --green-t:#6FE0A5;
+  --amber:#F0B429;   --amber-soft:rgba(240,180,41,.16);  --amber-t:#F7CE66;
+  --violet:#A78BFA;  --violet-soft:rgba(167,139,250,.16);--violet-t:#C4B0FF;
+  --magenta:#F472B6; --magenta-soft:rgba(244,114,182,.16);--magenta-t:#FA9BCD;
+  --orange:#FB923C;  --orange-soft:rgba(251,146,60,.16); --orange-t:#FDB776;
+  --indigo:#818CF8;  --indigo-soft:rgba(129,140,248,.16);--indigo-t:#A5AEFC;
   --shadow:0 1px 2px rgba(0,0,0,.4), 0 18px 40px -24px rgba(0,0,0,.9);
   --r:14px; --r-sm:10px;
   color-scheme:dark;
@@ -106,7 +109,7 @@ a{color:inherit}
   display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:var(--r-sm);
   color:var(--muted); text-decoration:none; font-weight:600; font-size:14px;
 }
-.nav a svg{width:16px; height:16px; color:var(--accent); flex:none}
+.nav a svg{width:16px; height:16px; color:var(--gold); flex:none}
 .nav a:hover{background:var(--surface2); color:var(--text)}
 .nav a[aria-current="page"]{background:var(--surface2); color:var(--text)}
 .nav .count{
@@ -140,15 +143,15 @@ a{color:inherit}
 .scroll-x{
   overflow-x:auto; overflow-y:hidden;
   background:
-    linear-gradient(90deg, var(--surface) 30%, rgba(32,30,28,0)) left/34px 100% no-repeat local,
-    linear-gradient(90deg, rgba(32,30,28,0), var(--surface) 70%) right/34px 100% no-repeat local,
+    linear-gradient(90deg, var(--surface) 30%, rgba(16,42,92,0)) left/34px 100% no-repeat local,
+    linear-gradient(90deg, rgba(16,42,92,0), var(--surface) 70%) right/34px 100% no-repeat local,
     radial-gradient(farthest-side at 0 50%, rgba(0,0,0,.45), rgba(0,0,0,0)) left/16px 100% no-repeat scroll,
     radial-gradient(farthest-side at 100% 50%, rgba(0,0,0,.45), rgba(0,0,0,0)) right/16px 100% no-repeat scroll;
 }
 .scroll-x.on-ground{
   background:
-    linear-gradient(90deg, var(--ground) 30%, rgba(19,18,17,0)) left/34px 100% no-repeat local,
-    linear-gradient(90deg, rgba(19,18,17,0), var(--ground) 70%) right/34px 100% no-repeat local,
+    linear-gradient(90deg, var(--ground) 30%, rgba(10,30,71,0)) left/34px 100% no-repeat local,
+    linear-gradient(90deg, rgba(10,30,71,0), var(--ground) 70%) right/34px 100% no-repeat local,
     radial-gradient(farthest-side at 0 50%, rgba(0,0,0,.45), rgba(0,0,0,0)) left/16px 100% no-repeat scroll,
     radial-gradient(farthest-side at 100% 50%, rgba(0,0,0,.45), rgba(0,0,0,0)) right/16px 100% no-repeat scroll;
 }
@@ -166,7 +169,7 @@ a{color:inherit}
 .btn.out{background:transparent; border-color:var(--accent-text); color:var(--accent-text)}
 .btn.out:hover{background:var(--accent-soft)}
 .btn.sm{padding:5px 10px; font-size:12.5px}
-.btn.danger{color:var(--bad); border-color:rgba(210,96,126,.5)}
+.btn.danger{color:var(--bad); border-color:rgba(255,107,138,.5)}
 .btn.solid-danger{background:var(--bad); border-color:var(--bad); color:#fff}
 .icon-btn{
   width:30px; height:30px; border-radius:var(--r-sm); display:grid; place-items:center;
@@ -226,15 +229,15 @@ a{color:inherit}
 /* fila de hábitos de hoy */
 .hrow{display:flex; gap:8px; overflow-x:auto; padding-bottom:6px}
 .hcard{
-  flex:none; width:78px; min-height:84px; background:var(--surface); border:1px solid var(--border);
-  border-radius:var(--r-sm); padding:8px 8px 7px; display:flex; flex-direction:column; gap:3px; position:relative;
+  flex:none; width:94px; min-height:96px; background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--r-sm); padding:10px 11px 9px; display:flex; flex-direction:column; gap:5px; position:relative;
 }
-.hcard .e{font-size:17px; line-height:1}
+.hcard .e{font-size:18px; line-height:1}
 .hcard .n{
-  font-size:11px; font-weight:600; line-height:1.15; color:var(--muted);
+  font-size:11.5px; font-weight:600; line-height:1.25; color:var(--muted);
   display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
 }
-.hcard .mark{width:15px; height:15px; border-radius:50%; border:1.5px solid var(--border2); margin-top:auto;
+.hcard .mark{width:16px; height:16px; border-radius:50%; border:1.5px solid var(--border2); margin-top:auto;
   display:grid; place-items:center; color:transparent}
 .hcard .mark svg{width:10px; height:10px; stroke-width:3.4}
 .hcard.on{background:var(--hc,var(--accent)); border-color:var(--hc,var(--accent))}
@@ -243,7 +246,7 @@ a{color:inherit}
 
 /* grilla del inicio */
 .home-grid{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; align-items:start}
-.accent-card{background:linear-gradient(150deg,var(--accent),#A94E2A); border-radius:var(--r); padding:16px 18px; color:#fff}
+.accent-card{background:linear-gradient(150deg,var(--accent),#0E3FA8); border-radius:var(--r); padding:16px 18px; color:#fff}
 .accent-card .k{font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; opacity:.85}
 .accent-card h3{font-size:20px; margin-top:8px; line-height:1.28}
 .accent-card p{margin:6px 0 0; font-size:14px; opacity:.9}
@@ -286,13 +289,13 @@ a{color:inherit}
 .ico-circle{width:32px; height:32px; border-radius:50%; display:grid; place-items:center; flex:none; font-size:14px}
 
 /* aviso pendientes */
-.alert{border:1px solid rgba(210,96,126,.45); background:var(--bad-soft); border-radius:var(--r);
+.alert{border:1px solid rgba(255,107,138,.45); background:var(--bad-soft); border-radius:var(--r);
   padding:13px 15px 11px; margin-bottom:20px; display:flex; flex-direction:column; gap:8px}
 .alert-head{display:flex; align-items:center; gap:10px; font-size:14px}
 .alert-head svg{width:17px; height:17px; color:var(--bad); flex:none}
 .alert-head b{flex:1; font-weight:700; min-width:0}
-.alert-list{display:flex; flex-direction:column; border-top:1px solid rgba(210,96,126,.25)}
-.alert-row{display:flex; align-items:center; gap:9px; padding:7px 0; border-bottom:1px solid rgba(210,96,126,.18)}
+.alert-list{display:flex; flex-direction:column; border-top:1px solid rgba(255,107,138,.25)}
+.alert-row{display:flex; align-items:center; gap:9px; padding:7px 0; border-bottom:1px solid rgba(255,107,138,.18)}
 .alert-row:last-child{border-bottom:none}
 .alert-row .grow{flex:1; min-width:0; font-size:14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .alert-row .ago{font-family:"JetBrains Mono",monospace; font-size:11px; font-weight:700; color:var(--bad); flex:none}
@@ -305,9 +308,13 @@ a{color:inherit}
 .donut span{position:absolute; inset:0; display:grid; place-items:center; font-family:"JetBrains Mono",monospace;
   font-size:14px; font-weight:700}
 .kv{flex:1; display:flex; flex-direction:column; gap:5px; font-size:14px}
-.kv div{display:flex; gap:12px}
+.kv div{display:flex; gap:12px; min-width:0}
 .kv span:first-child{color:var(--muted)}
-.kv span:last-child{margin-left:auto; font-family:"JetBrains Mono",monospace; font-weight:700}
+.kv span:first-child{flex:none}
+.kv span:last-child{
+  margin-left:auto; font-family:"JetBrains Mono",monospace; font-weight:700;
+  min-width:0; text-align:right; overflow-wrap:anywhere;   /* «Fuerza, ayer» se cortaba */
+}
 .matrix{overflow-x:auto; padding-bottom:4px}
 .mx{border-collapse:separate; border-spacing:3px; font-size:11px}
 .mx th{font-weight:700; color:var(--faint); font-size:11px; text-transform:uppercase; letter-spacing:.06em; padding:0}
@@ -748,9 +755,11 @@ a{color:inherit}
   position:relative; overflow:hidden; margin-bottom:26px; padding:20px 24px;
   border:1px solid var(--border); border-radius:var(--r);
   background:
-    radial-gradient(130% 180% at 0% 0%, rgba(217,58,47,.17), rgba(217,58,47,0) 62%),
+    radial-gradient(130% 180% at 0% 0%, rgba(47,123,255,.24), rgba(47,123,255,0) 62%),
     var(--surface);
-  display:flex; align-items:center; gap:22px; flex-wrap:wrap;
+  /* Rejilla de dos columnas: el anillo a la izquierda, el título a su lado y
+     los datos debajo. En el teléfono los datos pasan a ocupar el ancho entero. */
+  display:grid; grid-template-columns:auto 1fr; gap:0 22px; align-items:center;
 }
 .ring{position:relative; width:90px; height:90px; flex:none}
 .ring span{
@@ -758,10 +767,10 @@ a{color:inherit}
   font-family:"JetBrains Mono",monospace; font-size:22px; font-weight:700; letter-spacing:-.03em;
 }
 .ring i{font-size:12.5px; font-style:normal; color:var(--muted); margin-left:1px}
-.hero-main{flex:1; min-width:210px}
+.hero-main{grid-column:2; min-width:0}
 .hero-main .hl{font-size:20px; font-weight:800; letter-spacing:-.025em}
 .hero-main .hs{font-size:13px; color:var(--muted); margin-top:3px}
-.hero-stats{display:flex; gap:8px; flex-wrap:wrap; margin-top:14px}
+.hero-stats{grid-column:2; display:flex; gap:8px; flex-wrap:wrap; margin-top:14px}
 .hstat{
   display:inline-flex; align-items:center; gap:7px; padding:5px 13px 5px 10px; border-radius:99px;
   background:var(--surface2); border:1px solid var(--border); font-size:12.5px; color:var(--muted);
@@ -801,10 +810,15 @@ a{color:inherit}
 
 @media (max-width:900px){ .home-grid{grid-template-columns:1fr} .pair{grid-template-columns:1fr} }
 @media (max-width:560px){
-  .hero{padding:16px; gap:16px}
+  .hero{padding:16px; gap:0 14px}
   .ring{width:72px; height:72px}
   .ring svg{width:72px; height:72px}
   .ring span{font-size:20px}
+  /* Ocupan el ancho entero y se acomodan de a dos por renglón: la tarjeta
+     mide la mitad que antes y ningún dato se parte en dos líneas. */
+  .hero-stats{grid-column:1 / -1; gap:7px; margin-top:13px}
+  .hstat{padding:6px 10px; gap:6px; font-size:11.5px; white-space:nowrap}
+  .hstat b{font-size:13px}
 }
 
 /* ---------- una joya por sección ---------- */
@@ -858,6 +872,64 @@ a{color:inherit}
 #nueva-version button{color:var(--accent-text); font-weight:700; font-size:12.5px;
   text-transform:uppercase; letter-spacing:.06em}
 
+
+/* ---------- teléfono: la navegación va abajo, horizontal ---------- */
+.tabbar{display:none}
+@media (max-width:820px){
+  .app{grid-template-columns:1fr}
+  .rail{display:none}
+  .content{padding-bottom:calc(90px + env(safe-area-inset-bottom))}
+  .topbar{padding-left:16px; padding-right:16px}
+
+  .tabbar{
+    display:flex; position:fixed; left:0; right:0; bottom:0; z-index:60;
+    background:var(--rail); border-top:1px solid var(--border);
+    padding:5px 4px calc(4px + env(safe-area-inset-bottom));
+  }
+  .tabbar a, .tabbar button{
+    flex:1; min-width:0; position:relative;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
+    padding:7px 2px 5px; border-radius:var(--r-sm);
+    font-size:10px; font-weight:600; color:var(--faint); text-decoration:none; text-align:center;
+  }
+  .tabbar svg{width:22px; height:22px; color:var(--gold)}
+  .tabbar [aria-current="page"] svg{color:var(--accent-text)}
+  .tabbar [aria-current="page"]{color:var(--accent-text); background:var(--accent-soft)}
+  .tabbar .dot-n{
+    position:absolute; top:3px; left:50%; margin-left:5px; font-style:normal;
+    font-family:"JetBrains Mono",monospace; font-size:9px; font-weight:700;
+    background:var(--accent); color:#fff; border-radius:99px; padding:0 5px; min-width:16px;
+  }
+}
+
+/* la hoja de "Más": íconos en círculo, como una pantalla de cuenta */
+.sheet-scrim{align-items:flex-end; padding:0}
+.sheet{
+  width:100%; background:var(--surface); border-top:1px solid var(--border2);
+  border-radius:20px 20px 0 0; padding:14px 16px calc(18px + env(safe-area-inset-bottom));
+  animation:sheetUp .22s cubic-bezier(.2,.7,.3,1);
+}
+@keyframes sheetUp{from{transform:translateY(100%)} to{transform:none}}
+.sheet-head{display:flex; align-items:center; margin-bottom:14px}
+.sheet-head b{font-size:16px; font-weight:800}
+.sheet-head .icon-btn{margin-left:auto}
+.sheet-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
+.sheet-item{
+  display:flex; flex-direction:column; align-items:center; gap:9px;
+  padding:16px 6px; border-radius:var(--r); background:var(--surface2);
+  font-size:12px; font-weight:600; color:var(--muted); text-align:center;
+}
+.sheet-item .si{
+  width:42px; height:42px; border-radius:50%; display:grid; place-items:center;
+  border:1.5px solid var(--gold); color:var(--gold);
+}
+.sheet-item .si svg{width:19px; height:19px}
+.sheet-item:active{background:var(--surface3)}
+.sheet-item.on{background:var(--accent-soft); color:var(--text)}
+.sheet-foot{
+  display:flex; align-items:center; gap:8px; margin-top:14px; padding-top:12px;
+  border-top:1px solid var(--border); font-size:11px; color:var(--faint);
+}
 </style>
 </head>
 <body>
@@ -894,6 +966,7 @@ a{color:inherit}
     <main class="content" id="view"></main>
   </div>
 </div>
+<nav class="tabbar" id="tabbar" aria-label="Secciones"></nav>
 <div id="modal-root"></div>
 <div id="toast-root"></div>
 
@@ -944,6 +1017,7 @@ const ICON = {
   hourglass: S('<path d="M7 3h10M7 21h10"/><path d="M7 3c0 4.5 5 6.4 5 9s-5 4.5-5 9"/><path d="M17 3c0 4.5-5 6.4-5 9s5 4.5 5 9"/>'),
   user: S('<circle cx="12" cy="8.4" r="3.6"/><path d="M5 20c1.4-3.6 4-5.4 7-5.4s5.6 1.8 7 5.4"/>'),
   revision: S('<path d="M4.5 4.5h15v15h-15z"/><path d="M8 9.5l1.6 1.6 3-3.2M8 15.5l1.6 1.6 3-3.2M14.5 10h3M14.5 16h3"/>'),
+  mas: S('<circle cx="5" cy="12" r="1.7" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.7" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.7" fill="currentColor" stroke="none"/>'),
   case: S('<rect x="3" y="7.5" width="18" height="12" rx="2.2"/><path d="M9 7.5V5.6h6V7.5"/>'),
 };
 document.getElementById('brand-mark').innerHTML =
@@ -987,8 +1061,8 @@ const clone = o => JSON.parse(JSON.stringify(o));
    saltando de un lado al otro de la rueda, para que dos hábitos seguidos
    nunca queden parecidos. El rojo va último: la app ya tiene bastante. */
 const HCOLORS = [
-  '#2E6FD9','#C9A227','#2E9E52','#8A4FE0','#D9691F','#10938F','#C42A6E',
-  '#7E9B14','#4757D9','#B5651D','#A93BC4','#1C7FBF','#0E7A6E','#D93A2F',
+  '#22C7E0','#F0B429','#34C77B','#A78BFA','#FB923C','#19C2A8','#F472B6',
+  '#A3D42B','#818CF8','#E8823C','#C77DF5','#5595FF','#12B39B','#FF6B8A',
 ];
 /* Sobre los claros —amarillo, lima, verde— el blanco no se lee: la tinta
    se elige midiendo la luminancia real del color. */
@@ -997,14 +1071,14 @@ function inkFor(hex){
   if(isNaN(n)) return '#FFFFFF';
   const lin = v => { v /= 255; return v <= .03928 ? v/12.92 : Math.pow((v+.055)/1.055, 2.4); };
   const L = .2126*lin((n>>16)&255) + .7152*lin((n>>8)&255) + .0722*lin(n&255);
-  return L > .20 ? '#191512' : '#FFFFFF';
+  return L > .20 ? '#08183A' : '#FFFFFF';
 }
 const EMOJIS = [
   '✅','💪','🏋️','🏃','🚴','🏊','⚽','🧘','😴','🌙','☀️','💧','🥗','🍎',
   '📖','✍️','🧠','🤖','💻','📱','🎧','🎵','🎹','🎸','🎨','📷','🧩','🌱',
   '🐱','🐶','🎯','💰','🙏','📵','🚭','🧹','📞','❤️','⏰','🚿','🦷','🧴',
 ];
-const WEEKC = ['#D93A2F','#8A4FE0','#2E6FD9','#10938F','#C08A1E','#C42A6E'];
+const WEEKC = ['#2F7BFF','#A78BFA','#22C7E0','#19C2A8','#F0B429','#F472B6'];
 const CURRENCIES = [['ARS','Peso argentino'],['USD','Dólar'],['EUR','Euro'],['MXN','Peso mexicano'],['COP','Peso colombiano'],['CLP','Peso chileno'],['UYU','Peso uruguayo'],['PEN','Sol']];
 const money = n => {
   const cur = (state.finance && state.finance.currency) || 'ARS';
@@ -1060,14 +1134,14 @@ const blank = () => ({
 });
 let state = blank();
 const ui = {
-  view:'hoy', taskFilter:'hoy', taskProject:null, projStatus:'activo',
+  view:'hoy', taskMode:'lista', taskFilter:'hoy', taskProject:null, projStatus:'activo',
   weekStart:iso(startOfWeek(today())), month:monthKey(today()), habitMode:'mensual',
   habitSel:null, noteQ:'', openCats:{}, openTraining:null, menu:false, gq:'',
   projArea:'todos', dreamsOpen:true,
   wheelMonth:monthKey(today()), wheelArea:'todas', statRange:'semana',
   revWeek:iso(startOfWeek(addDays(today(),-7))), revStep:1, openTask:null,
 };
-const AREA_COLORS = ['#D93A2F','#D9691F','#C08A1E','#268A47','#10938F','#2E6FD9','#8A4FE0','#C42A6E'];
+const AREA_COLORS = ['#2F7BFF','#FB923C','#F0B429','#34C77B','#19C2A8','#22C7E0','#A78BFA','#F472B6'];
 const AREAS = [
   ['salud','Salud y deporte'], ['familia','Familia y amor'], ['trabajo','Trabajo y finanzas'],
   ['ocio','Ocio y amistad'], ['tiempo','Tiempo para mí'], ['emocional','Emocional'],
@@ -1098,7 +1172,7 @@ const CAT_COLORS = {
   Sueldo:'#6FA46B', Freelance:'#5C9B95', Ventas:'#C99042', Inversiones:'#6E92B8',
 };
 const catColor = c => CAT_COLORS[c] || 'var(--accent)';
-const TYPE_COLORS = {Fuerza:'#D93A2F', Cardio:'#2E6FD9', Movilidad:'#268A47', Deporte:'#8A4FE0'};
+const TYPE_COLORS = {Fuerza:'#FB923C', Cardio:'#2F7BFF', Movilidad:'#34C77B', Deporte:'#A78BFA'};
 const CATS = {
   gasto:  ['Vivienda','Comida','Transporte','Servicios','Salud','Ocio','Educación','Otros'],
   ingreso:['Sueldo','Freelance','Ventas','Inversiones','Otros'],
@@ -1366,7 +1440,8 @@ function rate30(h){
 const freqLabel = h => h.freq === 'daily' ? 'Todos los días'
   : h.freq === 'days' ? ((h.days||[]).map(i=>DOW[i]).join(' · ') || 'Sin días')
   : `${h.target||3}× por semana`;
-const dueToday = () => state.habits.list.filter(h => isDue(h, today()));
+const activos = () => state.habits.list.filter(h => !h.archivado);
+const dueToday = () => activos().filter(h => isDue(h, today()));
 const habitGoal = (h, mk) => {
   const n = daysInMonth(mk);
   if(h.freq === 'daily') return n;
@@ -1602,6 +1677,47 @@ const NAV_GROUPS = [
 ];
 /* Paneles apagados a pedido. El código sigue entero: para volver a
    encenderlos alcanza con sumarlos otra vez acá y a RENDERERS. */
+/* En el teléfono no entra un menú de nueve paneles: abajo van los cuatro
+   que se usan todos los días y el resto vive en la hoja de "Más". */
+const TABS = ['hoy','habitos','tareas','proyectos'];
+function renderTabbar(){
+  const el = document.getElementById('tabbar');
+  if(!el) return;
+  const cuenta = {
+    tareas: openTasks().filter(t => !t.date || t.date <= TODAY).length,
+    habitos: dueToday().filter(h => !habitDone(h,TODAY)).length,
+  };
+  const enMas = !TABS.includes(ui.view);
+  el.innerHTML = TABS.map(k => {
+    const v = VIEWS.find(x => x.k === k);
+    if(!v) return '';
+    return `<a href="#/${k}" ${ui.view===k?'aria-current="page"':''}>
+      ${ICON[k]}<span>${v.label}</span>${cuenta[k]?`<i class="dot-n">${cuenta[k]}</i>`:''}</a>`;
+  }).join('') +
+  `<button data-act="mas" ${enMas?'aria-current="page"':''} aria-haspopup="dialog">
+    ${ICON.mas}<span>Más</span></button>`;
+}
+/* La hoja: los paneles que no entran abajo, en grilla de íconos. */
+function openSheet(){
+  /* Solo los paneles encendidos: VIEWS todavía guarda los apagados (Ritual,
+     Semana, Objetivos, Finanzas, Enfoque) y se colaban en el menú del teléfono. */
+  const resto = NAV_GROUPS.flatMap(g => g.items)
+    .filter(k => !TABS.includes(k))
+    .map(k => VIEWS.find(v => v.k === k))
+    .filter(Boolean);
+  document.getElementById('modal-root').innerHTML = `<div class="scrim sheet-scrim" data-scrim>
+    <div class="sheet" role="dialog" aria-modal="true" aria-label="Más secciones">
+      <div class="sheet-head"><b>Menú</b>
+        <button class="icon-btn" data-act="close-form" aria-label="Cerrar">${ICON.x}</button></div>
+      <div class="sheet-grid">
+        ${resto.map(v => `<button class="sheet-item ${ui.view===v.k?'on':''}" data-act="ir" data-k="${v.k}">
+          <span class="si">${ICON[v.k]}</span><span>${v.label}</span></button>`).join('')}
+        <button class="sheet-item" data-act="settings"><span class="si">${ICON.ajustes}</span><span>Ajustes</span></button>
+      </div>
+      <div class="sheet-foot"><span class="dot ${document.getElementById('sync-dot')?document.getElementById('sync-dot').className.replace('dot ',''):'local'}"></span>
+        <span>${document.getElementById('sync-label')?esc(document.getElementById('sync-label').textContent):''}</span></div>
+    </div></div>`;
+}
 /* Qué se puede agregar desde cada panel. Las vistas que no están acá no
    ofrecen el botón: no hay nada que crear ahí. */
 const ADD_BTN = {
@@ -1645,6 +1761,7 @@ function renderShell(){
   document.getElementById('view-title').innerHTML = h1;
   document.getElementById('view-sub').textContent = sub;
   renderAddButton();
+  renderTabbar();
 }
 
 /* ---------- gráficos ---------- */
@@ -1711,7 +1828,7 @@ function viewHoy(){
   const late = overdue();
   const tr = trainOn(TODAY);
   const j = jday(TODAY);
-  const maxStreak = Math.max(0, ...state.habits.list.map(streak));
+  const maxStreak = Math.max(0, ...activos().map(streak));
 
   /* la semana en curso, de un vistazo */
   const wk = startOfWeek(today());
@@ -1719,7 +1836,7 @@ function viewHoy(){
   for(let i=0;i<7;i++){
     const d = addDays(wk,i), di = iso(d);
     if(di > TODAY) break;
-    state.habits.list.forEach(h => { if(h.freq === 'weekly' || isDue(h,d)){ wDue++; if(habitDone(h,di)) wDone++; } });
+    activos().forEach(h => { if(h.freq === 'weekly' || isDue(h,d)){ wDue++; if(habitDone(h,di)) wDone++; } });
   }
   const wPct = wDue ? Math.round(wDone/wDue*100) : 0;
   const wTasks = state.tasks.list.filter(t => t.done && t.doneAt && iso(new Date(t.doneAt)) >= iso(wk));
@@ -1757,12 +1874,12 @@ function viewHoy(){
         : 'Hoy sin hábitos programados'}</div>
       <div class="hs">${fmtLong(today())}${
         due.length && doneH < due.length ? ` · te falta${due.length-doneH===1?'':'n'} ${due.length-doneH}` : ''}</div>
+    </div>
       <div class="hero-stats">
         <span class="hstat">🔥 <b>${maxStreak}</b> de racha</span>
         <span class="hstat">📋 <b>${tToday.length}</b> tarea${tToday.length===1?'':'s'} hoy</span>
         <span class="hstat">🏋️ <b>${trainStreak()}</b> semana${trainStreak()===1?'':'s'} entrenando</span>
         ${late.length ? `<a class="hstat alerta" href="#/tareas">${ICON.alerta} <b>${late.length}</b> atrasada${late.length===1?'':'s'}</a>` : ''}
-      </div>
     </div>
   </section>
 
@@ -1870,8 +1987,24 @@ function viewHoy(){
   </div>`;
 }
 /* ---------- vista: hábitos ---------- */
-function viewHabitos(){
-  const list = state.habits.list;
+/* El panel muestra los hábitos activos; los archivados quedan abajo, en un
+   cajón, con su historial intacto y un botón para volver a activarlos. */
+function viewHabitos(){ return cuerpoHabitos() + cajonHabitos(); }
+function cajonHabitos(){
+  const g = state.habits.list.filter(h => h.archivado);
+  if(!g.length) return '';
+  return `<div class="sec" style="margin-top:26px">
+    <div class="sec-title"><h2>Archivados</h2>
+      <span class="aside">${g.length} · conservan su historial</span></div>
+    <div class="rows">${g.map(h => `<div class="row">
+      <span class="ico-circle" style="background:${h.color}22;box-shadow:inset 0 0 0 1.5px ${h.color}">${h.emoji?esc(h.emoji):'✅'}</span>
+      <div class="grow"><div class="t">${esc(h.name)}</div>
+        <div class="m">${Object.keys(state.habits.logs[h.id]||{}).length} marcas guardadas</div></div>
+      <button class="btn sm" data-act="desarchivar" data-id="${h.id}">Reactivar</button></div>`).join('')}</div>
+  </div>`;
+}
+function cuerpoHabitos(){
+  const list = activos();
   if(!list.length) return `${sampleBanner()}<div class="empty" style="padding:44px 20px">
     <div style="font-size:14px;color:var(--text);font-weight:700;margin-bottom:6px">Sin hábitos todavía</div>
     Empezá con uno solo y sumá cuando ya sea automático.
@@ -1886,6 +2019,7 @@ function viewHabitos(){
     <div class="seg" style="margin-left:auto">
       ${[['diario','Diario'],['mensual','Mensual'],['anual','Anual']].map(([k,l]) =>
         `<button data-act="habit-mode" data-mode="${k}" aria-pressed="${mode===k}">${l}</button>`).join('')}</div>
+    <button class="btn sm" data-act="reiniciar">${ICON.reset} Reiniciar</button>
   </div>`;
 
   if(mode === 'diario'){
@@ -1944,13 +2078,20 @@ function viewHabitos(){
 
   /* mensual */
   const nd = daysInMonth(mk);
+  /* La curva se corta en hoy. Antes recorría el mes entero y les ponía cero
+     a los días que todavía no pasaron: parecía un derrumbe donde no había
+     nada. Y el porcentaje se mide contra los días transcurridos, no contra
+     el mes completo, que a mitad de mes daba un número siempre deprimente. */
+  const hasta = `${mk}-31` < TODAY ? nd
+              : (`${mk}-01` > TODAY ? 0 : +TODAY.slice(8));
   const vals = [], labels = [];
-  for(let d=1;d<=nd;d++){
+  for(let d=1; d<=hasta; d++){
     const di = `${mk}-${pad(d)}`;
     vals.push(list.filter(h => habitDone(h,di)).length);
-    labels.push(d===1||d%5===0 ? String(d) : '');
+    labels.push(d===1||d%5===0||d===hasta ? String(d) : '');
   }
-  const goalTotal = sum(list.map(h => habitGoal(h,mk)));
+  const enCurso = hasta > 0 && hasta < nd;
+  const goalTotal = Math.round(sum(list.map(h => habitGoal(h,mk))) * (hasta/nd));
   const doneTotal = sum(vals);
   const pct = goalTotal ? Math.round(doneTotal/goalTotal*100) : 0;
   const first = dowIdx(new Date(+my, +mm-1, 1));
@@ -1971,13 +2112,15 @@ function viewHabitos(){
   </div>
 
   <div class="card pad sec">
-    <div class="card-title">Progreso del mes</div>
-    <div class="chart-wrap scroll-x">${areaChart(vals, labels, 'var(--blue)')}</div>
+    <div class="card-title">Progreso del mes
+      ${enCurso?`<span class="muted" style="font-weight:500;font-size:12.5px">· hasta hoy</span>`:''}</div>
+    ${hasta ? `<div class="chart-wrap scroll-x">${areaChart(vals, labels, 'var(--blue)')}</div>`
+      : `<div class="muted" style="font-size:13px;padding:18px 2px">Este mes todavía no empezó.</div>`}
     <div class="donut-row">${donut(pct, 'var(--blue)')}
       <div class="kv">
         <div><span>Completados</span><span>${doneTotal}</span></div>
         <div><span>Restantes</span><span>${Math.max(0, goalTotal-doneTotal)}</span></div>
-        <div><span>Número de días</span><span>${nd}</span></div>
+        <div><span>Días transcurridos</span><span>${hasta} de ${nd}</span></div>
       </div></div>
   </div>
 
@@ -2044,6 +2187,9 @@ function taskRow(t, showDate){
   </div>`;
 }
 function viewTareas(){
+  /* Misma sección, dos maneras de mirar lo mismo: la lista para decidir qué
+     hago ahora, la semana para repartir la carga entre los días. */
+  if(ui.taskMode === 'semana') return sampleBanner() + cabeceraTareas() + cuerpoSemana();
   const F = ui.taskFilter;
   const wkEnd = iso(addDays(startOfWeek(today()),6));
   const all = ui.taskProject ? state.tasks.list.filter(t => t.projectId === ui.taskProject) : state.tasks.list;
@@ -2062,6 +2208,7 @@ function viewTareas(){
 
   return `
   ${sampleBanner()}
+  ${cabeceraTareas()}
   ${late.length ? `<section class="alert" aria-label="Tareas pendientes">
     <div class="alert-head">${ICON.alerta}
       <b>${late.length} tarea${late.length===1?'':'s'} quedó pendiente${late.length===1?'':'s'} de días anteriores</b>
@@ -2186,6 +2333,16 @@ function viewProyectos(){
 }
 
 /* ---------- vista: semana ---------- */
+function cabeceraTareas(){
+  return `<div class="seg" style="margin-bottom:16px">
+    ${[['lista','Lista'],['semana','Semana']].map(([k,l]) =>
+      `<button data-act="task-mode" data-mode="${k}" aria-pressed="${(ui.taskMode||'lista')===k}">${l}</button>`).join('')}
+  </div>`;
+}
+function cuerpoSemana(){
+  const b = sampleBanner();          // ya se dibujó arriba: no lo repito acá
+  return b ? viewSemana().replace(b, '') : viewSemana();
+}
 function viewSemana(){
   const ws = parse(ui.weekStart);
   const days = Array.from({length:7},(_,i)=>addDays(ws,i));
@@ -2212,7 +2369,7 @@ function viewSemana(){
   <div class="week">${days.map((d,i) => {
     const di = iso(d), ts = tasksOn(di), tr = trainOn(di);
     const done = ts.filter(t=>t.done).length;
-    const hDue = state.habits.list.filter(h => isDue(h,d));
+    const hDue = activos().filter(h => isDue(h,d));
     const hDone = hDue.filter(h => habitDone(h,di)).length;
     const j = jday(di);
     return `<div class="day ${di===TODAY?'today':''}" id="day-${di}" data-drop="${di}">
@@ -2608,7 +2765,7 @@ function viewObjetivos(){
       <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
         <div class="day-lab" style="margin-bottom:8px">Tus otros horizontes</div>
         ${otros.map(o => `<button class="pick" data-act="goal-h" data-h="${o.k}" style="width:100%">
-          <span class="dot-color" style="background:${o.k==='semana'?'#6E92B8':o.k==='mes'?'#9E82B2':'#D93A2F'}"></span>
+          <span class="dot-color" style="background:${o.k==='semana'?'var(--blue)':o.k==='mes'?'var(--purple)':'var(--gold)'}"></span>
           <span style="flex:1">${o.l}</span>
           <span class="mono" style="color:var(--muted);font-size:12.5px">${o.done}/${o.total}</span></button>`).join('')}
       </div>
@@ -2813,7 +2970,7 @@ function weekReport(wsISO){
   const ws = parse(wsISO), we = addDays(ws,6), a = wsISO, b = iso(we);
   const inW = d => d >= a && d <= b;
   let due = 0, done = 0;
-  const perHabit = state.habits.list.map(h => {
+  const perHabit = activos().map(h => {
     let hd = 0, hdo = 0;
     for(let i=0;i<7;i++){
       const d = addDays(ws,i), di = iso(d);
@@ -2857,15 +3014,15 @@ function viewRevision(){
   const cuerpo = {
     1: `<div class="report">
       <div class="rep-tiles">
-        <div class="rep" style="--tint:#D93A2F"><span class="k">Hábitos</span><span class="v mono">${r.done}/${r.due}</span>
+        <div class="rep" style="--tint:var(--blue)"><span class="k">Hábitos</span><span class="v mono">${r.done}/${r.due}</span>
           <span class="s">${r.pct}% de constancia</span></div>
-        <div class="rep" style="--tint:#6E92B8"><span class="k">Tareas cerradas</span><span class="v mono">${r.cerradas.length}</span>
+        <div class="rep" style="--tint:var(--accent-2)"><span class="k">Tareas cerradas</span><span class="v mono">${r.cerradas.length}</span>
           <span class="s">${r.quedaron.length} quedaron abiertas</span></div>
-        <div class="rep" style="--tint:#6FA46B"><span class="k">Entrenamiento</span><span class="v mono">${r.tr.length}</span>
+        <div class="rep" style="--tint:var(--good)"><span class="k">Entrenamiento</span><span class="v mono">${r.tr.length}</span>
           <span class="s">${r.trMin} minutos</span></div>
-        <div class="rep" style="--tint:#9E82B2"><span class="k">Proyectos cerrados</span><span class="v mono">${r.metas.length}</span>
+        <div class="rep" style="--tint:var(--purple)"><span class="k">Proyectos cerrados</span><span class="v mono">${r.metas.length}</span>
           <span class="s">en esta semana</span></div>
-        <div class="rep" style="--tint:#C99042"><span class="k">Rituales</span><span class="v mono">${r.rit}/7</span>
+        <div class="rep" style="--tint:var(--gold)"><span class="k">Rituales</span><span class="v mono">${r.rit}/7</span>
           <span class="s">días que arrancaste con intención</span></div>
       </div>
       ${r.orden.length ? `<div style="margin-top:16px">
@@ -2952,11 +3109,11 @@ function viewEstadisticas(){
   for(let i=0;i<days;i++){
     const d = addDays(from,i), di = iso(d);
     if(di > TODAY) break;
-    state.habits.list.forEach(h => { if(h.freq === 'weekly' || isDue(h,d)){ due++; if(habitDone(h,di)) done++; } });
+    activos().forEach(h => { if(h.freq === 'weekly' || isDue(h,d)){ due++; if(habitDone(h,di)) done++; } });
   }
   const pct = due ? Math.round(done/due*100) : 0;
-  const rachas = state.habits.list.map(h => ({h, s:streak(h)})).filter(x => x.s > 0).sort((a,b)=>b.s-a.s).slice(0,5);
-  const mejores = state.habits.list.map(h => ({h, r:rate30(h)})).sort((a,b)=>b.r-a.r).slice(0,5);
+  const rachas = activos().map(h => ({h, s:streak(h)})).filter(x => x.s > 0).sort((a,b)=>b.s-a.s).slice(0,5);
+  const mejores = activos().map(h => ({h, r:rate30(h)})).sort((a,b)=>b.r-a.r).slice(0,5);
   const inRange = di => di >= iso(from) && di <= TODAY;
   const prevFrom = addDays(from, -days), prevTo = addDays(from,-1);
   const inPrev = di => di >= iso(prevFrom) && di <= iso(prevTo);
@@ -2965,8 +3122,8 @@ function viewEstadisticas(){
       Object.keys(state.journal.days).filter(d => inRange(d) && hasRitual(d)).length,
       Object.keys(state.journal.days).filter(d => inPrev(d) && hasRitual(d)).length],
     ['Hábitos marcados',
-      sum(state.habits.list.map(h => Object.keys(state.habits.logs[h.id]||{}).filter(inRange).length)),
-      sum(state.habits.list.map(h => Object.keys(state.habits.logs[h.id]||{}).filter(inPrev).length))],
+      sum(activos().map(h => Object.keys(state.habits.logs[h.id]||{}).filter(inRange).length)),
+      sum(activos().map(h => Object.keys(state.habits.logs[h.id]||{}).filter(inPrev).length))],
     ['Tareas cerradas',
       state.tasks.list.filter(t => t.done && t.doneAt && inRange(iso(new Date(t.doneAt)))).length,
       state.tasks.list.filter(t => t.done && t.doneAt && inPrev(iso(new Date(t.doneAt)))).length],
@@ -2981,10 +3138,10 @@ function viewEstadisticas(){
   <div class="stats-grid">
     <div class="card pad">
       <div class="card-title">Resumen ${R === 'semana' ? 'semanal' : R === 'mes' ? 'mensual' : 'anual'}</div>
-      <div style="display:flex;align-items:center;gap:18px">${donut(pct,'var(--orange)')}
+      <div style="display:flex;align-items:center;gap:18px">${donut(pct,'var(--blue)')}
         <div><div class="mono" style="font-size:20px;font-weight:700">${done}/${due}</div>
           <div class="muted" style="font-size:12.5px">Progreso global</div></div></div>
-      <div class="progline" style="margin-top:14px"><i style="width:${pct}%;background:var(--orange)"></i></div>
+      <div class="progline" style="margin-top:14px"><i style="width:${pct}%;background:var(--blue)"></i></div>
     </div>
 
     <div class="card pad">
@@ -3112,7 +3269,7 @@ function emptyState(icon, title, text, btn){
 /* ---------- banner de ejemplo ---------- */
 function sampleBanner(){
   if(!state.settings.sample) return '';
-  return `<div class="alert" style="border-color:rgba(220,106,60,.45);background:var(--accent-soft);margin-bottom:18px">
+  return `<div class="alert" style="border-color:rgba(47,123,255,.45);background:var(--accent-soft);margin-bottom:18px">
     <div class="alert-head" style="gap:10px">
       <span style="font-size:16px">👋</span>
       <b style="font-weight:600">Estás viendo <strong>datos de ejemplo</strong> para que veas cómo funciona el sistema.</b>
@@ -3380,14 +3537,18 @@ function formHabit(h){
       {k:'freq', label:'Frecuencia', type:'select', options:[['daily','Todos los días'],['days','Días específicos'],['weekly','X veces por semana']]},
       {k:'target', label:'Veces por semana', type:'number', min:1, ph:'5', help:'Solo para «X veces por semana»'},
       {k:'days', label:'Días', type:'days', wide:true, help:'Solo para «Días específicos»'},
+      {k:'archivado', label:'Archivar', type:'select', wide:true, options:[['no','Activo'],['si','Archivado']],
+        help:'Archivado desaparece de tus listas pero conserva todo el historial.'},
     ],
-    values: h || {color:HCOLORS[0], freq:'daily', target:5, days:[0,2,4], emoji:'✅'},
+    values: h ? {...h, archivado: h.archivado?'si':'no'}
+      : {color:HCOLORS[0], freq:'daily', target:5, days:[0,2,4], emoji:'✅', archivado:'no'},
     onDelete: h ? () => { state.habits.list = state.habits.list.filter(x=>x.id!==h.id); delete state.habits.logs[h.id];
       touch('habits'); toast('Hábito borrado', true); } : null,
     onSave: v => {
       if(!v.name.trim()) return 'Ponele un nombre al hábito.';
       const obj = {id:h?h.id:uid(), name:v.name.trim(), emoji:(v.emoji||'').trim(), color:v.color||HCOLORS[0],
-        freq:v.freq, days:v.days||[], target:clamp(+v.target||5,1,7), created:h?h.created:Date.now()};
+        freq:v.freq, days:v.days||[], target:clamp(+v.target||5,1,7),
+        archivado: v.archivado === 'si', created:h?h.created:Date.now()};
       if(obj.freq === 'days' && !obj.days.length) return 'Elegí al menos un día de la semana.';
       snap(h?'editar hábito':'crear hábito');
       if(h) state.habits.list = state.habits.list.map(x => x.id===h.id?obj:x);
@@ -3641,6 +3802,8 @@ function addGoal(h, input){
 }
 const ACTIONS = {
   quickadd(){ toggleQuickMenu(); },
+  mas(){ toggleQuickMenu(false); openSheet(); },
+  ir(el){ closeForm(); location.hash = '#/' + el.dataset.k; },
   search(){ openSearch(); },
   settings(){ openSettings(); },
   undo(){ undo(); },
@@ -3765,6 +3928,30 @@ const ACTIONS = {
   'retry-sync'(){ if(db){ setSync('saving'); flush(); } else toast('Los datos viven en este dispositivo. Exportá una copia desde Ajustes.'); },
   export(){ exportData(); },
   'habit-mode'(el){ ui.habitMode = el.dataset.mode; render(); },
+  /* Dos formas de empezar de nuevo, porque no son lo mismo: una conserva
+     los hábitos y borra el historial, la otra se lleva todo. */
+  reiniciar(){
+    const cuantos = state.habits.list.length;
+    if(!cuantos) return toast('Todavía no tenés hábitos');
+    const marcas = sum(state.habits.list.map(h => Object.keys(state.habits.logs[h.id]||{}).length));
+    openForm({title:'Reiniciar hábitos', saveLabel:'Reiniciar',
+      fields:[{k:'que', label:'¿Qué querés borrar?', type:'select', wide:true, options:[
+        ['marcas', `Solo las ${marcas} marcas · los hábitos quedan, las rachas vuelven a cero`],
+        ['todo',   `Los ${cuantos} hábitos y todo su historial`],
+      ], help:'Se puede deshacer desde el aviso que aparece abajo.'}],
+      values:{que:'marcas'},
+      onSave: v => {
+        snap('reiniciar hábitos');
+        if(v.que === 'todo'){
+          state.habits.list = []; state.habits.logs = {};
+          toast('Hábitos borrados', true);
+        } else {
+          state.habits.list.forEach(h => { state.habits.logs[h.id] = {}; });
+          toast('Marcas borradas · rachas en cero', true);
+        }
+        touch('habits');
+      }});
+  },
   'scroll-day'(el){ const n = document.getElementById('day-'+el.dataset.date); if(n) n.scrollIntoView({block:'center', behavior:'smooth'}); },
   mood(el){ const i = +el.dataset.i; const cur = jday(TODAY).mood;
     setJday(TODAY, {mood: cur === i ? null : i}); render(); },
@@ -3786,6 +3973,11 @@ const ACTIONS = {
   },
   'new-habit'(){ toggleQuickMenu(false); formHabit(null); },
   'edit-habit'(el){ formHabit(state.habits.list.find(h=>h.id===el.dataset.id)); },
+  desarchivar(el){
+    const h = state.habits.list.find(x => x.id === el.dataset.id); if(!h) return;
+    snap('reactivar hábito'); h.archivado = false;
+    touch('habits'); render(); toast(`«${h.name}» vuelve a tus hábitos`, true);
+  },
   'new-task'(el){ toggleQuickMenu(false); formTask(null, el.dataset.date, el.dataset.project); },
   'edit-task'(el){ formTask(state.tasks.list.find(t=>t.id===el.dataset.id)); },
   'add-day-task'(el){
@@ -3835,6 +4027,7 @@ const ACTIONS = {
     touch('tasks'); render(); toast(`${late.length} tarea${late.length===1?'':'s'} movida${late.length===1?'':'s'} a hoy`, true);
   },
   'task-filter'(el){ ui.taskFilter = el.dataset.filter; render(); },
+  'task-mode'(el){ ui.taskMode = el.dataset.mode; render(); },
   'clear-proj-filter'(){ ui.taskProject = null; render(); },
   'new-project'(){ toggleQuickMenu(false); formProject(null); },
   'edit-project'(el){ formProject(state.projects.list.find(p=>p.id===el.dataset.id)); },
