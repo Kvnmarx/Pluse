@@ -1,0 +1,100 @@
+MULTIBOT CHAT — cómo usarlo
+============================
+
+Esta es una app aparte de Pluse, que vive en su propia carpeta dentro
+del mismo repositorio. Es un chat grupal con varios bots de IA con
+personalidad propia, que pueden responder a menciones (@nombre) o
+debatir entre ellos.
+
+Todo corre en el navegador. No hay servidor: tus bots, salas y
+conversaciones se guardan solo en el teléfono o computadora donde la
+uses (localStorage), igual que Pluse.
+
+
+════════════════════════════════════════
+PARTE 1 · ACTIVAR LA PÁGINA (si todavía no lo hiciste con Pluse)
+════════════════════════════════════════
+
+Si ya activaste GitHub Pages para el repositorio "pluse" (Settings →
+Pages → Branch: main), no necesitás hacer nada más: esta carpeta va a
+quedar disponible sola en:
+
+    https://TUUSUARIO.github.io/pluse/multibot-chat/
+
+Si todavía no lo activaste, seguí los mismos pasos que usaste para
+Pluse (Settings → Pages → Branch → main → Save) y esperá 1-2 minutos.
+
+
+════════════════════════════════════════
+PARTE 2 · CONSEGUIR TU API KEY DE ANTHROPIC (Claude)
+════════════════════════════════════════
+
+Los bots necesitan hablar con la IA de Claude para responder. Para eso
+hace falta una clave (API key) personal, gratuita para crear pero con
+costo por uso (se paga solo lo que se usa, es bastante barato para uso
+personal).
+
+1. Entrá a  https://console.anthropic.com
+2. Creá una cuenta o iniciá sesión.
+3. Cargá una tarjeta en "Billing" (podés poner un límite mensual bajo
+   para tranquilidad, ej. USD 5).
+4. Andá a "API Keys" → "Create Key". Ponele un nombre y copiala.
+   ⚠️ Esa clave se muestra una sola vez. Guardala en un lugar seguro.
+
+
+════════════════════════════════════════
+PARTE 3 · CONFIGURAR LA APP
+════════════════════════════════════════
+
+1. Abrí  https://TUUSUARIO.github.io/pluse/multibot-chat/
+2. Tocá el botón "⚙️ Ajustes" abajo a la izquierda.
+3. Pegá tu API key donde dice "API key de Anthropic".
+4. Guardar.
+
+Esa clave queda guardada solo en ese navegador. No se sube a GitHub
+ni a ningún otro lado: viaja únicamente hacia la API de Anthropic
+cuando un bot responde.
+
+⚠️ Importante: como esta app no tiene servidor propio, quien tenga
+acceso a la clave guardada en el navegador podría, en teoría, verla
+inspeccionando el código. Está pensada para uso personal/privado, no
+para compartir el link públicamente con esa clave puesta.
+
+
+════════════════════════════════════════
+PARTE 4 · CREAR TUS BOTS Y SALAS
+════════════════════════════════════════
+
+Ya viene con dos bots de ejemplo (Ada y Leo) y una sala de prueba, para
+que veas cómo funciona.
+
+1. "+ Nuevo bot": ponele nombre, color, foto (opcional), el modelo de
+   Claude que va a usar, y su personalidad en texto libre (cuanto más
+   específica, mejor responde).
+2. "+ Nueva sala": elegí qué bots participan.
+3. Escribí en el chat. Si mencionás a un bot con @ (ej. "@Ada qué
+   pensás de esto"), responde solo ese bot. Si no mencionás a nadie,
+   un "coordinador" elige automáticamente cuál o cuáles bots conviene
+   que respondan, y pueden debatir entre ellos.
+4. El botón "🔁 Continuar" deja que los bots sigan la conversación un
+   turno más, sin que vos escribas nada.
+
+
+════════════════════════════════════════
+PARTE 5 · RESPALDAR TUS DATOS
+════════════════════════════════════════
+
+En Ajustes → Exportar, se descarga un archivo con todos tus bots,
+salas y conversaciones. Con Importar podés restaurarlo en otro
+navegador o dispositivo.
+
+
+════════════════════════════════════════
+QUÉ FALTA (próximas versiones)
+════════════════════════════════════════
+- Fotos de perfil generadas por IA (por ahora: iniciales o foto que
+  subas vos).
+- Búsqueda web, acceso a archivos y ejecución de código como
+  herramientas para los bots.
+- Memoria automática (por ahora la "memoria" de cada bot es un texto
+  que escribís vos a mano, no se actualiza sola).
