@@ -1147,6 +1147,67 @@ const GREET = {
   nexo:'Hola, soy Nexo. Dime qué necesitas y lo reparto en el equipo.',
 };
 
+/* ---------- respuestas con IA (al publicarse en claude.ai) ----------
+   Usa la capacidad "sample": responde Claude en el papel de cada agente,
+   con la cuenta de quien mira la página (pide permiso la primera vez).
+   Si no está disponible, se usan las respuestas simuladas.            */
+let sampler = null, aiState = 'pendiente', aiAsked = false;
+(async () => {
+  try { sampler = window.claude?.use ? await window.claude.use('sample') : null; } catch { sampler = null; }
+  aiState = sampler ? 'on' : 'off';
+  renderChat();
+})();
+
+async function aiReply(ch, text){
+  const responder = ch !== 'equipo' ? ch : (mentioned(text) || 'nexo');
+  const ag = who(responder);
+  const team = AGENTS.map(a => {
+    const rb = robots[a.id];
+    return `- ${a.id} = ${a.name} (${a.role}, sala ${ROOMS[a.home].name}). ${rb.info.mision} Ahora: ${STATE_LABEL[rb.state]}${rb.task ? ' · ' + rb.task : ''}. Su lista: ${rb.info.cola.join('; ') || 'vacía'}.`;
+  }).join('\n');
+  const convo = allMsgs().filter(m => chanOf(m) === ch && m.tipo !== 'sistema').slice(-12)
+    .map(m => `${who(m.de).name}${m.tipo === 'tarea' ? ` (asigna tarea a ${who(m.para).name})` : ''}: ${m.texto}`).join('\n');
+  const prompt = `Eres ${ag.name}, un agente de IA del equipo interno de Madreperla Realtors, una firma boutique de bienes raíces de lujo en República Dominicana (Cap Cana, Bávaro, Cabeza de Toro, Cana Bay, Bayahibe, Miches, Las Terrenas). Tu función: ${robots[responder].info.mision}
+${ch === 'equipo' ? 'Hablas en el canal general del equipo, donde están los seis agentes y la persona que dirige el equipo ("Tú").' : 'Hablas en privado con la persona que dirige el equipo ("Tú").'}
+
+El equipo:
+${team}
+
+Reglas:
+- Responde en español, en 1 a 3 frases, con tono cercano y profesional (es una conversación interna).
+- No inventes cifras, resultados ni datos de clientes. Si no sabes algo, dilo y propone cómo averiguarlo.
+- No decides temas legales, contractuales ni precios finales: eso lo revisa una persona autorizada.
+- Nunca digas que enviaste o publicaste algo hacia clientes; como mucho preparas borradores para revisión.
+- Si te piden una tarea que es tuya, acéptala. Si corresponde mejor a otro agente, asígnasela y dilo.
+
+Conversación reciente:
+${convo}
+
+Responde solo con JSON, así: {"respuesta": "texto", "asignar": null}
+o, si asignas una tarea: {"respuesta": "texto", "asignar": {"para": "pixel", "texto": "tarea corta y concreta"}}
+Valores válidos de "para": ${AGENTS.map(a => a.id).join(', ')}.`;
+
+  const replyTo = ch === 'equipo' ? 'todos' : 'tu';
+  typing[ch] = responder; renderTyping();
+  aiAsked = true; renderChat();
+  let out;
+  try {
+    out = await sampler.json(prompt, { modelTier:'quick', cache:false });
+  } finally {
+    if (typing[ch] === responder) delete typing[ch];
+    renderTyping();
+  }
+  const respuesta = typeof out?.respuesta === 'string' && out.respuesta.trim() ? out.respuesta.trim().slice(0, 600) : null;
+  if (!respuesta) throw { code:'invalid_json' };
+  post({ de:responder, para:replyTo, texto:respuesta });
+  const asg = out.asignar;
+  if (asg && typeof asg === 'object' && AGENTS.some(a => a.id === asg.para) && typeof asg.texto === 'string' && asg.texto.trim()) {
+    const tarea = cap(asg.texto.trim().slice(0, 160));
+    if (asg.para === responder) await assignFlow('tu', responder, tarea, ch === 'equipo');
+    else await assignFlow(responder, asg.para, tarea, true);
+  }
+}
+
 /* ---------- respuestas (modo simulación) ---------- */
 async function assignFlow(from, to, texto, inTeam = true){
   const extra = { tipo:'tarea', estado:'pendiente', canal: inTeam ? 'equipo' : undefined };
@@ -1171,6 +1232,16 @@ async function replyToUser(ch, text){
   if (live) return;                                   // en vivo responden los agentes reales
   const target = mentioned(text);
   const body = clean(text);
+  const special = isMeet(text) && ch === 'equipo' || isStatus(text) && !(ch === 'equipo' && target);
+  if (aiState === 'on' && !special) {
+    try { return await aiReply(ch, text); }
+    catch (e) {
+      if (['not_granted','sampling_disabled','not_declared','capability_disabled','capability_removed'].includes(e?.code)) { aiState = 'off'; renderChat(); }
+      else if (e?.code === 'rate_limited') { post({ de:'sistema', para:'todos', canal:ch, tipo:'sistema', texto:'Demasiadas consultas seguidas. Espera un momento y vuelve a escribir.' }); return; }
+      else if (e?.code === 'session_expired') { post({ de:'sistema', para:'todos', canal:ch, tipo:'sistema', texto:'Tu sesión de Claude expiró. Vuelve a iniciar sesión para que los agentes respondan con IA.' }); return; }
+      // cualquier otro fallo: seguimos con la respuesta simulada
+    }
+  }
   if (ch !== 'equipo') {                              // conversación privada
     const id = ch;
     if (isStatus(text)) return say(id, 'tu', statusLine(id));
@@ -1317,7 +1388,7 @@ function renderChat(){
 
   const isTeam = channel === 'equipo', ag = isTeam ? null : who(channel);
   chHead.innerHTML = `<div class="grow"><h2>${isTeam ? '# Equipo' : ag.name}</h2>
-      <div class="sub">${isTeam ? 'Los seis agentes y tú · menciona con @Nombre' : `${ag.role} · ${STATE_LABEL[robots[ag.id].state]} · ${robots[ag.id].room ? ROOMS[robots[ag.id].room].name : 'Pasillo'}`}</div></div>
+      <div class="sub">${isTeam ? 'Los seis agentes y tú · menciona con @Nombre' : `${ag.role} · ${STATE_LABEL[robots[ag.id].state]} · ${robots[ag.id].room ? ROOMS[robots[ag.id].room].name : 'Pasillo'}`}${live ? '' : aiState === 'on' ? ' · responden con IA' : ' · respuestas simuladas'}</div></div>
     <button class="x" id="chClose" aria-label="Cerrar chat">×</button>`;
 
   const near = chMsgs.scrollHeight - chMsgs.scrollTop - chMsgs.clientHeight < 80;
@@ -1330,8 +1401,9 @@ function renderChat(){
     : [['¿Cómo vas?', '¿Cómo vas?'], ['Asignarle tarea', 'Tarea: '], ['Saludar', 'Hola, ' + ag.name]];
   chQuick.innerHTML = qs.map(([l, v]) => `<button class="qk" type="button" data-v="${esc(v)}">${l}</button>`).join('');
   chInput.placeholder = isTeam ? 'Escribe al equipo… (usa @Nombre para mencionar)' : `Escribe a ${ag.name}…`;
-  chNote.hidden = !live;
-  chNote.textContent = 'En vivo: tus mensajes quedan en esta pantalla. Para que lleguen a tus agentes hay que conectarlos (ver LEEME).';
+  if (live) { chNote.hidden = false; chNote.textContent = 'En vivo: tus mensajes quedan en esta pantalla. Para que lleguen a tus agentes hay que conectarlos (ver LEEME).'; }
+  else if (aiState === 'on' && !aiAsked) { chNote.hidden = false; chNote.textContent = 'Los agentes responden con Claude usando tu cuenta. La primera vez se te pedirá permiso.'; }
+  else chNote.hidden = true;
   renderTyping();
 }
 
