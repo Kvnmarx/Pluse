@@ -1,0 +1,11 @@
+{
+  "actualizado": "2026-09-24T10:30:00-04:00",
+  "agentes": [
+    { "id": "byte",   "estado": "trabajando", "tarea": "Actualizando la web de propiedades" },
+    { "id": "pixel",  "estado": "pensando",   "tarea": "Eligiendo portada para el carrusel de Cap Cana" },
+    { "id": "metric", "estado": "reunion",    "tarea": "Revisión semanal de leads" },
+    { "id": "folio",  "estado": "trabajando", "sala": "archivo", "tarea": "Buscando el brochure de Puerto Marina" },
+    { "id": "arca",   "estado": "inactivo",   "tarea": "" },
+    { "id": "nexo",   "estado": "reunion",    "tarea": "Revisión semanal de leads" }
+  ]
+}
