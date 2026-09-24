@@ -273,6 +273,7 @@
    "estado.json" junto a esta página (ver estado.ejemplo.json).       */
 
 const ESTADO_URL = 'estado.json';
+const BURBUJAS = false;   // burbujas de habla sobre los robots (apagadas mientras desarrollamos)
 const REFRESCO_MS = 15000;
 
 const ROOMS = {
@@ -1925,7 +1926,7 @@ function tick(){
     const saying = rb.say && now < rb.sayUntil;
     const text = saying ? rb.say : rb.task;
     const talk = (saying || (!rb.isMe && (now < rb.talkUntil || selected === rb.a.id))) && text;
-    rb.tag.classList.toggle('talk', !!talk);
+    rb.tag.classList.toggle('talk', BURBUJAS && !!talk);
     if (talk && rb.bubble.textContent !== text) rb.bubble.textContent = text;
   }
 
