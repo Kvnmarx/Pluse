@@ -2085,6 +2085,7 @@ function loadLiveApprovals(list){
     detalle: String(a.detalle || ''), clase: CLASE_LABEL[a.clase] ? a.clase : 'borrador',
     estado: AP_LABEL[a.estado] ? a.estado : 'pendiente', comentario: String(a.comentario || ''),
     t: Date.parse(a.hora) || Date.now(), td: Date.parse(a.decidido) || null,
+    evento: a.evento ? String(a.evento) : undefined,
   }));
   renderApprovals();
 }

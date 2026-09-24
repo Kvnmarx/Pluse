@@ -4,6 +4,8 @@
   "reenviar_tareas": true,
   "max_reenvios_10min": 6,
   "espera_segundos": 600,
+  "calendario": { "ics": [], "dias": 30, "cada_minutos": 10, "etiqueta": null },
+  "eventos_automaticos": ["7d", "2d", "1d", "despues"],
   "bots": {
     "@sylvia":                              { "perfil": "sylvia",                              "clave": "PEGA-AQUI-LA-CLAVE-DE-SYLVIA" },
     "@viktor":                              { "perfil": "viktor",                              "clave": "PEGA-AQUI-LA-CLAVE-DE-VIKTOR" },

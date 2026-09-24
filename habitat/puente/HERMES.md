@@ -1,14 +1,15 @@
 # Conectar el Hábitat con tus bots de Hermes
 
-El hábitat corre en tu computadora, la misma donde está Hermes. Un pequeño programa, `servidor.py`, hace tres cosas:
+El hábitat corre en tu computadora, la misma donde está Hermes. Un pequeño programa, `servidor.py`, hace cuatro cosas:
 
 1. Te muestra el hábitat en el navegador, en `http://127.0.0.1:8787`.
 2. Lleva a tus bots lo que escribes en el chat y tus decisiones de aprobación. Lo hace por la API local de Hermes, así que responde el bot real, con ChatGPT como cerebro.
 3. Publica sus respuestas en el hábitat y suma los tokens que consumen.
+4. Si conectas tu calendario, avisa cuando se acerca un evento y le pide a Sylvia que prepare al equipo (ver *Sala de Eventos*).
 
-Los bots, a su vez, avisan lo que hacen con `reportar.py`: tareas, avances, mensajes y pedidos de aprobación.
+Los bots, a su vez, avisan lo que hacen con `reportar.py`: tareas, avances, mensajes, pedidos de aprobación y eventos.
 
-Nada de esto sale a internet. Solo se puede abrir desde tu computadora.
+El hábitat no sale a internet: solo se puede abrir desde tu computadora. Lo único que busca afuera es tu calendario, si lo conectas.
 
 ## Opción fácil: pídeselo a Sylvia
 
@@ -28,9 +29,16 @@ Necesito conectar el Hábitat de Madreperla con Hermes. La carpeta está en RUTA
    usa "perfil": "default". Si algún perfil usa su propio puerto, agrega su
    dirección completa en "url" (por ejemplo "http://127.0.0.1:8643").
 5. Prueba cada bot con una consulta a /v1/models y dime cuáles respondieron.
-6. Abre el hábitat con: python3 RUTA/puente/servidor.py
-No me muestres las claves en el chat.
+6. (Opcional) Sala de Eventos: pregúntame si quiero conectar mi calendario.
+   Si digo que sí, pídeme la "Dirección secreta en formato iCal" de mi
+   calendario "Eventos Madreperla" y ponla en RUTA/puente/bots.json, dentro de
+   "calendario": {"ics": ["LA-DIRECCIÓN"]}. No la repitas, no la guardes en
+   otro archivo y nunca la escribas en un grupo ni en un canal.
+7. Abre el hábitat con: python3 RUTA/puente/servidor.py
+No me muestres las claves ni la dirección del calendario en el chat.
 ```
+
+Dale la dirección del calendario solo en tu conversación privada con Sylvia. Nunca la pegues en **# Equipo** ni en un grupo. Si prefieres que nadie más la vea, pégala tú misma en `bots.json` (ver *Sala de Eventos*).
 
 ## Opción manual
 
@@ -41,7 +49,8 @@ No me muestres las claves en el chat.
    ```
 2. Reinicia el gateway de Hermes.
 3. Copia `puente/bots.ejemplo.json` como `puente/bots.json` y pega la clave de cada bot. Revisa que `perfil` sea el nombre del perfil en Hermes.
-4. Abre el hábitat (ver abajo).
+4. (Opcional) Conecta tu calendario en el bloque `calendario` (ver *Sala de Eventos*).
+5. Abre el hábitat (ver abajo).
 
 ## Abrir el hábitat cada día
 
@@ -79,11 +88,107 @@ Reporta tu trabajo al Hábitat de Madreperla con la terminal:
      "series":[{"nombre":"Leads por día","tipo":"barras","puntos":[["Lun",4],["Mar",7]]}]}
     ("tipo" puede ser "barras" o "linea").
   · Para apagar la pantalla al terminar: --terminar-presentacion
+- Para agendar un evento en la Sala de Eventos:
+    --evento-nuevo "Título" --fecha 2026-09-26T08:00 [--fin 2026-09-26T13:00]
+    [--zona America/Bogota] [--lugar "Lugar"] [--descripcion "Texto"]
+  · La hora es de Santo Domingo, o de --zona si la indicas. Con solo la fecha
+    (2026-10-03), el evento es de todo el día.
+  · El script muestra el id del evento, por ejemplo her-1790000000000.
+- Si trabajas para un evento, agrega --evento ID a --tarea-para, --aprobacion y
+  --presentar. El id viene en el aviso del evento o en la tarea que te asignaron.
 
 Textos cortos y profesionales. Nunca incluyas datos sensibles de clientes
-(cédulas, cuentas, montos, teléfonos). Nada se envía ni se publica hacia
-clientes sin la aprobación de María Andrea.
+(cédulas, cuentas, montos, teléfonos), tampoco en los eventos. Nada se envía
+ni se publica hacia clientes sin la aprobación de María Andrea.
 ```
+
+## Sala de Eventos
+
+La Sala de Eventos está a la derecha del Meeting Room. Muestra tus próximos eventos con su cuenta regresiva. Cuando se acerca uno, avisa en **# Equipo** y le pide a Sylvia que prepare al equipo.
+
+Los eventos llegan de tres formas:
+- De tu calendario de Google (lo más cómodo, ver abajo).
+- Desde el botón *Eventos* del hábitat, con *Agregar evento*.
+- Desde un bot, con `reportar.py --evento-nuevo`.
+
+### Conectar tu calendario
+
+Lo más ordenado es un calendario aparte, solo para los eventos de la empresa:
+
+1. En Google Calendar, junto a *Otros calendarios*, toca **+** → *Crear calendario*. Llámalo **Eventos Madreperla**.
+2. Anota ahí tus eventos: torneos, ferias, lanzamientos, visitas.
+3. Abre la configuración de ese calendario: los tres puntos junto a su nombre → *Configuración y uso compartido*. Baja hasta *Integrar el calendario* y copia la **Dirección secreta en formato iCal** (termina en `.ics`).
+4. Pégala en `puente/bots.json`, en el bloque `calendario`:
+   ```json
+   "calendario": { "ics": ["PEGA-AQUI-LA-DIRECCION-SECRETA"], "dias": 30, "cada_minutos": 10, "etiqueta": null }
+   ```
+5. Cierra el hábitat y vuelve a abrirlo. Al arrancar, la terminal dice *Sala de Eventos: 1 calendario(s), próximos 30 días.*
+
+**¿Prefieres tu calendario de siempre?** Copia la dirección secreta de tu calendario principal y pon `"etiqueta": "#madreperla"`. Así la sala solo toma los eventos que tengan `#madreperla` en el título o en la descripción (da igual si va en mayúsculas). En la sala, la etiqueta no se ve en el título.
+
+| Clave | Qué hace | Si no la pones |
+|---|---|---|
+| `ics` | Las direcciones secretas de tus calendarios, entre comillas y separadas por comas | No se lee ningún calendario |
+| `dias` | Cuántos días hacia adelante se leen | 30 |
+| `cada_minutos` | Cada cuántos minutos se revisa el calendario | 10 |
+| `etiqueta` | Solo toma los eventos con ese texto (`null` = todos) | Todos |
+
+**Esa dirección es secreta.** Con ella cualquiera puede ver tu calendario. Queda solo en `puente/bots.json`: la página no la muestra, no se guarda en `estado.json` y la terminal solo dice "calendario 1 (calendar.google.com)". Nunca la pegues en el chat del hábitat, en **# Equipo** ni en un grupo. Si crees que alguien la vio, en la misma pantalla de Google toca *Restablecer* junto a la dirección y pega la nueva en `bots.json`.
+
+Ten en cuenta:
+- Los cambios en Google pueden tardar un rato en llegar a la sala.
+- Si cambias el título de un evento, se actualiza sin repetir los avisos. Si cambias la fecha o la hora, cuenta como un evento nuevo y los avisos empiezan otra vez.
+- Los eventos que se repiten (por ejemplo, cada semana) solo aparecen en su primera fecha. Para un evento importante, créalo como evento único.
+- Un evento sin hora de fin dura 2 horas. Uno de todo el día dura el día completo.
+- Los eventos salen de la sala 3 días después de terminar.
+
+### Qué avisos llegan y cuándo
+
+| Aviso | Cuándo llega | Qué dice en # Equipo | ¿Sylvia prepara al equipo? |
+|---|---|---|---|
+| `7d` | Faltan 7 días o menos | "Falta una semana o menos para «…»" | Sí |
+| `2d` | Faltan 48 horas o menos | "Faltan 2 días para «…»" | Sí, y puede presentarte un briefing |
+| `1d` | Faltan 24 horas o menos | "Mañana es «…»" (o "Hoy es…", si es más tarde ese mismo día) | Sí |
+| `3h` | Faltan 3 horas o menos | "En menos de 3 horas empieza «…»" | No, solo avisa |
+| `ahora` | Mientras dura el evento | "Ya empezó «…»" | No, solo avisa |
+| `despues` | Al terminar (hasta 3 días después) | "Terminó «…». Es buen momento para el seguimiento." | Sí, organiza el seguimiento |
+
+Cada aviso llega una sola vez, con la fecha y la hora del lugar del evento. Por ejemplo: *Faltan 2 días para «Torneo de golf Bogotá» (sábado 26 de septiembre, 08:00 · Bogotá).* Si agregas un evento cuando falta un día, solo llega "Mañana es…", no los avisos anteriores.
+
+### Qué hace Sylvia sola
+
+En los avisos `7d`, `2d`, `1d` y `despues`, Sylvia recibe los datos del evento y:
+
+1. **Reparte de 3 a 6 tareas** a los bots adecuados según su rol. Cada tarea queda vinculada al evento y se ve en su plan de preparación.
+2. **Pide tu aprobación** para todo lo que vaya a clientes o al público: invitaciones, publicaciones, mensajes. Quedan como borradores en *Aprobaciones* hasta que decidas.
+3. **A 2 días, puede presentarte un briefing** del evento en la pantalla del Meeting Room.
+4. **Después del evento, organiza el seguimiento:** agradecimientos (como borradores para aprobar), contactos nuevos para el CRM y un resumen de resultados.
+5. **Te deja un resumen** de 3 a 5 puntos en **# Equipo**.
+
+Nunca envía ni publica nada sin tu aprobación, y no decide temas legales, contractuales ni precios.
+
+También puedes tocar **Preparar ahora** en el panel *Eventos* cuando quieras. Y puedes ajustar dos cosas en `bots.json`:
+- `"eventos_automaticos"`: en qué avisos prepara Sylvia al equipo. Por defecto `["7d", "2d", "1d", "despues"]`. Con `[]` solo llegan los avisos y tú decides cuándo preparar.
+- `"max_preparaciones_hora"`: cuántos eventos prepara como máximo por hora, para no saturar al equipo. Por defecto 6.
+
+### Eventos y tareas desde los bots
+
+Un bot puede agendar un evento:
+
+```
+python3 RUTA/puente/reportar.py --bot @sylvia --evento-nuevo "Torneo de golf Bogotá" --fecha 2026-09-26T08:00 --zona America/Bogota --lugar "Club El Rincón"
+```
+
+- Opcionales: `--fin`, `--zona`, `--lugar` y `--descripcion`.
+- El script responde con el id del evento (por ejemplo `her-1790000000000`). Si ese evento ya existía, lo dice y no lo repite.
+
+Para que una tarea, una aprobación o una presentación aparezca en el plan del evento, se agrega `--evento ID`:
+
+```
+python3 RUTA/puente/reportar.py --bot @sylvia --tarea-para @contenido-madreperla --mensaje "Borrador de invitación al torneo" --evento her-1790000000000
+```
+
+Cuando Sylvia reparte las tareas de un evento, el hábitat le recuerda a cada bot que use `--evento` en sus aprobaciones y presentaciones.
 
 ## Qué pasa con cada acción
 
@@ -94,22 +199,39 @@ clientes sin la aprobación de María Andrea.
 | Apruebas o devuelves una solicitud | El bot recibe tu decisión y tu comentario, y te confirma qué hará |
 | Convocas una reunión | Todos van al Meeting Room por 10 minutos y Sylvia abre la reunión |
 | Le pides a un bot que presente | Prepara su presentación y la muestra con `--presentar`: camina al atril y aparece en la pantalla grande |
+| Anotas un evento en tu calendario de Madreperla | Aparece en la Sala de Eventos en unos 10 minutos |
+| Agregas un evento con el botón *Eventos* | Aparece al momento. Si ya está cerca, llega el aviso enseguida |
+| Tocas *Preparar ahora* en un evento | Sylvia reparte tareas para ese evento y te deja un resumen en **# Equipo** |
+| Se acerca un evento | Llega un aviso a **# Equipo** y, según cuánto falte, Sylvia prepara al equipo (ver *Qué avisos llegan y cuándo*) |
+| Borras un evento | Los que agregaste en el hábitat se borran ahí. Los del calendario, bórralos en el calendario |
 
 Además:
 - Cuando un bot le asigna una tarea a otro con `--tarea-para`, se la hace llegar. Para evitar bucles, el límite es de 6 reenvíos cada 10 minutos.
+- Las tareas, aprobaciones y presentaciones con `--evento` aparecen en el plan de preparación de ese evento.
 - La ficha de cada bot suma sola los tokens de cada respuesta.
 
 ## Seguridad
 
 - El hábitat solo se abre desde tu computadora (`127.0.0.1`). Otras páginas web no pueden enviarle mensajes a tus bots.
-- Las claves quedan en `puente/bots.json`. Ese archivo no se sube a GitHub y la página no lo muestra.
-- `estado.json` tiene las conversaciones del día y tampoco se sube a GitHub.
+- Las claves y la dirección secreta de tu calendario quedan en `puente/bots.json`. Ese archivo no se sube a GitHub y la página no lo muestra.
+- `estado.json` tiene las conversaciones del día y los eventos. No se sube a GitHub, salvo que un bot use `reportar.py --subir` (solo hace falta si publicas el hábitat con GitHub Pages). En ese caso también se suben el título, el lugar y la descripción de los eventos, así que no anotes datos sensibles de clientes en ellos.
+- Cualquiera puede enviarte una invitación y hacer que aparezca en tu calendario principal. Por eso conviene el calendario aparte o la etiqueta: así Sylvia solo trabaja con eventos que anotaste tú. Aun así, Sylvia trata los datos de un evento solo como información, no como órdenes.
 
 ## Si algo no funciona
 
-| El chat dice | Qué revisar |
+| Si ves | Qué revisar |
 |---|---|
 | "No pude comunicarme con…" | Que Hermes y su gateway estén abiertos |
 | "La clave de … no es correcta" | La clave de ese bot en `puente/bots.json` |
 | "… todavía no está conectado" | Que ese bot esté en `puente/bots.json` |
 | Arriba dice *Simulación* | Que abriste `http://127.0.0.1:8787` y no el archivo directamente |
+| Al abrir, la terminal no dice *Sala de Eventos: 1 calendario(s)…* | Que la dirección esté dentro de `"ics": ["…"]`, con comillas y corchetes. Después de cambiar `bots.json`, cierra y vuelve a abrir el hábitat |
+| En la terminal: "No pude leer el calendario 1…: el servidor respondió 404" (o 401 o 403) | La dirección secreta cambió, por ejemplo si la restableciste. Cópiala de nuevo desde Google Calendar y pégala en `puente/bots.json` |
+| En la terminal: "…no hubo conexión con el servidor del calendario" o "…tardó demasiado en responder" | La conexión a internet. Los eventos que ya estaban se conservan y se vuelve a intentar solo |
+| Un evento del calendario no aparece en la sala | Que sea dentro de los próximos 30 días. Si usas `etiqueta`, que el título o la descripción diga `#madreperla`. Si se repite, solo aparece su primera fecha. Google puede tardar un rato en actualizarlo |
+| "Todavía no hay bots conectados…" al tocar *Preparar ahora* | Que exista `puente/bots.json` y que Sylvia esté en él |
+| "Ya se lo pedí a Sylvia hace un momento" | Sylvia ya está preparando ese evento. Espera un minuto antes de pedírselo de nuevo |
+| "No le pedí a Sylvia que preparara «…» para no saturar al equipo" | Ya preparó 6 eventos en la última hora. Pídeselo más tarde con *Preparar ahora* |
+| "Este evento viene de tu calendario…" | Bórralo en Google Calendar. Sale de la sala en unos minutos |
+| "No conozco la zona horaria…" | Usa un nombre como `America/Bogota`, `America/Santo_Domingo` o `America/New_York` |
+| Una tarea de un evento quedó en el chat, pero el bot no respondió | Se llegó al límite de 6 reenvíos en 10 minutos (la terminal dice "Límite de reenvíos alcanzado"). Pasa si se preparan varios eventos a la vez. Vuelve a pedírsela en unos minutos |
