@@ -1,2 +1,6 @@
 habitat/estado.json.lock
 habitat/estado.json.tmp
+# claves de los bots y datos del día a día del hábitat: nunca se suben
+habitat/puente/bots.json
+habitat/estado.json
+habitat/puente/__pycache__/

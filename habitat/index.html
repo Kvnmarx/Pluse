@@ -118,7 +118,43 @@
   .tag .name{pointer-events:auto;cursor:pointer}
 
   /* Chat del equipo */
-  .chatbtn{all:unset;pointer-events:auto;cursor:pointer;margin-top:6px;display:inline-flex;align-items:center;gap:8px;justify-self:start;font:600 12px/1 var(--display);letter-spacing:.02em;padding:9px 12px;border-radius:10px;background:var(--champagne);color:#0B252A}
+  .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+  .clockrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font:11.5px/1.2 var(--mono);color:var(--muted)}
+  .clock{font-variant-numeric:tabular-nums}
+  .horasel{pointer-events:auto;background:rgba(239,233,221,.06);color:var(--ivory);border:1px solid var(--line);border-radius:8px;font:11.5px var(--mono);padding:3px 6px}
+  .horasel:focus-visible{outline:2px solid var(--champagne)}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .aprbtn{all:unset;pointer-events:auto;cursor:pointer;display:inline-flex;align-items:center;gap:8px;font:600 12px/1 var(--display);letter-spacing:.02em;padding:8px 12px;border-radius:10px;border:1px solid var(--champagne);color:var(--champagne)}
+  .aprbtn:hover{background:rgba(205,187,147,.1)} .aprbtn:focus-visible{outline:2px solid var(--ivory);outline-offset:2px}
+  .aprbtn .badge{background:var(--champagne);color:#0B252A}
+  .apr{--c:var(--champagne)}
+  .apr-tabs{display:flex;gap:6px;flex-wrap:wrap}
+  .apr-tab{all:unset;cursor:pointer;font:500 12px/1 var(--mono);padding:7px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+  .apr-tab.on{border-color:var(--champagne);color:var(--ivory)} .apr-tab:focus-visible{outline:2px solid var(--champagne)}
+  .apr-list{display:grid;gap:10px}
+  .apr-item{border:1px solid var(--line);border-left:3px solid var(--c);border-radius:12px;padding:12px;display:grid;gap:8px;background:rgba(239,233,221,.02)}
+  .apr-top{display:flex;justify-content:space-between;gap:8px;align-items:center}
+  .apr-who{font:600 12.5px/1.3 var(--body)} .apr-who small{font:11px var(--mono);color:var(--muted);font-weight:400;margin-left:6px}
+  .apr-title{font:500 14.5px/1.35 var(--body);text-wrap:balance}
+  .apr-body{font-size:13px;line-height:1.5;color:var(--ivory);opacity:.88;white-space:pre-wrap;overflow-wrap:anywhere;max-height:7.6em;overflow:hidden}
+  .apr-body.open{max-height:none}
+  .apr-more{all:unset;cursor:pointer;justify-self:start;font:11.5px var(--mono);color:var(--champagne)} .apr-more:focus-visible{outline:2px solid var(--champagne)}
+  .apr-item textarea{width:100%;box-sizing:border-box;min-height:54px;resize:vertical;background:rgba(239,233,221,.06);border:1px solid var(--line);border-radius:8px;color:var(--ivory);font:13px/1.4 var(--body);padding:8px 10px}
+  .apr-item textarea:focus{outline:none;border-color:var(--champagne)}
+  .apr-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .apr-ok{all:unset;cursor:pointer;padding:8px 14px;border-radius:9px;background:var(--champagne);color:#0B252A;font:600 12.5px/1 var(--display)}
+  .apr-ok.confirm{background:var(--ok)}
+  .apr-back{all:unset;cursor:pointer;padding:8px 14px;border-radius:9px;border:1px solid var(--line);color:var(--ivory);font:500 12.5px/1 var(--body)}
+  .apr-ok:focus-visible,.apr-back:focus-visible{outline:2px solid var(--ivory);outline-offset:2px}
+  .apr-ok[disabled],.apr-back[disabled]{opacity:.45;cursor:not-allowed}
+  .apr-err{font:11.5px/1.4 var(--mono);color:var(--bad)}
+  .apr-note{font:11.5px/1.45 var(--mono);color:var(--muted)}
+  .apr-dec{font-size:12.5px;line-height:1.45;color:var(--muted)} .apr-dec b{color:var(--ivory);font-weight:500}
+  .apr-empty{font:13px/1.5 var(--body);color:var(--muted);text-align:center;padding:22px 8px}
+  .st-pendiente{color:var(--champagne)} .st-aprobada{color:var(--ok)} .st-devuelta{color:var(--warn)}
+  .tag .name .flag{display:none}
+  .tag.wait .name .flag{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--champagne);box-shadow:0 0 8px var(--champagne)}
+  .chatbtn{all:unset;pointer-events:auto;cursor:pointer;display:inline-flex;align-items:center;gap:8px;justify-self:start;font:600 12px/1 var(--display);letter-spacing:.02em;padding:9px 12px;border-radius:10px;background:var(--champagne);color:#0B252A}
   .chatbtn:hover{filter:brightness(1.08)} .chatbtn:focus-visible{outline:2px solid var(--ivory);outline-offset:2px}
   .badge{min-width:18px;height:18px;padding:0 5px;box-sizing:border-box;border-radius:999px;background:#0B252A;color:var(--ivory);font:600 10.5px/18px var(--mono);text-align:center}
   .chat{pointer-events:auto;top:calc(env(safe-area-inset-top,0px) + 16px);left:16px;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);width:min(720px, calc(100% - 380px));display:grid;grid-template-columns:210px 1fr;background:var(--panel-solid);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.5);z-index:4}
@@ -215,7 +251,21 @@
       <span class="mode" id="mode"><i></i><span id="modeText">Simulación</span></span>
       <span id="updated">—</span>
     </div>
-    <button class="chatbtn" id="chatBtn" aria-controls="chat">Chat del equipo <span class="badge" id="chatBadge" hidden>0</span></button>
+    <div class="clockrow">
+      <span class="clock" id="reloj">Santo Domingo</span>
+      <label for="horaSel" class="sr">Hora del laboratorio</label>
+      <select id="horaSel" class="horasel">
+        <option value="auto">Hora real</option>
+        <option value="manana">Mañana</option>
+        <option value="mediodia">Mediodía</option>
+        <option value="atardecer">Atardecer</option>
+        <option value="noche">Noche</option>
+      </select>
+    </div>
+    <div class="acts">
+      <button class="chatbtn" id="chatBtn" aria-controls="chat">Chat del equipo <span class="badge" id="chatBadge" hidden>0</span></button>
+      <button class="aprbtn" id="aprBtn" aria-controls="aprPanel">Aprobaciones <span class="badge" id="aprBadge" hidden>0</span></button>
+    </div>
   </div>
   <div class="hint">Arrastra para girar · pellizca o rueda para acercar · toca un robot o su nombre para ver su ficha</div>
 </div>
@@ -227,6 +277,7 @@
   <button class="av-btn" id="avFollow" type="button" aria-pressed="false">Seguirme</button>
   <button class="av-btn av-talk" id="avTalk" type="button" hidden>Hablar</button>
   <button class="av-btn" id="avMeet" type="button" hidden>Convocar reunión</button>
+  <button class="av-btn" id="avApr" type="button" hidden>Ver aprobaciones</button>
   <span class="av-hint">Toca el piso para caminar</span>
 </div>
 
@@ -247,6 +298,7 @@
 </section>
 
 <aside class="ui detail" id="detail" hidden aria-label="Ficha del agente"></aside>
+<aside class="ui detail apr" id="aprPanel" hidden aria-label="Aprobaciones"></aside>
 
 <div class="ui feed" aria-live="polite">
   <span class="eyebrow">Actividad reciente</span>
@@ -356,7 +408,9 @@ if (THREE.RoomEnvironment) {
   const pmrem = new THREE.PMREMGenerator(renderer);
   scene.environment = pmrem.fromScene(new THREE.RoomEnvironment(), 0.04).texture;
 }
-scene.add(new THREE.HemisphereLight('#bfe8e4', '#0a1d20', 0.16));
+const hemi = new THREE.HemisphereLight('#bfe8e4', '#0a1d20', 0.16);
+scene.add(hemi);
+const ROOM_LIGHTS = [], NIGHT_GLOWS = [];      // se ajustan con la hora del día
 const rim = new THREE.DirectionalLight('#7fd3d6', 0.35);      // contraluz frío
 rim.position.set(20, 14, -26); scene.add(rim);
 const sun = new THREE.DirectionalLight('#ffe9c9', 0.95);
@@ -453,6 +507,7 @@ function roomAt(p){
 }
 
 /* ───────── Salas ───────── */
+var APR_SCREEN = null;                           // pantalla del tablero de aprobaciones
 const W = 15, D = 11, WALL_H = 2.1, DOOR = 2.6;
 const updaters = [];   // animaciones de mobiliario
 
@@ -506,6 +561,7 @@ function buildRoom(key){
   // luz de la sala
   const pl = new THREE.PointLight(r.color, s === 0 ? 1.2 : 0.7, s === 0 ? 24 : 14, 2);
   pl.position.set(r.x, 3.4, r.z); g.add(pl);
+  pl.userData.base = pl.intensity; ROOM_LIGHTS.push(pl);
 
   r.center = new THREE.Vector3(r.x, 0, r.z);
   r.labelPos = new THREE.Vector3(r.x, WALL_H + 0.9, r.z - Dr/2);   // borde más lejano a la cámara
@@ -729,13 +785,21 @@ const FURNITURE = {
     });
     // franja de luz en el techo, a lo largo de la mesa
     const bar = box(L, 0.06, 0.25, glow('#FFE9C9', 1.3), c.x, 3.4, c.z, g); bar.castShadow = false;
-    // pantallas en las paredes laterales
+    bar.material.userData.base = 1.3; NIGHT_GLOWS.push(bar.material);
+    // pantallas en las paredes laterales: al oeste, el tablero de aprobaciones
     [-1, 1].forEach(sd => {
       const sp = new THREE.Vector3(c.x + sd*(r.w/2 - 0.12), 1.6, c.z);
-      const fr = box(0.1, 2, 5, M.dark, sp.x, sp.y, sp.z, g);
-      const tex = codeTex(r.color);
-      screen(tex, 4.8, 1.8, new THREE.Vector3(sp.x - sd*0.06, sp.y, sp.z), -sd*Math.PI/2, g);
-      updaters.push(dt => { tex.offset.y -= dt*.015; });
+      box(0.1, 2, 5, M.dark, sp.x, sp.y, sp.z, g);
+      if (sd < 0) {
+        const cv = document.createElement('canvas'); cv.width = 640; cv.height = 240;
+        const tex = new THREE.CanvasTexture(cv); tex.encoding = THREE.sRGBEncoding;
+        const mesh = screen(tex, 4.8, 1.8, new THREE.Vector3(sp.x - sd*0.06, sp.y, sp.z), -sd*Math.PI/2, g);
+        APR_SCREEN = { cv, tex, mesh };
+      } else {
+        const tex = codeTex(r.color);
+        screen(tex, 4.8, 1.8, new THREE.Vector3(sp.x - sd*0.06, sp.y, sp.z), -sd*Math.PI/2, g);
+        updaters.push(dt => { tex.offset.y -= dt*.015; });
+      }
     });
     // plantas en las esquinas
     [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([sx, sz]) => {
@@ -789,12 +853,14 @@ const FURNITURE = {
 Object.keys(ROOMS).forEach(buildRoom);
 
 /* partículas flotando en el aire del laboratorio */
+var DUST = null;
 {
   const N = 700, pos = new Float32Array(N*3), spd = new Float32Array(N);
   for (let i = 0; i < N; i++) { pos[i*3] = (Math.random()-.5)*56; pos[i*3+1] = Math.random()*9; pos[i*3+2] = (Math.random()-.5)*42; spd[i] = .08 + Math.random()*.25; }
   const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
   const dust = new THREE.Points(geo, new THREE.PointsMaterial({ map:GLOW_TEX_EARLY(), color:'#E9DDBF', size:.22, transparent:true, opacity:.55, depthWrite:false, blending:THREE.AdditiveBlending }));
   scene.add(dust);
+  DUST = dust;
   updaters.push((dt, t) => {
     for (let i = 0; i < N; i++) {
       pos[i*3+1] += spd[i]*dt; pos[i*3] += Math.sin(t*.3 + i)*dt*.05;
@@ -896,7 +962,7 @@ function buildRobot(a, idx){
 
   const tag = document.createElement('div');
   tag.className = 'tag'; tag.dataset.id = a.id; tag.style.setProperty('--c', a.color);
-  tag.innerHTML = `<div class="bubble"></div><div class="name">${a.name}<i></i></div>`;
+  tag.innerHTML = `<div class="bubble"></div><div class="name">${a.name}<i></i><span class="flag" title="Espera tu aprobación"></span></div>`;
   labelsEl.appendChild(tag);
 
   const PF = PROFILE[a.id] || { modelo:'', herramientas:[], mision:'' };
@@ -1053,7 +1119,8 @@ let selected = null;
 function renderRoster(){
   rosterEl.innerHTML = AGENTS.map(a => {
     const rb = robots[a.id];
-    const where = rb.room ? ROOMS[rb.room].name : 'Pasillo';
+    const waiting = typeof approvals !== 'undefined' && approvals.some(x => x.de === a.id && x.estado === 'pendiente');
+    const where = (rb.room ? ROOMS[rb.room].name : 'Pasillo') + (waiting ? ' · espera tu aprobación' : '');
     return `<button class="card${selected === a.id ? ' sel' : ''}" role="listitem" data-id="${a.id}" style="--c:${a.color}">
       <span class="dot"></span>
       <span><b>${a.name}</b><span class="role">${a.role}</span></span>
@@ -1068,10 +1135,11 @@ rosterEl.addEventListener('click', e => {
   select(selected === c.dataset.id ? null : c.dataset.id);
 });
 function select(id){
+  if (id && aprOpen) closeApprovals();
   selected = id; renderRoster();
   if (id) robots[id].talkUntil = performance.now() + 8000;
   detailEl.hidden = !id;
-  rosterEl.hidden = !!id;
+  rosterEl.hidden = !!id || aprOpen;
   if (id) { renderDetail(); detailEl.scrollTop = 0; }
 }
 
@@ -1218,6 +1286,24 @@ labelsEl.addEventListener('click', e => {
 const modeEl = document.getElementById('mode'), modeText = document.getElementById('modeText'), updatedEl = document.getElementById('updated');
 let live = false, simTimer = null;
 
+/* servidor local (puente/servidor.py): conecta el chat y las aprobaciones con Hermes */
+let server = null;
+async function detectServer(){
+  try {
+    const r = await fetch('api/salud', { cache:'no-store' });
+    if (!r.ok) return;
+    const j = await r.json();
+    if (j && j.ok && j.token) server = j;
+  } catch {}
+}
+async function api(path, body){
+  const r = await fetch(path, { method:'POST', headers:{ 'Content-Type':'application/json', 'X-Habitat-Token': server.token }, body: JSON.stringify(body) });
+  let j = {};
+  try { j = await r.json(); } catch {}
+  if (!r.ok) throw new Error(j.error || 'El servidor del hábitat no respondió.');
+  return j;
+}
+
 async function poll(){
   try {
     const res = await fetch(`${ESTADO_URL}?t=${Date.now()}`, { cache:'no-store' });
@@ -1226,12 +1312,18 @@ async function poll(){
     if (!Array.isArray(data.agentes)) throw new Error('formato');
     const first = !live;
     live = true; stopSim();
-    modeEl.className = 'mode live'; modeText.textContent = 'En vivo';
+    modeEl.className = 'mode live'; modeText.textContent = server ? 'Conectado a Hermes' : 'En vivo';
     data.agentes.forEach(ag => applyState(ag, false));
     if (Array.isArray(data.mensajes)) loadLiveMessages(data.mensajes);
+    if (Array.isArray(data.aprobaciones)) loadLiveApprovals(data.aprobaciones);
+    if (Array.isArray(data.escribiendo)) {
+      for (const k in typing) delete typing[k];
+      data.escribiendo.forEach(e => { const id = resolveId(e.bot); typing[e.canal === 'equipo' ? 'equipo' : resolveId(e.canal)] = id; });
+      renderTyping();
+    }
     const when = data.actualizado ? new Date(data.actualizado) : new Date();
     updatedEl.textContent = 'Actualizado ' + when.toLocaleString('es-DO', { hour:'2-digit', minute:'2-digit', day:'2-digit', month:'short', hour12:false });
-    if (first) setInterval(poll, REFRESCO_MS);
+    if (first) setInterval(poll, server ? 3000 : REFRESCO_MS);
   } catch (err) {
     if (live) { modeEl.className = 'mode lost'; modeText.textContent = 'Sin conexión'; }
     else startSim();
@@ -1313,6 +1405,7 @@ function startSim(){
   seedSim();
   simTimer = setInterval(simStep, 3500);
   startChatter();
+  startSimApprovals();
 }
 function stopSim(){ if (simTimer) { clearInterval(simTimer); simTimer = null; } }
 
@@ -1612,6 +1705,8 @@ async function helpFlow(a){
   if (live) return;
   await wait(1200);
   await say(a.id, 'todos', 'Necesito una aprobación antes de continuar. ¿Alguien puede revisar el borrador conmigo?', { tipo:'ayuda' });
+  simAddApproval({ de:a.id, clase:'consulta', titulo:`Aprobación para continuar: ${robots[a.id].info.cola[0] || 'tarea en curso'}`,
+    detalle:`${a.name} necesita tu visto bueno antes de seguir. Puedes aprobar o devolver con un comentario.` });
   const helper = a.id === 'sylvia' ? 'marcelo' : 'sylvia';
   await say(helper, 'todos', `Voy para allá, ${a.name}. Si hace falta, se lo escalo a María Andrea.`);
   applyState({ id:helper, estado:'trabajando', sala:a.home, tarea:`Ayudando a ${a.name}` });
@@ -1639,11 +1734,16 @@ function loadLiveMessages(list){
     tipo: ['mensaje','tarea','ayuda','sistema'].includes(m.tipo) ? m.tipo : 'mensaje',
     estado: TK_LABEL[m.estado] ? m.estado : (m.tipo === 'tarea' ? 'pendiente' : undefined),
     t: m.hora && !isNaN(Date.parse(m.hora)) ? Date.parse(m.hora) : Date.now(),
+    canal: m.canal ? (m.canal === 'equipo' ? 'equipo' : resolveId(m.canal)) : undefined,
   })).filter(m => m.texto);
+  const sig = next.map(m => m.id + (m.estado || '')).join('|');
+  if (sig === liveSig) return;
+  liveSig = sig;
   next.forEach(m => { if (!seenLive.has(m.id)) { seenLive.add(m.id); if (liveMsgs.length) notify(m); } });
   liveMsgs = next;
   renderChat();
 }
+let liveSig = '';
 
 /* ---------- interfaz ---------- */
 function initials(n){ return n === 'Tú' ? 'TÚ' : n.slice(0, 1); }
@@ -1677,7 +1777,8 @@ function renderChat(){
     : [['¿Cómo vas?', '¿Cómo vas?'], ['Asignarle tarea', 'Tarea: '], ['Saludar', 'Hola, ' + ag.name]];
   chQuick.innerHTML = qs.map(([l, v]) => `<button class="qk" type="button" data-v="${esc(v)}">${l}</button>`).join('');
   chInput.placeholder = isTeam ? 'Escribe al equipo… (usa @Nombre para mencionar)' : `Escribe a ${ag.name}…`;
-  if (live) { chNote.hidden = false; chNote.textContent = 'En vivo: tus mensajes quedan en esta pantalla. Para que lleguen a tus agentes hay que conectarlos (ver LEEME).'; }
+  if (live && server) { chNote.hidden = false; chNote.textContent = 'Conectado a Hermes: tus mensajes llegan a los bots de tu computadora.'; }
+  else if (live) { chNote.hidden = false; chNote.textContent = 'Solo lectura: para escribirles, abre el hábitat con el servidor local (ver puente/HERMES.md).'; }
   else if (aiState === 'on' && !aiAsked) { chNote.hidden = false; chNote.textContent = 'Los agentes responden con Claude usando tu cuenta. La primera vez se te pedirá permiso.'; }
   else chNote.hidden = true;
   renderTyping();
@@ -1732,14 +1833,223 @@ chQuick.addEventListener('click', e => {
   chInput.value = b.dataset.v; chInput.focus();
   if (!/[:\s]$/.test(b.dataset.v)) chForm.requestSubmit();
 });
-chForm.addEventListener('submit', e => {
+async function sendMeeting(tema){
+  avatarToSeat();
+  try { await api('api/reunion', { tema }); poll(); }
+  catch (err) { post({ de:'sistema', para:'tu', canal:'equipo', tipo:'sistema', texto: err.message }); }
+}
+chForm.addEventListener('submit', async e => {
   e.preventDefault();
   const text = chInput.value.trim(); if (!text) return;
   chInput.value = '';
   const ch = channel;
+  if (live && server) {
+    if (ch === 'equipo' && isMeet(text)) return sendMeeting(text.replace(/^reuni[oó]n\s*:?\s*/i, '') || 'Reunión convocada por María Andrea');
+    try { await api('api/mensaje', { para: ch === 'equipo' ? 'todos' : who(ch).hermes, texto: text }); poll(); }
+    catch (err) { post({ de:'sistema', para:'tu', canal: ch, tipo:'sistema', texto: err.message }); chInput.value = text; }
+    return;
+  }
+  if (live) { post({ de:'sistema', para:'tu', canal: ch, tipo:'sistema', texto:'En esta versión el chat es de solo lectura. Abre el hábitat con el servidor local para escribirles.' }); return; }
   post({ de:'tu', para: ch === 'equipo' ? 'todos' : ch, texto:text });
   replyToUser(ch, text);
 });
+
+/* ───────── Aprobaciones ─────────
+   Los bots piden tu visto bueno (reportar.py --aprobacion). Tú apruebas o
+   devuelves con un comentario, y la decisión les llega por el servidor.     */
+const CLASE_LABEL = { borrador:'Borrador', propuesta:'Propuesta', consulta:'Consulta' };
+const AP_LABEL = { pendiente:'Pendiente', aprobada:'Aprobada', devuelta:'Devuelta' };
+var approvals = [];
+let aprOpen = false, aprTab = 'pendientes', aprSig = '';
+const aprUI = {};                                // borradores de comentario y confirmaciones
+const aprPanel = document.getElementById('aprPanel'), aprBtn = document.getElementById('aprBtn'),
+      aprBadge = document.getElementById('aprBadge'), avApr = document.getElementById('avApr');
+
+const pendingApprovals = () => approvals.filter(a => a.estado === 'pendiente');
+
+function loadLiveApprovals(list){
+  approvals = list.slice(-60).map(a => ({
+    id: 'v' + a.id, srcId: a.id, de: resolveId(a.de), titulo: String(a.titulo || 'Sin título'),
+    detalle: String(a.detalle || ''), clase: CLASE_LABEL[a.clase] ? a.clase : 'borrador',
+    estado: AP_LABEL[a.estado] ? a.estado : 'pendiente', comentario: String(a.comentario || ''),
+    t: Date.parse(a.hora) || Date.now(), td: Date.parse(a.decidido) || null,
+  }));
+  renderApprovals();
+}
+
+function drawAprScreen(){
+  if (!APR_SCREEN) return;
+  const { cv, tex } = APR_SCREEN, x = cv.getContext('2d'), w = cv.width, h = cv.height;
+  const pend = pendingApprovals();
+  x.fillStyle = '#071A1E'; x.fillRect(0, 0, w, h);
+  x.fillStyle = '#CDBB93'; x.font = '600 22px sans-serif'; x.fillText('APROBACIONES', 28, 44);
+  x.fillStyle = '#EFE9DD'; x.font = '700 74px sans-serif'; x.fillText(String(pend.length), 28, 130);
+  x.fillStyle = '#8FA7A5'; x.font = '18px sans-serif'; x.fillText(pend.length === 1 ? 'pendiente' : 'pendientes', 28, 160);
+  pend.slice(0, 4).forEach((a, i) => {
+    const y = 70 + i*40;
+    x.fillStyle = robots[a.de]?.a.color || '#CDBB93'; x.beginPath(); x.arc(176, y - 7, 8, 0, Math.PI*2); x.fill();
+    x.fillStyle = '#EFE9DD'; x.font = '19px sans-serif';
+    const t = a.titulo.length > 38 ? a.titulo.slice(0, 37) + '…' : a.titulo;
+    x.fillText(t, 194, y);
+  });
+  if (!pend.length) { x.fillStyle = '#8FA7A5'; x.font = '19px sans-serif'; x.fillText('Todo al día', 176, 110); }
+  tex.needsUpdate = true;
+}
+
+function renderApprovals(force){
+  const pend = pendingApprovals();
+  aprBadge.hidden = !pend.length; aprBadge.textContent = pend.length;
+  avApr.textContent = pend.length ? `Ver aprobaciones (${pend.length})` : 'Ver aprobaciones';
+  for (const rb of Object.values(robots)) rb.tag.classList.toggle('wait', pend.some(a => a.de === rb.a.id));
+  const sig = approvals.map(a => a.id + a.estado).join('|');
+  if (sig !== aprSig) { aprSig = sig; drawAprScreen(); renderRoster(); }
+  else if (!force) return;
+  if (!aprOpen) return;
+
+  const focusId = document.activeElement?.dataset?.apr;
+  const list = aprTab === 'pendientes' ? pend : approvals.filter(a => a.estado !== 'pendiente').sort((a, b) => (b.td || b.t) - (a.td || a.t));
+  const canDecide = !live || !!server;
+  aprPanel.innerHTML = `
+    <div class="d-head">
+      <div class="d-avatar" aria-hidden="true" style="--c:#CDBB93"></div>
+      <div><h2>Aprobaciones</h2><div class="sub">Lo que el equipo te deja para revisar</div></div>
+      <button class="x" id="aprClose" aria-label="Cerrar aprobaciones">×</button>
+    </div>
+    ${live ? '' : '<div class="note">Modo simulación: estas solicitudes son de ejemplo.</div>'}
+    ${live && !server ? '<div class="apr-note">Para aprobar o devolver, abre el hábitat con el servidor local de tu computadora.</div>' : ''}
+    <div class="apr-tabs" role="tablist">
+      <button class="apr-tab${aprTab === 'pendientes' ? ' on' : ''}" data-tab="pendientes" role="tab" aria-selected="${aprTab === 'pendientes'}">Pendientes (${pend.length})</button>
+      <button class="apr-tab${aprTab === 'resueltas' ? ' on' : ''}" data-tab="resueltas" role="tab" aria-selected="${aprTab === 'resueltas'}">Resueltas</button>
+    </div>
+    <div class="apr-list">
+      ${list.length ? list.map(a => aprItem(a, canDecide)).join('') : `<div class="apr-empty">${aprTab === 'pendientes' ? 'No hay nada pendiente. Todo está al día.' : 'Todavía no has resuelto ninguna solicitud.'}</div>`}
+    </div>`;
+  if (focusId) { const el = aprPanel.querySelector(`textarea[data-apr="${focusId}"]`); if (el) { el.focus(); el.selectionStart = el.selectionEnd = el.value.length; } }
+}
+
+function aprItem(a, canDecide){
+  const rb = robots[a.de], col = rb?.a.color || '#CDBB93', name = rb?.a.name || a.de;
+  const ui = aprUI[a.id] || {};
+  const long = a.detalle.length > 260;
+  const body = a.detalle ? `<div class="apr-body${ui.open || !long ? ' open' : ''}">${esc(a.detalle)}</div>${long ? `<button class="apr-more" data-more="${a.id}">${ui.open ? 'Ver menos' : 'Ver completo'}</button>` : ''}` : '';
+  if (a.estado !== 'pendiente') {
+    return `<article class="apr-item" style="--c:${col}">
+      <div class="apr-top"><span class="apr-who">${esc(name)}<small>${CLASE_LABEL[a.clase]} · ${hhmm(a.t)}</small></span><span class="chip st-${a.estado}">${AP_LABEL[a.estado]}</span></div>
+      <div class="apr-title">${esc(a.titulo)}</div>
+      ${body}
+      <div class="apr-dec">${a.estado === 'aprobada' ? 'Aprobada' : 'Devuelta'}${a.td ? ' a las ' + hhmm(a.td) : ''}${a.comentario ? ` · <b>${esc(a.comentario)}</b>` : ''}</div>
+    </article>`;
+  }
+  return `<article class="apr-item" style="--c:${col}">
+    <div class="apr-top"><span class="apr-who">${esc(name)}<small>${CLASE_LABEL[a.clase]} · ${hhmm(a.t)}</small></span><span class="chip st-pendiente">Pendiente</span></div>
+    <div class="apr-title">${esc(a.titulo)}</div>
+    ${body}
+    <label class="sr" for="c-${a.id}">Comentario para ${esc(name)}</label>
+    <textarea id="c-${a.id}" data-apr="${a.id}" placeholder="Comentario (obligatorio para devolver)" maxlength="1500"${canDecide ? '' : ' disabled'}>${esc(ui.comment || '')}</textarea>
+    ${ui.err ? `<div class="apr-err" role="alert">${esc(ui.err)}</div>` : ''}
+    <div class="apr-actions">
+      <button class="apr-ok${ui.confirm ? ' confirm' : ''}" data-ok="${a.id}"${canDecide && !ui.busy ? '' : ' disabled'}>${ui.confirm ? 'Confirmar aprobación' : 'Aprobar'}</button>
+      <button class="apr-back" data-back="${a.id}"${canDecide && !ui.busy ? '' : ' disabled'}>Devolver</button>
+    </div>
+  </article>`;
+}
+
+function openApprovals(){
+  if (selected) select(null);
+  aprOpen = true; aprPanel.hidden = false; rosterEl.hidden = true;
+  aprBtn.setAttribute('aria-expanded', 'true');
+  renderApprovals(true); aprPanel.scrollTop = 0;
+}
+function closeApprovals(){
+  aprOpen = false; aprPanel.hidden = true;
+  aprBtn.setAttribute('aria-expanded', 'false');
+  if (!selected) rosterEl.hidden = false;
+}
+aprBtn.addEventListener('click', () => aprOpen ? closeApprovals() : openApprovals());
+avApr.addEventListener('click', openApprovals);
+aprPanel.addEventListener('input', e => {
+  const id = e.target.dataset?.apr; if (!id) return;
+  (aprUI[id] ||= {}).comment = e.target.value;
+  if (aprUI[id].err) { aprUI[id].err = ''; }
+});
+aprPanel.addEventListener('click', e => {
+  if (e.target.closest('#aprClose')) return closeApprovals();
+  const tab = e.target.closest('[data-tab]'); if (tab) { aprTab = tab.dataset.tab; return renderApprovals(true); }
+  const more = e.target.closest('[data-more]'); if (more) { const u = (aprUI[more.dataset.more] ||= {}); u.open = !u.open; return renderApprovals(true); }
+  const ok = e.target.closest('[data-ok]'); if (ok) return decide(ok.dataset.ok, 'aprobada');
+  const back = e.target.closest('[data-back]'); if (back) return decide(back.dataset.back, 'devuelta');
+});
+
+async function decide(id, decision){
+  const a = approvals.find(x => x.id === id);
+  if (!a || a.estado !== 'pendiente') return;
+  const ui = (aprUI[id] ||= {});
+  const comentario = (ui.comment || '').trim();
+  if (decision === 'devuelta' && !comentario) { ui.err = 'Escribe qué hay que ajustar para devolverlo.'; return renderApprovals(true); }
+  if (decision === 'aprobada' && !ui.confirm) {            // segundo toque para confirmar
+    ui.confirm = true; renderApprovals(true);
+    setTimeout(() => { if (ui.confirm) { ui.confirm = false; renderApprovals(true); } }, 8000);
+    return;
+  }
+  ui.confirm = false; ui.err = '';
+  if (live) {
+    if (!server) return;
+    ui.busy = true; renderApprovals(true);
+    try { await api('api/aprobacion', { id: a.srcId, decision, comentario }); delete aprUI[id]; poll(); }
+    catch (err) { ui.err = err.message; }
+    ui.busy = false; renderApprovals(true);
+    return;
+  }
+  a.estado = decision; a.comentario = comentario; a.td = Date.now();
+  delete aprUI[id];
+  renderApprovals(true);
+  simApprovalReply(a);
+}
+
+/* solicitudes de ejemplo (modo simulación) */
+const SIM_APPROVALS = [
+  { de:'bety', clase:'borrador', titulo:'Carrusel de LinkedIn: vivir en Cap Cana',
+    detalle:'Diapositiva 1: Cap Cana, donde el Caribe se vive con calma.\nDiapositiva 2: Playa Juanillo, la marina internacional y el campo de golf Punta Espada.\nDiapositiva 3: Una decisión patrimonial se toma con información, no con prisa.\nCierre: ¿Le gustaría conocer las opciones disponibles? Escríbanos y conversamos.' },
+  { de:'viktor', clase:'propuesta', titulo:'Propuesta de visita a villas en Cap Cana',
+    detalle:'Borrador para dos inversionistas interesados (sin datos personales):\n— Recorrido por tres villas seleccionadas.\n— Almuerzo en la marina.\n— Reunión final con María Andrea para revisar criterios.\nPrecios y condiciones: por confirmar con una persona autorizada.' },
+  { de:'mark', clase:'propuesta', titulo:'Mensaje y audiencia de la campaña de Miches',
+    detalle:'Audiencia: inversionistas de 40 a 65 años interesados en una segunda residencia.\nMensaje: Miches, naturaleza y desarrollos de lujo sostenible.\nTono: sereno y consultivo, sin promesas de rentabilidad.' },
+  { de:'sergio', clase:'consulta', titulo:'Resumen de novedades en Miches para el equipo',
+    detalle:'Resumen con fuentes verificadas y sus fechas. Las cifras quedan marcadas "por verificar" antes de usarse con clientes. ¿Lo comparto con el equipo?' },
+  { de:'bety', clase:'borrador', titulo:'Publicación: invertir en República Dominicana con criterio',
+    detalle:'Más allá del paisaje, República Dominicana ofrece un marco claro para la inversión extranjera. Antes de elegir una propiedad, conviene entender el perfil, el horizonte y los objetivos de cada inversionista.\n¿Le gustaría una lectura de su caso? Escríbanos y conversamos.' },
+  { de:'marcelo', clase:'consulta', titulo:'Recordatorios de seguimiento de la semana',
+    detalle:'Tres recordatorios cordiales listos para programarse en el CRM, sin datos sensibles. ¿Los programo?' },
+];
+let simAprIdx = 0, simAprTimer = null;
+function simAddApproval(src){
+  const s = src || SIM_APPROVALS[simAprIdx++ % SIM_APPROVALS.length];
+  approvals.push({ id:'s' + (++msgSeq), de:s.de, titulo:s.titulo, detalle:s.detalle, clase:s.clase, estado:'pendiente', comentario:'', t:Date.now(), td:null });
+  renderApprovals(true);
+}
+function startSimApprovals(){
+  if (simAprTimer) return;
+  simAddApproval(); simAddApproval();
+  simAprTimer = setInterval(() => { if (!live && pendingApprovals().length < 4) simAddApproval(); }, 45000);
+}
+async function simApprovalReply(a){
+  if (live) return;
+  if (a.estado === 'aprobada') {
+    await say(a.de, 'tu', pick([
+      `Gracias, María Andrea. Con tu aprobación sigo con «${a.titulo}».`,
+      `Perfecto, queda aprobado. Avanzo con el siguiente paso de «${a.titulo}».`,
+    ]));
+    applyState({ id:a.de, estado:'trabajando', tarea:`Aplicando aprobación: ${a.titulo}` });
+  } else {
+    await say(a.de, 'tu', `Entendido. Ajusto «${a.titulo}» con tus comentarios y te lo vuelvo a enviar.`);
+    applyState({ id:a.de, estado:'trabajando', tarea:`Ajustando: ${a.titulo}` });
+    setTimeout(() => {
+      if (live) return;
+      simAddApproval({ de:a.de, clase:a.clase, titulo:`${a.titulo} (versión 2)`,
+        detalle:`${a.detalle}\n\nAjustado según tu comentario: «${a.comentario}».` });
+    }, 30000);
+  }
+}
 
 /* ───────── Interacción ───────── */
 
@@ -1753,13 +2063,14 @@ canvas.addEventListener('pointerup', e => {
   ray.setFromCamera(ptr, camera);
   const hits = ray.intersectObjects(Object.values(robots).flatMap(r => r.hitboxes), false);
   if (hits.length) return select(hits[0].object.userData.agent);
+  if (APR_SCREEN && ray.intersectObject(APR_SCREEN.mesh, false).length) return openApprovals();
   if (selected) return select(null);               // primer toque cierra la ficha
   const fh = ray.intersectObject(floor, false);
   if (fh.length) moveAvatar(fh[0].point);
 });
 window.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
-  if (chatOpen) closeChat(); else select(null);
+  if (chatOpen) closeChat(); else if (aprOpen) closeApprovals(); else select(null);
 });
 
 /* etiquetas de sala */
@@ -1795,6 +2106,7 @@ avTalk.addEventListener('click', () => {
   openChat(nearId);
 });
 avMeet.addEventListener('click', () => {
+  if (live && server) return sendMeeting('Reunión convocada por María Andrea');
   post({ de:'tu', para:'todos', texto:'Los espero en el Meeting Room.' });
   replyToUser('equipo', 'Reunión convocada por María Andrea');
   avatarToSeat();
@@ -1815,6 +2127,7 @@ function avatarWorld(now){
   if (room !== meRoom) {
     meRoom = room;
     avMeet.hidden = room !== 'meeting';
+    avApr.hidden = room !== 'meeting';
     const host = room && Object.values(robots).find(rb => rb.room === room && rb.a.home === room && !rb.path.length);
     if (host && (!lastGreet[host.a.id] || now - lastGreet[host.a.id] > 60000)) {
       lastGreet[host.a.id] = now;
@@ -1828,6 +2141,7 @@ function avatarWorld(now){
 }
 
 /* ───────── Brillo (bloom), tono y viñeta ───────── */
+let tonePass = null;
 if (THREE.EffectComposer && THREE.RenderPass && THREE.UnrealBloomPass && THREE.ShaderPass) {
   renderer.toneMapping = THREE.NoToneMapping;          // el tono se aplica al final
   renderer.outputEncoding = THREE.LinearEncoding;
@@ -1836,7 +2150,7 @@ if (THREE.EffectComposer && THREE.RenderPass && THREE.UnrealBloomPass && THREE.S
   composer.addPass(new THREE.RenderPass(scene, camera));
   bloom = new THREE.UnrealBloomPass(new THREE.Vector2(innerWidth/2, innerHeight/2), 0.6, 0.28, 1.05);
   composer.addPass(bloom);
-  composer.addPass(new THREE.ShaderPass({
+  composer.addPass(tonePass = new THREE.ShaderPass({
     uniforms: { tDiffuse: { value: null }, exposure: { value: 0.8 } },
     vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
     fragmentShader: `uniform sampler2D tDiffuse; uniform float exposure; varying vec2 vUv;
@@ -1855,6 +2169,69 @@ if (THREE.EffectComposer && THREE.RenderPass && THREE.UnrealBloomPass && THREE.S
 }
 
 resize();
+
+/* ───────── Día y noche con la hora de Santo Domingo ─────────
+   Cambia la luz del sol, el color del ambiente y enciende las luces de las
+   salas al anochecer. "Hora real" sigue el reloj; las demás opciones son
+   para ver cómo se ve el laboratorio a otras horas.                       */
+const horaSel = document.getElementById('horaSel'), relojEl = document.getElementById('reloj');
+const PRESET_H = { manana:8.6, mediodia:13, atardecer:18.35, noche:22.5 };
+const DN_KEYS = [
+  { t:0,     bg:'#02080a', sun:'#8fa6ff', si:.2,  hi:.08, ex:.74, rl:1.8,  du:.95 },
+  { t:5.3,   bg:'#030c10', sun:'#8fa6ff', si:.22, hi:.09, ex:.75, rl:1.7,  du:.9 },
+  { t:6.5,   bg:'#0b1d24', sun:'#ffad73', si:.6,  hi:.13, ex:.8,  rl:1.25, du:.6 },
+  { t:8.5,   bg:'#082226', sun:'#ffe6c4', si:.92, hi:.18, ex:.82, rl:1,    du:.55 },
+  { t:13,    bg:'#0a2a30', sun:'#fff7ea', si:1.08,hi:.22, ex:.86, rl:.9,   du:.5 },
+  { t:17,    bg:'#0c2226', sun:'#ffcf96', si:.92, hi:.18, ex:.82, rl:1,    du:.55 },
+  { t:18.35, bg:'#26181c', sun:'#ff7f45', si:.85, hi:.12, ex:.8,  rl:1.3,  du:.7 },
+  { t:19.4,  bg:'#0a0c16', sun:'#8b8fe0', si:.28, hi:.09, ex:.76, rl:1.65, du:.85 },
+  { t:24,    bg:'#02080a', sun:'#8fa6ff', si:.2,  hi:.08, ex:.74, rl:1.8,  du:.95 },
+];
+DN_KEYS.forEach(k => { k.bgC = new THREE.Color(k.bg); k.sunC = new THREE.Color(k.sun); });
+const dn = { bg: new THREE.Color(), sun: new THREE.Color(), si:0, hi:0, ex:.8, rl:1, du:.55, pos: new THREE.Vector3(), ready:false };
+const dnTmp = { bg: new THREE.Color(), sun: new THREE.Color(), pos: new THREE.Vector3() };
+function horaRD(){
+  try {
+    const p = new Intl.DateTimeFormat('es-DO', { timeZone:'America/Santo_Domingo', hour:'2-digit', minute:'2-digit', hourCycle:'h23' }).formatToParts(new Date());
+    const h = +p.find(x => x.type === 'hour').value, m = +p.find(x => x.type === 'minute').value;
+    return { h, m, f: h + m/60 };
+  } catch { const d = new Date(); return { h:d.getHours(), m:d.getMinutes(), f:d.getHours() + d.getMinutes()/60 }; }
+}
+function periodo(f){ return f < 5.5 ? 'Madrugada' : f < 12 ? 'Mañana' : f < 14 ? 'Mediodía' : f < 18 ? 'Tarde' : f < 19.4 ? 'Atardecer' : 'Noche'; }
+let dnLastClock = 0;
+function updateDayNight(dt){
+  const real = horaRD();
+  const mode = horaSel.value;
+  const f = PRESET_H[mode] ?? real.f;
+  let i = 0; while (i < DN_KEYS.length - 2 && DN_KEYS[i+1].t <= f) i++;
+  const A = DN_KEYS[i], B = DN_KEYS[i+1], u = Math.min(1, Math.max(0, (f - A.t) / (B.t - A.t)));
+  dnTmp.bg.copy(A.bgC).lerp(B.bgC, u); dnTmp.sun.copy(A.sunC).lerp(B.sunC, u);
+  const lerp = (a, b) => a + (b - a) * u;
+  const T = { si:lerp(A.si, B.si), hi:lerp(A.hi, B.hi), ex:lerp(A.ex, B.ex), rl:lerp(A.rl, B.rl), du:lerp(A.du, B.du) };
+  // el sol cruza de este a oeste; de noche, la luna queda alta y fría
+  if (f >= 6 && f <= 19) { const ang = (f - 6) / 13 * Math.PI; dnTmp.pos.set(-Math.cos(ang) * 40, 10 + Math.sin(ang) * 34, 18); }
+  else dnTmp.pos.set(16, 40, -12);
+  const k = dn.ready ? 1 - Math.exp(-dt * 2.2) : 1;       // transición suave al cambiar de hora
+  dn.ready = true;
+  dn.bg.lerp(dnTmp.bg, k); dn.sun.lerp(dnTmp.sun, k); dn.pos.lerp(dnTmp.pos, k);
+  for (const key of ['si', 'hi', 'ex', 'rl', 'du']) dn[key] += (T[key] - dn[key]) * k;
+  scene.background.copy(dn.bg); scene.fog.color.copy(dn.bg);
+  sun.color.copy(dn.sun); sun.intensity = dn.si; sun.position.copy(dn.pos);
+  hemi.intensity = dn.hi;
+  if (tonePass) tonePass.uniforms.exposure.value = dn.ex; else renderer.toneMappingExposure = dn.ex + .12;
+  ROOM_LIGHTS.forEach(l => { l.intensity = l.userData.base * dn.rl; });
+  NIGHT_GLOWS.forEach(m => { m.emissiveIntensity = m.userData.base * dn.rl; });
+  if (DUST) DUST.material.opacity = dn.du;
+  const now = performance.now();
+  if (now - dnLastClock > 5000 || dt === 0) {
+    dnLastClock = now;
+    const hh = String(real.h).padStart(2, '0') + ':' + String(real.m).padStart(2, '0');
+    relojEl.textContent = mode === 'auto' ? `Santo Domingo · ${hh} · ${periodo(real.f)}` : `Santo Domingo · ${hh} · vista de ${horaSel.options[horaSel.selectedIndex].text.toLowerCase()}`;
+  }
+}
+horaSel.addEventListener('change', () => { dnLastClock = 0; try { localStorage.setItem('habitat-hora', horaSel.value); } catch {} });
+try { const v = localStorage.getItem('habitat-hora'); if (v && [...horaSel.options].some(o => o.value === v)) horaSel.value = v; } catch {}
+updateDayNight(0);
 
 /* entrada de cámara */
 const intro = { t: reduceMotion ? 1 : 0, from: new THREE.Vector3(-20, 70, 76), to: camera.position.clone() };
@@ -1938,6 +2315,7 @@ function tick(){
     controls.target.lerp(tmp.set(p.x, 0.8, p.z), 0.08);
   }
   avatarWorld(now);
+  updateDayNight(dt);
   roomTags.forEach(({ r, el }) => project(r.labelPos, el, 0));
 
   if (intro.t < 1) {
@@ -1953,7 +2331,9 @@ function tick(){
 function shortAngle(a){ return ((a + Math.PI) % (Math.PI*2) + Math.PI*2) % (Math.PI*2) - Math.PI; }
 
 renderRoster();
-poll();
+renderApprovals(true);
+drawAprScreen();
+detectServer().then(poll);
 tick();
 document.getElementById('loading').classList.add('done');
 })();

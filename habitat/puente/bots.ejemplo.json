@@ -1,0 +1,15 @@
+{
+  "hermes": "http://127.0.0.1:8642",
+  "coordinador": "@sylvia",
+  "reenviar_tareas": true,
+  "max_reenvios_10min": 6,
+  "espera_segundos": 600,
+  "bots": {
+    "@sylvia":                              { "perfil": "sylvia",                              "clave": "PEGA-AQUI-LA-CLAVE-DE-SYLVIA" },
+    "@viktor":                              { "perfil": "viktor",                              "clave": "PEGA-AQUI-LA-CLAVE-DE-VIKTOR" },
+    "@ageente-de-investigacion-madreperla": { "perfil": "ageente-de-investigacion-madreperla", "clave": "PEGA-AQUI-LA-CLAVE-DE-SERGIO" },
+    "@contenido-madreperla":                { "perfil": "contenido-madreperla",                "clave": "PEGA-AQUI-LA-CLAVE-DE-BETY" },
+    "@mark":                                { "perfil": "mark",                                "clave": "PEGA-AQUI-LA-CLAVE-DE-MARK" },
+    "@marcelo":                             { "perfil": "marcelo",                             "clave": "PEGA-AQUI-LA-CLAVE-DE-MARCELO" }
+  }
+}

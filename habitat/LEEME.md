@@ -15,12 +15,17 @@ El **Code Lab** queda libre para un futuro agente. El **Meeting Room** está en 
 
 **Tu avatar (María Andrea):** toca el piso para caminar. Cerca de un bot aparece *Hablar con…*, y dentro del Meeting Room, *Convocar reunión*. *Seguirme* hace que la cámara te acompañe.
 
-**Conectar Hermes:** ver `puente/HERMES.md`.
+**Conectar Hermes:** ver `puente/HERMES.md`. Para abrir el hábitat conectado a tus bots: doble clic en `iniciar.command` (Mac) o `iniciar.bat` (Windows).
+
+**Aprobaciones:** el botón *Aprobaciones* (y la pantalla del Meeting Room) muestra lo que los bots te dejan para revisar. *Aprobar* pide un segundo toque para confirmar. *Devolver* pide un comentario con lo que hay que ajustar. Los bots con algo pendiente muestran un punto champagne junto a su nombre.
+
+**Día y noche:** la luz sigue la hora real de Santo Domingo. En el selector junto al reloj puedes ver el laboratorio de mañana, al mediodía, al atardecer o de noche.
 
 ## Cómo funciona
 
-- **Sin `estado.json`** → la página entra en *Simulación*: los robots trabajan, se reúnen y se mueven solos con tareas de ejemplo.
-- **Con `estado.json`** junto a `index.html` → pasa a *En vivo*: cada 15 segundos lee ese archivo y mueve a cada robot según lo que diga.
+- **Simulación:** sin `estado.json`, los robots trabajan, se reúnen, conversan y piden aprobaciones de ejemplo. Así se ve en claude.ai.
+- **Conectado a Hermes:** abierto con `puente/servidor.py` en tu computadora. Lee `estado.json` cada 3 segundos, y el chat y las aprobaciones llegan a tus bots reales.
+- **En vivo (solo lectura):** si la página se publica con `estado.json` en otro lugar, como GitHub Pages, muestra a los bots cada 15 segundos, pero no permite escribirles.
 
 ## Cómo conectar un agente real
 
@@ -81,7 +86,17 @@ En **vivo**, los mensajes de los agentes llegan en el campo `mensajes` de `estad
 - `tipo`: `mensaje` (por defecto), `tarea`, `ayuda` o `sistema`.
 - `estado` (solo tareas): `pendiente`, `aceptada` o `hecha`.
 
-Lo que tú escribes en modo en vivo se queda en tu pantalla: para que llegue a los agentes reales hace falta conectar la página con ellos (siguiente paso).
+Con el servidor local (*Conectado a Hermes*), lo que escribes llega a tus bots y sus respuestas aparecen en el chat. Si la página está publicada en otro lugar (*En vivo*), el chat es de solo lectura.
+
+Las **aprobaciones** llegan en el campo `aprobaciones` de `estado.json`:
+
+```json
+"aprobaciones": [
+  { "id": "1", "de": "@contenido-madreperla", "titulo": "Carrusel de Cap Cana", "detalle": "Texto del borrador…", "clase": "borrador", "estado": "pendiente", "hora": "2026-09-24T09:40:00-04:00" }
+]
+```
+
+`clase` puede ser `borrador`, `propuesta` o `consulta`. `estado` puede ser `pendiente`, `aprobada` o `devuelta` (en estas dos, con `comentario`). Los bots las crean con `reportar.py --aprobacion`.
 
 No pongas en `tarea` datos sensibles de clientes (nombres completos, cédulas, montos): el archivo se puede ver públicamente si la página está publicada.
 
