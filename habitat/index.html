@@ -234,6 +234,13 @@
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/shaders/CopyShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/EffectComposer.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/RenderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/ShaderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/environments/RoomEnvironment.js"></script>
 <script>
 (() => {
 'use strict';
@@ -255,34 +262,40 @@ const ROOMS = {
 };
 
 const AGENTS = [
-  { id:'byte',   name:'Byte',   role:'Código',     home:'code',      color:'#3FD0E0' },
-  { id:'pixel',  name:'Pixel',  role:'Diseño',     home:'design',    color:'#E86AC0' },
-  { id:'metric', name:'Metric', role:'Analítica',  home:'analitica', color:'#F2B544' },
-  { id:'folio',  name:'Folio',  role:'Librería',   home:'libreria',  color:'#6FD68E' },
-  { id:'arca',   name:'Arca',   role:'Archivo',    home:'archivo',   color:'#9C82FF' },
-  { id:'nexo',   name:'Nexo',   role:'Coordina',   home:'meeting',   color:'#FF8663' },
+  { id:'sylvia',  hermes:'@sylvia',                               name:'Sylvia',  role:'Coordina',       home:'meeting',   color:'#FF8663' },
+  { id:'viktor',  hermes:'@viktor',                               name:'Viktor',  role:'Ventas',         home:'meeting',   color:'#3FD0E0' },
+  { id:'sergio',  hermes:'@ageente-de-investigacion-madreperla',  name:'Sergio',  role:'Investigación',  home:'libreria',  color:'#6FD68E' },
+  { id:'bety',    hermes:'@contenido-madreperla',                 name:'Bety',    role:'Contenido',      home:'design',    color:'#E86AC0' },
+  { id:'mark',    hermes:'@mark',                                 name:'Mark',    role:'Marketing',      home:'analitica', color:'#F2B544' },
+  { id:'marcelo', hermes:'@marcelo',                              name:'Marcelo', role:'CRM y clientes', home:'archivo',   color:'#9C82FF' },
 ];
+/* acepta el id o el usuario de Hermes (con o sin @) */
+function resolveId(x){
+  const k = String(x || '').trim().toLowerCase().replace(/^@/, '');
+  const a = AGENTS.find(a => a.id === k || a.hermes.slice(1) === k || a.name.toLowerCase() === k);
+  return a ? a.id : k;
+}
 
 const STATE_LABEL = { trabajando:'Trabajando', pensando:'Pensando', reunion:'En reunión', inactivo:'En pausa', error:'Necesita ayuda' };
 
 /* Ficha fija de cada agente (se puede sobrescribir desde estado.json) */
 const PROFILE = {
-  byte:   { mision:'Construye y mantiene la web, las integraciones con el CRM y las automatizaciones internas.', herramientas:['GitHub','CRM','Sitio web'], modelo:'claude-sonnet-5' },
-  pixel:  { mision:'Crea piezas visuales, presentaciones y publicaciones con la identidad de Madreperla.', herramientas:['Diseño','Banco de fotos','LinkedIn'], modelo:'claude-sonnet-5' },
-  metric: { mision:'Mide leads, alcance y resultados comerciales, y los traduce en informes claros.', herramientas:['CRM','Hojas de cálculo','Analítica web'], modelo:'claude-sonnet-5' },
-  folio:  { mision:'Investiga zonas, tendencias y normativa, y resume lo relevante para el equipo.', herramientas:['Búsqueda web','Google Drive'], modelo:'claude-sonnet-5' },
-  arca:   { mision:'Ordena, clasifica y encuentra documentos, brochures y fichas de proyectos.', herramientas:['Google Drive','Carpeta Proyectos'], modelo:'claude-haiku-4-5' },
-  nexo:   { mision:'Coordina al equipo: asigna tareas, prepara reuniones y consolida los avances.', herramientas:['Calendario','Gmail (borradores)','CRM'], modelo:'claude-opus-5-5' },
+  sylvia:  { mision:'Asistente principal y coordinadora de los demás agentes de Madreperla: reparte tareas, prepara reuniones y consolida avances.', herramientas:['Hermes Agent','Calendario','Chat del equipo'], modelo:'Hermes Agent' },
+  viktor:  { mision:'Asesor inmobiliario enfocado en ventas: prepara propuestas y acompaña oportunidades. Precios y condiciones finales los confirma una persona autorizada.', herramientas:['Hermes Agent','Fichas de proyectos'], modelo:'Hermes Agent' },
+  sergio:  { mision:'Investiga proyectos, destinos y el mercado inmobiliario de República Dominicana; verifica fuentes y fechas.', herramientas:['Hermes Agent','Búsqueda web','Carpeta Proyectos'], modelo:'Hermes Agent' },
+  bety:    { mision:'Planifica calendarios y redacta contenido con la voz de Madreperla. Prepara borradores para revisión; no publica ni responde a clientes sin aprobación.', herramientas:['Hermes Agent','Calendario de contenido','LinkedIn (borradores)'], modelo:'Hermes Agent' },
+  mark:    { mision:'Se encarga del marketing y la captación de leads: campañas, alcance y resultados.', herramientas:['Hermes Agent','Campañas','Analítica'], modelo:'Hermes Agent' },
+  marcelo: { mision:'Gestiona el CRM y el seguimiento de clientes, con cuidado de los datos sensibles.', herramientas:['Hermes Agent','CRM (en cambio)'], modelo:'Hermes Agent' },
 };
 
 /* Tareas de ejemplo para el modo simulación */
 const SIM_TASKS = {
-  byte:   ['Actualizando la web de propiedades','Conectando el CRM con el formulario','Corrigiendo la ficha de L\'Atelier Cap Cana','Automatizando el reporte de leads'],
-  pixel:  ['Diseñando carrusel para LinkedIn','Ajustando la paleta de la presentación','Preparando piezas de Velero at Bayahibe','Revisando fotos de Cana Bay'],
-  metric: ['Midiendo leads de la semana','Comparando ocupación por zona','Analizando alcance de publicaciones','Actualizando el tablero comercial'],
-  folio:  ['Investigando tendencias en Miches','Resumiendo noticias de CONFOTUR','Leyendo informe de turismo 2025','Preparando notas sobre Las Terrenas'],
-  arca:   ['Ordenando fichas de proyectos','Archivando brochures nuevos','Indexando documentos de Puerto Marina','Clasificando borradores de correos'],
-  nexo:   ['Preparando la agenda semanal','Asignando tareas al equipo','Revisando prioridades con el CRM','Consolidando avances del día'],
+  sylvia:  ['Preparando la agenda semanal','Asignando tareas al equipo','Revisando prioridades del día','Consolidando avances para María Andrea'],
+  viktor:  ['Preparando propuesta de Cap Cana para revisión','Revisando disponibilidad en Cana Bay','Ordenando oportunidades de la semana','Preparando comparativa de villas en Bávaro'],
+  sergio:  ['Investigando tendencias en Miches','Verificando fechas de entrega de Puerto Marina','Resumiendo novedades de CONFOTUR','Comparando precios por zona en Punta Cana'],
+  bety:    ['Redactando carrusel para LinkedIn','Planificando el calendario de octubre','Preparando borrador sobre Las Terrenas','Ajustando textos con la voz de Madreperla'],
+  mark:    ['Midiendo leads de la semana','Analizando alcance de publicaciones','Preparando campaña de Cabeza de Toro','Revisando origen de los leads'],
+  marcelo: ['Actualizando el seguimiento de clientes','Ordenando registros para el nuevo CRM','Programando recordatorios de seguimiento','Revisando contactos pendientes'],
 };
 
 /* ───────────────────────── Escena ───────────────────────── */
@@ -296,6 +309,7 @@ renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 0.92;
 
+let composer = null, bloom = null;   // se crean más abajo si hay postprocesado
 const scene = new THREE.Scene();
 scene.background = new THREE.Color('#061619');
 scene.fog = new THREE.Fog('#061619', 45, 95);
@@ -311,21 +325,29 @@ controls.minDistance = 10;
 controls.maxDistance = 70;
 controls.target.set(0, 0, 0);
 
-scene.add(new THREE.HemisphereLight('#bfe8e4', '#0a1d20', 0.32));
-const sun = new THREE.DirectionalLight('#fff4e2', 0.9);
+/* reflejos suaves: un estudio neutro como entorno */
+if (THREE.RoomEnvironment) {
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(new THREE.RoomEnvironment(), 0.04).texture;
+}
+scene.add(new THREE.HemisphereLight('#bfe8e4', '#0a1d20', 0.16));
+const rim = new THREE.DirectionalLight('#7fd3d6', 0.35);      // contraluz frío
+rim.position.set(20, 14, -26); scene.add(rim);
+const sun = new THREE.DirectionalLight('#ffe9c9', 0.95);
 sun.position.set(-18, 32, 14);
 sun.castShadow = true;
 sun.shadow.mapSize.set(2048, 2048);
 Object.assign(sun.shadow.camera, { left:-30, right:30, top:22, bottom:-22, near:1, far:80 });
+sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.02;
 scene.add(sun);
 
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* materiales base */
 const M = {
-  floor:  new THREE.MeshStandardMaterial({ color:'#081D21', roughness:.9 }),
-  roomFl: new THREE.MeshStandardMaterial({ color:'#0E2E33', roughness:.7, metalness:.1 }),
-  glass:  new THREE.MeshStandardMaterial({ color:'#9fe3e0', transparent:true, opacity:.07, roughness:.1, metalness:.2, depthWrite:false }),
+  floor:  new THREE.MeshStandardMaterial({ color:'#071A1E', roughness:.42, metalness:.35 }),
+  roomFl: new THREE.MeshStandardMaterial({ color:'#0D2B30', roughness:.3, metalness:.3 }),
+  glass:  new THREE.MeshStandardMaterial({ color:'#b9ecea', transparent:true, opacity:.11, roughness:.04, metalness:.7, depthWrite:false }),
   frame:  new THREE.MeshStandardMaterial({ color:'#274C51', roughness:.5, metalness:.4 }),
   desk:   new THREE.MeshStandardMaterial({ color:'#E8E1D2', roughness:.55 }),
   dark:   new THREE.MeshStandardMaterial({ color:'#14262A', roughness:.5, metalness:.3 }),
@@ -371,7 +393,8 @@ function toWorld(room, lx, lb){      // lb > 0 = hacia la pared del fondo
 function buildRoom(key){
   const r = ROOMS[key];
   const owner = AGENTS.find(a => a.home === key);
-  r.color = owner.color;
+  r.color = owner ? owner.color : '#8FB3B5';          // sala sin residente
+  if (!owner) r.sub += ' · libre';
   const s = Math.sign(r.z);
   const g = new THREE.Group(); scene.add(g);
 
@@ -385,7 +408,7 @@ function buildRoom(key){
   const wall = (len, x, z, rotY) => {
     const p = box(len, WALL_H, 0.06, M.glass, x, WALL_H/2, z, g);
     p.rotation.y = rotY; p.castShadow = false;
-    const rail = box(len, 0.08, 0.1, glow(r.color, 1.1), x, WALL_H, z, g);
+    const rail = box(len, 0.06, 0.08, glow(r.color, 0.75), x, WALL_H, z, g);
     rail.rotation.y = rotY; rail.castShadow = false;
     const base = box(len, 0.14, 0.14, M.frame, x, 0.07, z, g);
     base.rotation.y = rotY;
@@ -620,37 +643,109 @@ const FURNITURE = {
 
 Object.keys(ROOMS).forEach(buildRoom);
 
+/* partículas flotando en el aire del laboratorio */
+{
+  const N = 420, pos = new Float32Array(N*3), spd = new Float32Array(N);
+  for (let i = 0; i < N; i++) { pos[i*3] = (Math.random()-.5)*44; pos[i*3+1] = Math.random()*9; pos[i*3+2] = (Math.random()-.5)*30; spd[i] = .08 + Math.random()*.25; }
+  const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  const dust = new THREE.Points(geo, new THREE.PointsMaterial({ map:GLOW_TEX_EARLY(), color:'#E9DDBF', size:.22, transparent:true, opacity:.55, depthWrite:false, blending:THREE.AdditiveBlending }));
+  scene.add(dust);
+  updaters.push((dt, t) => {
+    for (let i = 0; i < N; i++) {
+      pos[i*3+1] += spd[i]*dt; pos[i*3] += Math.sin(t*.3 + i)*dt*.05;
+      if (pos[i*3+1] > 9) pos[i*3+1] = 0;
+    }
+    geo.attributes.position.needsUpdate = true;
+  });
+}
+function GLOW_TEX_EARLY(){
+  return canvasTex(64, 64, (x, w, h) => {
+    const g = x.createRadialGradient(w/2, h/2, 0, w/2, h/2, w/2);
+    g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+    x.fillStyle = g; x.fillRect(0, 0, w, h);
+  });
+}
+
+/* reflejos más sutiles en el mobiliario que en los robots */
+scene.traverse(o => { if (o.material && o.material.isMeshStandardMaterial && !o.material.isMeshPhysicalMaterial) o.material.envMapIntensity = .22; });
+M.floor.envMapIntensity = .06; M.roomFl.envMapIntensity = .1; M.glass.envMapIntensity = .2;
+
 /* ───────── Robots ───────── */
 
 const robots = {};
 const labelsEl = document.getElementById('labels');
 
+function glowTexture(){
+  return canvasTex(128, 128, (x, w, h) => {
+    const g = x.createRadialGradient(w/2, h/2, 0, w/2, h/2, w/2);
+    g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(.35, 'rgba(255,255,255,.35)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+    x.fillStyle = g; x.fillRect(0, 0, w, h);
+  });
+}
+const GLOW_TEX = glowTexture();
+
 function buildRobot(a, idx){
   const col = new THREE.Color(a.color);
   const g = new THREE.Group();
-  const shell = new THREE.MeshStandardMaterial({ color:col, roughness:.35, metalness:.35 });
-  const visorMat = new THREE.MeshStandardMaterial({ color:'#061619', emissive:col, emissiveIntensity:1.8, roughness:.2 });
-  const tipMat = glow(a.color, 2.2);
+  const Phys = THREE.MeshPhysicalMaterial || THREE.MeshStandardMaterial;
+  const shell = new Phys({ color:col, roughness:.3, metalness:.2, clearcoat:1, clearcoatRoughness:.15, envMapIntensity:.55 });
+  const pearl = new Phys({ color:'#D9D2C4', roughness:.3, metalness:.05, clearcoat:1, clearcoatRoughness:.1, envMapIntensity:.45 });
+  const face  = new Phys({ color:'#050E10', roughness:.12, metalness:.4, clearcoat:1, envMapIntensity:.8 });
+  const visorMat = new THREE.MeshStandardMaterial({ color:'#061619', emissive:col, emissiveIntensity:2.2, roughness:.2 });
+  const tipMat = glow(a.color, 2.6);
+
+  // halo en el suelo y anillo flotante
+  const halo = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 2.2), new THREE.MeshBasicMaterial({ map:GLOW_TEX, color:col, transparent:true, opacity:.55, depthWrite:false, blending:THREE.AdditiveBlending }));
+  halo.rotation.x = -Math.PI/2; halo.position.y = 0.09; g.add(halo);
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(0.34, 0.035, 10, 40), glow(a.color, 2.4));
+  ring.rotation.x = Math.PI/2; ring.position.y = 0.2; g.add(ring);
 
   const body = new THREE.Group(); g.add(body);
-  const hover = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.3, 0.08, 24), glow(a.color, 1.2));
-  hover.position.y = 0.16; g.add(hover);
-  const torso = cyl(0.42, 0.5, 0.8, shell, 0, 0.72, 0, 24, body);
-  const belt  = cyl(0.51, 0.51, 0.08, M.ivory, 0, 0.42, 0, 24, body);
-  const head  = new THREE.Mesh(new THREE.SphereGeometry(0.4, 28, 20), M.ivory);
-  head.position.y = 1.45; head.castShadow = true; body.add(head);
-  const visor = new THREE.Mesh(new THREE.CapsuleGeometry(0.11, 0.36, 6, 16), visorMat);
-  visor.rotation.z = Math.PI/2; visor.position.set(0, 1.48, 0.33); body.add(visor);
-  const ant = cyl(0.02, 0.02, 0.35, M.metal, 0, 1.95, 0, 8, body);
-  const tip = new THREE.Mesh(new THREE.SphereGeometry(0.07, 12, 10), tipMat);
-  tip.position.y = 2.15; body.add(tip);
-  const arms = [-1, 1].map(sd => {
-    const arm = new THREE.Mesh(new THREE.CapsuleGeometry(0.09, 0.4, 4, 10), shell);
-    arm.position.set(sd*0.58, 0.8, 0); arm.castShadow = true; body.add(arm); return arm;
+  // torso redondeado (perfil de cápsula)
+  const prof = [];
+  for (let i = 0; i <= 12; i++) { const t = i/12; prof.push(new THREE.Vector2(0.2 + Math.sin(t*Math.PI)*0.3 + t*0.02, 0.32 + t*0.78)); }
+  prof.unshift(new THREE.Vector2(0.001, 0.3)); prof.push(new THREE.Vector2(0.001, 1.12));
+  const torso = new THREE.Mesh(new THREE.LatheGeometry(prof, 32), shell);
+  torso.castShadow = true; body.add(torso);
+  const belt = new THREE.Mesh(new THREE.TorusGeometry(0.49, 0.04, 10, 40), pearl);
+  belt.rotation.x = Math.PI/2; belt.position.y = 0.6; body.add(belt);
+  const chest = new THREE.Mesh(new THREE.CircleGeometry(0.08, 24), glow(a.color, 2));
+  chest.position.set(0, 0.82, 0.5); body.add(chest);
+
+  // cabeza: grupo que gira entero
+  const headG = new THREE.Group(); headG.position.y = 1.5; body.add(headG);
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.44, 40, 28), pearl);
+  head.scale.set(1.08, 0.92, 1); head.castShadow = true; headG.add(head);
+  const screenFace = new THREE.Mesh(new THREE.SphereGeometry(0.452, 32, 20, Math.PI/2 - 0.95, 1.9, 0.95, 1.2), face);
+  screenFace.scale.set(1.08, 0.92, 1); headG.add(screenFace);
+  const eyes = [-1, 1].map(sd => {
+    const e = new THREE.Mesh(new THREE.CapsuleGeometry(0.045, 0.07, 4, 10), visorMat);
+    e.position.set(sd*0.14, 0.03, 0.455); headG.add(e); return e;
   });
+  [-1, 1].forEach(sd => {
+    const ear = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.12, 20), shell);
+    ear.rotation.z = Math.PI/2; ear.position.set(sd*0.47, 0, 0); headG.add(ear);
+    const er = new THREE.Mesh(new THREE.TorusGeometry(0.07, 0.015, 8, 24), glow(a.color, 2));
+    er.rotation.y = Math.PI/2; er.position.set(sd*0.535, 0, 0); headG.add(er);
+  });
+  cyl(0.018, 0.018, 0.32, M.metal, 0, 0.52, 0, 8, headG);
+  const tip = new THREE.Mesh(new THREE.SphereGeometry(0.07, 16, 12), tipMat);
+  tip.position.y = 0.72; headG.add(tip);
+  const tipGlow = new THREE.Sprite(new THREE.SpriteMaterial({ map:GLOW_TEX, color:col, transparent:true, opacity:.7, depthWrite:false, blending:THREE.AdditiveBlending }));
+  tipGlow.scale.set(0.5, 0.5, 1); tipGlow.position.y = 0.72; headG.add(tipGlow);
+
+  const arms = [-1, 1].map(sd => {
+    const arm = new THREE.Group(); arm.position.set(sd*0.56, 0.95, 0); body.add(arm);
+    const up = new THREE.Mesh(new THREE.CapsuleGeometry(0.08, 0.3, 4, 12), shell);
+    up.position.y = -0.2; up.castShadow = true; arm.add(up);
+    const hand = new THREE.Mesh(new THREE.SphereGeometry(0.1, 16, 12), pearl);
+    hand.position.y = -0.45; arm.add(hand);
+    return arm;
+  });
+  const blink = { next: 1 + Math.random()*4, until: 0 };
   torso.userData.agent = head.userData.agent = a.id;
 
-  const start = ROOMS[a.home].spot.clone();
+  const start = spotFor(a.id, a.home, 'trabajando').pos;
   g.position.copy(start);
   scene.add(g);
 
@@ -660,7 +755,7 @@ function buildRobot(a, idx){
   labelsEl.appendChild(tag);
 
   robots[a.id] = {
-    a, g, body, head, visorMat, tipMat, arms, tag, hitboxes:[torso, head],
+    a, g, body, head: headG, visorMat, tipMat, arms, eyes, blink, ring, halo, tag, hitboxes:[torso, head],
     bubble: tag.querySelector('.bubble'), stateEl: tag.querySelector('i'),
     path: [], at: a.home, look: ROOMS[a.home].look.clone(),
     state: 'trabajando', room: a.home, task: '', talkUntil: 0, phase: idx*1.3,
@@ -678,7 +773,7 @@ AGENTS.forEach(buildRobot);
 function spotFor(id, roomKey, state){
   const r = ROOMS[roomKey];
   const idx = AGENTS.findIndex(a => a.id === id);
-  if (roomKey === 'meeting' && (state === 'reunion' || id === 'nexo')) return { pos: r.seats[idx % 6].clone(), look: r.look.clone() };
+  if (roomKey === 'meeting' && (state === 'reunion' || AGENTS[idx].home === 'meeting')) return { pos: r.seats[idx % 6].clone(), look: r.look.clone() };
   if (AGENTS[idx].home === roomKey) return { pos: r.spot.clone(), look: r.look.clone() };
   // visitante: se ubica en la sala sin chocar con el anfitrión
   const off = ((idx % 3) - 1) * 1.4;
@@ -741,6 +836,7 @@ function mergeInfo(rb, ag, taskChanged){
 }
 
 function applyState(ag, silent){
+  if (ag && ag.id) ag = { ...ag, id: resolveId(ag.id), sala: ag.sala };
   const rb = robots[ag.id]; if (!rb) return;
   mergeInfo(rb, ag, (ag.tarea || '') !== rb.task);
   const estado = STATE_LABEL[ag.estado] ? ag.estado : 'trabajando';
@@ -966,7 +1062,7 @@ async function poll(){
 
 /* modo simulación */
 function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
-const SIM_WEIGHT = { byte:1.4, pixel:1, metric:.9, folio:1.2, arca:.4, nexo:1.1 };
+const SIM_WEIGHT = { sylvia:1.1, viktor:.8, sergio:1.3, bety:1.2, mark:.9, marcelo:.6 };
 function seedSim(){
   const start = new Date(); start.setHours(8, 0, 0, 0);
   const nowH = new Date().getHours();
@@ -1016,7 +1112,7 @@ function simStep(){
   if (now > meetingUntil && Math.random() < .12) {
     meetingUntil = now + 22000;
     const tema = pick(['Revisión semanal de leads','Planificación de contenido de octubre','Prioridades del CRM','Lanzamiento de nuevo proyecto']);
-    AGENTS.forEach(a => { if (a.id === 'nexo' || Math.random() < .7) applyState({ id:a.id, estado:'reunion', tarea:tema }); });
+    AGENTS.forEach(a => { if (a.id === 'sylvia' || Math.random() < .7) applyState({ id:a.id, estado:'reunion', tarea:tema }); });
     setTimeout(() => AGENTS.forEach(a => { if (robots[a.id].state === 'reunion') applyState({ id:a.id, estado:'trabajando', tarea:pick(SIM_TASKS[a.id]) }); }), 22000);
     return;
   }
@@ -1110,24 +1206,24 @@ async function say(de, para, texto, extra = {}, delay){
 
 /* ---------- a quién le toca ---------- */
 const SKILLS = [
-  ['pixel',  /dise[nñ]|foto|carrusel|imagen|pieza|presentaci|visual|logo|portada|video/i],
-  ['metric', /dato|lead|m[eé]trica|informe|reporte|alcance|n[uú]mero|an[aá]lisis|tablero|estad[ií]stic/i],
-  ['folio',  /investig|mercado|tendencia|noticia|zona|confotur|ley|resum|lee |leer/i],
-  ['arca',   /document|brochure|archiv|carpeta|ficha|pdf|contrato|orden/i],
-  ['byte',   /web|c[oó]digo|p[aá]gina|formulario|autom|integra|crm|sitio|app/i],
-  ['nexo',   /reuni[oó]n|agenda|coordina|prioridad|planifica/i],
+  ['bety',    /contenido|redact|texto|post|publicaci|carrusel|calendario|linkedin|copy|borrador|art[ií]culo|newsletter/i],
+  ['mark',    /marketing|lead|campa[nñ]|anuncio|alcance|m[eé]trica|captaci|audiencia|redes|ads/i],
+  ['marcelo', /crm|cliente|seguimiento|contacto|recordatorio|registro/i],
+  ['viktor',  /venta|vender|propuesta|oferta de compra|comprador|negociaci|visita|cierre|inversionista/i],
+  ['sergio',  /investig|mercado|tendencia|noticia|zona|destino|confotur|ley|verific|fuente|proyecto|dato/i],
+  ['sylvia',  /reuni[oó]n|agenda|coordina|prioridad|planifica|equipo/i],
 ];
 function mentioned(text){
-  const m = text.match(/@([a-záéíóúñ]+)/i);
+  const m = text.match(/@([a-záéíóúñ0-9_-]+)/i);
   if (!m) return null;
-  const a = AGENTS.find(a => a.name.toLowerCase() === m[1].toLowerCase());
-  return a ? a.id : null;
+  const id = resolveId(m[1]);
+  return AGENTS.some(a => a.id === id) ? id : null;
 }
 function route(text){ for (const [id, re] of SKILLS) if (re.test(text)) return id; return null; }
 const isTask   = t => /tarea|asigna|prepara|hazme|haz |necesito|puedes|podr[ií]as|revisa|crea|busca|actualiza|dise[nñ]a|investiga|env[ií]a|arma|redacta/i.test(t);
 const isStatus = t => /c[oó]mo va|estado|avance|en qu[eé] est|qu[eé] hac/i.test(t);
 const isMeet   = t => /reuni[oó]n|junta|re[uú]nanse/i.test(t);
-const clean    = t => t.replace(/@[a-záéíóúñ]+/ig, '').replace(/^\s*(tarea|asigna(r)?( tarea)?)\s*:?\s*/i, '').replace(/^\s*(por favor,?\s*)?(necesito( que)?|puedes|podr[ií]as|hazme)\s+/i, '').replace(/[?¿]/g, '').replace(/\s+/g, ' ').trim();
+const clean    = t => t.replace(/@[a-záéíóúñ0-9_-]+/ig, '').replace(/^\s*(tarea|asigna(r)?( tarea)?)\s*:?\s*/i, '').replace(/^\s*(por favor,?\s*)?(necesito( que)?|puedes|podr[ií]as|hazme)\s+/i, '').replace(/[?¿]/g, '').replace(/\s+/g, ' ').trim();
 const cap      = t => t.charAt(0).toUpperCase() + t.slice(1);
 
 function statusLine(id){
@@ -1139,12 +1235,12 @@ function statusLine(id){
   return `${rb.state === 'pensando' ? 'Estoy planificando' : 'Estoy con'} «${rb.task}»${I.avance !== null ? `, al ${Math.round(I.avance)}%` : ''}. ${I.cola.length ? `Después sigo con «${I.cola[0]}».` : 'No tengo nada más en la lista.'}`;
 }
 const GREET = {
-  byte:'Aquí Byte. Si es algo de la web, el CRM o una automatización, cuenta conmigo.',
-  pixel:'Hola, soy Pixel. ¿Qué pieza visual necesitas?',
-  metric:'Metric al habla. Dime qué quieres medir y te traigo los números.',
-  folio:'Hola, soy Folio. Puedo investigar o resumir lo que necesites.',
-  arca:'Arca por aquí. Si buscas un documento, probablemente sé dónde está.',
-  nexo:'Hola, soy Nexo. Dime qué necesitas y lo reparto en el equipo.',
+  sylvia:'Hola, soy Sylvia. Dime qué necesitas y lo reparto en el equipo.',
+  viktor:'Viktor al habla. Si es sobre una venta o una propuesta, cuéntame.',
+  sergio:'Hola, soy Sergio. Investigo lo que necesites y verifico las fuentes.',
+  bety:'Hola, soy Bety. ¿Qué contenido preparamos? Todo queda en borrador hasta que lo apruebes.',
+  mark:'Mark por aquí. ¿Revisamos campañas o leads?',
+  marcelo:'Hola, soy Marcelo. ¿Qué seguimiento de clientes necesitas?',
 };
 
 /* ---------- respuestas con IA (al publicarse en claude.ai) ----------
@@ -1159,7 +1255,7 @@ let sampler = null, aiState = 'pendiente', aiAsked = false;
 })();
 
 async function aiReply(ch, text){
-  const responder = ch !== 'equipo' ? ch : (mentioned(text) || 'nexo');
+  const responder = ch !== 'equipo' ? ch : (mentioned(text) || 'sylvia');
   const ag = who(responder);
   const team = AGENTS.map(a => {
     const rb = robots[a.id];
@@ -1167,7 +1263,7 @@ async function aiReply(ch, text){
   }).join('\n');
   const convo = allMsgs().filter(m => chanOf(m) === ch && m.tipo !== 'sistema').slice(-12)
     .map(m => `${who(m.de).name}${m.tipo === 'tarea' ? ` (asigna tarea a ${who(m.para).name})` : ''}: ${m.texto}`).join('\n');
-  const prompt = `Eres ${ag.name}, un agente de IA del equipo interno de Madreperla Realtors, una firma boutique de bienes raíces de lujo en República Dominicana (Cap Cana, Bávaro, Cabeza de Toro, Cana Bay, Bayahibe, Miches, Las Terrenas). Tu función: ${robots[responder].info.mision}
+  const prompt = `Eres ${ag.name}, un agente de IA (bot de Hermes Agent) del equipo interno de Madreperla Realtors, una firma boutique de bienes raíces de lujo en República Dominicana (Cap Cana, Bávaro, Cabeza de Toro, Cana Bay, Bayahibe, Miches, Las Terrenas). Tu función: ${robots[responder].info.mision}
 ${ch === 'equipo' ? 'Hablas en el canal general del equipo, donde están los seis agentes y la persona que dirige el equipo ("Tú").' : 'Hablas en privado con la persona que dirige el equipo ("Tú").'}
 
 El equipo:
@@ -1247,13 +1343,13 @@ async function replyToUser(ch, text){
     if (isStatus(text)) return say(id, 'tu', statusLine(id));
     if (isTask(text) && body.length > 3) {
       const best = route(body);
-      if (best && best !== id && id !== 'nexo') {
+      if (best && best !== id && id !== 'sylvia') {
         await say(id, 'tu', `Esto le corresponde más a ${who(best).name}. Se lo paso y le doy seguimiento.`);
         return assignFlow(id, best, cap(body));
       }
-      if (id === 'nexo' && best && best !== 'nexo') {
-        await say('nexo', 'tu', `Perfecto. Se lo asigno a ${who(best).name}.`);
-        return assignFlow('nexo', best, cap(body));
+      if (id === 'sylvia' && best && best !== 'sylvia') {
+        await say('sylvia', 'tu', `Perfecto. Se lo asigno a ${who(best).name}.`);
+        return assignFlow('sylvia', best, cap(body));
       }
       return assignFlow('tu', id, cap(body), false);
     }
@@ -1265,7 +1361,7 @@ async function replyToUser(ch, text){
   }
   // canal Equipo
   if (isMeet(text)) {
-    await say('nexo', 'todos', 'Convoco a todo el equipo al Meeting Room.');
+    await say('sylvia', 'todos', 'Convoco a todo el equipo al Meeting Room.');
     const tema = body.length > 10 ? cap(body) : 'Reunión convocada desde el chat';
     AGENTS.forEach(a => applyState({ id:a.id, estado:'reunion', tarea:tema }));
     meetingUntil = performance.now() + 25000;
@@ -1277,38 +1373,39 @@ async function replyToUser(ch, text){
     return;
   }
   if (isTask(text) && body.length > 3) {
-    const to = target || route(body) || 'nexo';
+    const to = target || route(body) || 'sylvia';
     if (target) return assignFlow('tu', to, cap(body), true);
-    await say('nexo', 'todos', to === 'nexo' ? 'Lo tomo yo y lo organizo.' : `Se lo asigno a ${who(to).name}.`);
-    return assignFlow('nexo', to, cap(body));
+    await say('sylvia', 'todos', to === 'sylvia' ? 'Lo tomo yo y lo organizo.' : `Se lo asigno a ${who(to).name}.`);
+    return assignFlow('sylvia', to, cap(body));
   }
   if (target) return say(target, 'todos', GREET[target]);
-  return say('nexo', 'todos', 'Anotado. Si quieres que alguien se encargue, escribe la tarea o menciona a un agente con @.');
+  return say('sylvia', 'todos', 'Anotado. Si quieres que alguien se encargue, escribe la tarea o menciona a un agente con @.');
 }
 
 /* ---------- conversaciones entre agentes (simulación) ---------- */
 const SCENES = [
-  [ ['metric','pixel','Pixel, el carrusel de Cap Cana tuvo 32% más alcance que el promedio. ¿Preparamos uno similar para Cabeza de Toro?'],
-    ['pixel','metric','Buena idea. Lo armo con la misma estructura y te paso la versión para comparar.'],
-    ['metric','pixel','Carrusel de Cabeza de Toro con la estructura del de Cap Cana', 'tarea'] ],
-  [ ['pixel','arca','Arca, ¿tienes las fotos aprobadas de Velero at Bayahibe?'],
-    ['arca','pixel','Sí, están en Proyectos › Velero at Bayahibe › Fotos aprobadas. Te dejo la ruta en tu lista.'] ],
-  [ ['nexo','todos','Buenos días, equipo. Prioridades de hoy: web de propiedades, informe de leads y brochure de Puerto Marina.'],
-    ['byte','todos','Me encargo de la web.'],
-    ['metric','todos','El informe de leads estará listo antes del mediodía.'],
-    ['arca','todos','Busco la última versión del brochure y se la paso a Pixel.'] ],
-  [ ['byte','folio','Folio, ¿qué beneficios de CONFOTUR puedo mencionar en la ficha de la web?'],
-    ['folio','byte','Te preparo un resumen corto. Las cifras hay que verificarlas con el equipo antes de publicarlas.'],
-    ['byte','folio','Resumen de beneficios CONFOTUR para la web', 'tarea'] ],
-  [ ['folio','metric','Encontré un informe nuevo sobre ocupación hotelera en Bávaro. ¿Te sirve para el tablero?'],
-    ['metric','folio','Sí, pásamelo y lo cruzo con nuestros leads por zona.'] ],
-  [ ['arca','nexo','Terminé de ordenar los brochures nuevos. ¿Cuál es la siguiente prioridad?'],
-    ['nexo','arca','Indexar los documentos de L\'Atelier Cap Cana', 'tarea'] ],
-  [ ['nexo','byte','Byte, ¿cómo vas con el formulario del CRM?'],
-    ['byte','nexo','Al 70%. Me falta probarlo con un lead de ejemplo.'],
-    ['nexo','byte','Perfecto. Avísame cuando esté listo y lo revisamos juntos.'] ],
-  [ ['pixel','todos','Terminé la paleta para la presentación de Cana Bay. ¿Alguien quiere revisarla antes de enviarla al equipo?'],
-    ['nexo','todos','Déjala en la carpeta de revisión; María Andrea la aprueba antes de que salga.'] ],
+  [ ['mark','bety','Bety, el carrusel de Cap Cana tuvo buen alcance. ¿Preparamos uno similar para Cabeza de Toro?'],
+    ['bety','mark','Buena idea. Preparo el borrador con la misma estructura y lo dejo para revisión.'],
+    ['mark','bety','Borrador de carrusel de Cabeza de Toro', 'tarea'] ],
+  [ ['bety','sergio','Sergio, ¿me confirmas la fecha de entrega de Velero at Bayahibe antes de mencionarla?'],
+    ['sergio','bety','La verifico con la fuente oficial del proyecto y te aviso. Mejor no la pongas hasta confirmarla.'],
+    ['bety','sergio','Verificar fecha de entrega de Velero at Bayahibe', 'tarea'] ],
+  [ ['sylvia','todos','Buenos días, equipo. Prioridades de hoy: leads de la semana, calendario de octubre y seguimiento de clientes.'],
+    ['mark','todos','Me encargo del informe de leads.'],
+    ['bety','todos','El calendario de octubre queda en borrador esta tarde.'],
+    ['marcelo','todos','Reviso los seguimientos pendientes y le paso a Viktor los más avanzados.'] ],
+  [ ['viktor','sergio','Sergio, un inversionista pregunta por Miches. ¿Qué hay de nuevo en la zona?'],
+    ['sergio','viktor','Te preparo un resumen con fuentes verificadas. Las cifras las revisamos antes de compartirlas.'],
+    ['viktor','sergio','Resumen verificado de novedades en Miches', 'tarea'] ],
+  [ ['mark','marcelo','Marcelo, entraron leads nuevos de la campaña de Bávaro. ¿Los agregas al seguimiento?'],
+    ['marcelo','mark','Sí, los registro y programo el primer contacto para revisión.'] ],
+  [ ['marcelo','viktor','Viktor, hay dos clientes listos para una visita en Cap Cana.'],
+    ['viktor','marcelo','Perfecto. Preparo la propuesta de visita y se la paso a María Andrea para que la apruebe.'] ],
+  [ ['sylvia','bety','Bety, ¿cómo vas con el calendario de octubre?'],
+    ['bety','sylvia','Al 70%. Me falta cerrar los temas de la última semana.'],
+    ['sylvia','bety','Perfecto. Avísame cuando esté listo y lo revisamos juntas.'] ],
+  [ ['viktor','todos','Tengo lista una comparativa de villas en Bávaro. ¿Alguien la revisa antes de enviarla?'],
+    ['sylvia','todos','Déjala en la carpeta de revisión; María Andrea la aprueba antes de que salga.'] ],
 ];
 
 async function runScene(scene){
@@ -1336,7 +1433,7 @@ async function helpFlow(a){
   if (live) return;
   await wait(1200);
   await say(a.id, 'todos', 'Necesito una aprobación antes de continuar. ¿Alguien puede revisar el borrador conmigo?', { tipo:'ayuda' });
-  const helper = a.id === 'nexo' ? 'metric' : 'nexo';
+  const helper = a.id === 'sylvia' ? 'marcelo' : 'sylvia';
   await say(helper, 'todos', `Voy para allá, ${a.name}. Si hace falta, se lo escalo a María Andrea.`);
   applyState({ id:helper, estado:'trabajando', sala:a.home, tarea:`Ayudando a ${a.name}` });
   await wait(14000);
@@ -1359,7 +1456,7 @@ function startChatter(){
 /* ---------- mensajes en vivo ---------- */
 function loadLiveMessages(list){
   const next = list.slice(-300).map((m, i) => ({
-    id: 'v' + (m.id ?? i), de: String(m.de || ''), para: String(m.para || 'todos'), texto: String(m.texto || ''),
+    id: 'v' + (m.id ?? i), de: resolveId(m.de), para: ['todos','tu'].includes(m.para) || !m.para ? (m.para || 'todos') : resolveId(m.para), texto: String(m.texto || ''),
     tipo: ['mensaje','tarea','ayuda','sistema'].includes(m.tipo) ? m.tipo : 'mensaje',
     estado: TK_LABEL[m.estado] ? m.estado : (m.tipo === 'tarea' ? 'pendiente' : undefined),
     t: m.hora && !isNaN(Date.parse(m.hora)) ? Date.parse(m.hora) : Date.now(),
@@ -1397,7 +1494,7 @@ function renderChat(){
   if (near || list[list.length - 1]?.de === 'tu') chMsgs.scrollTop = chMsgs.scrollHeight;
 
   const qs = isTeam
-    ? [['¿Cómo van todos?', '¿Cómo van todos?'], ['Asignar tarea', '@Pixel tarea: '], ['Convocar reunión', 'Reunión: revisión de prioridades']]
+    ? [['¿Cómo van todos?', '¿Cómo van todos?'], ['Asignar tarea', '@Bety tarea: '], ['Convocar reunión', 'Reunión: revisión de prioridades']]
     : [['¿Cómo vas?', '¿Cómo vas?'], ['Asignarle tarea', 'Tarea: '], ['Saludar', 'Hola, ' + ag.name]];
   chQuick.innerHTML = qs.map(([l, v]) => `<button class="qk" type="button" data-v="${esc(v)}">${l}</button>`).join('');
   chInput.placeholder = isTeam ? 'Escribe al equipo… (usa @Nombre para mencionar)' : `Escribe a ${ag.name}…`;
@@ -1492,12 +1589,46 @@ const roomTags = Object.values(ROOMS).map(r => {
 function resize(){
   const w = window.innerWidth, h = window.innerHeight;
   renderer.setSize(w, h, false);
+  if (composer) { composer.setPixelRatio(Math.min(devicePixelRatio, 2)); composer.setSize(w, h); bloom.resolution.set(w/2, h/2); }
   camera.aspect = w/h;
   camera.fov = w < 760 ? 58 : 42;
   camera.updateProjectionMatrix();
   if (!selected) controls.target.set(w < 760 ? 0 : 4, 0, w < 760 ? 3 : 1.5);   // deja libre el panel lateral
 }
 window.addEventListener('resize', resize); resize();
+
+/* ───────── Brillo (bloom), tono y viñeta ───────── */
+if (THREE.EffectComposer && THREE.RenderPass && THREE.UnrealBloomPass && THREE.ShaderPass) {
+  renderer.toneMapping = THREE.NoToneMapping;          // el tono se aplica al final
+  renderer.outputEncoding = THREE.LinearEncoding;
+  const rt = new THREE.WebGLRenderTarget(innerWidth, innerHeight, { type: THREE.HalfFloatType, samples: renderer.capabilities.isWebGL2 ? 4 : 0 });
+  composer = new THREE.EffectComposer(renderer, rt);
+  composer.addPass(new THREE.RenderPass(scene, camera));
+  bloom = new THREE.UnrealBloomPass(new THREE.Vector2(innerWidth/2, innerHeight/2), 0.6, 0.28, 1.05);
+  composer.addPass(bloom);
+  composer.addPass(new THREE.ShaderPass({
+    uniforms: { tDiffuse: { value: null }, exposure: { value: 0.8 } },
+    vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+    fragmentShader: `uniform sampler2D tDiffuse; uniform float exposure; varying vec2 vUv;
+      vec3 fit(vec3 v){ vec3 a = v*(v+0.0245786)-0.000090537; vec3 b = v*(0.983729*v+0.4329510)+0.238081; return a/b; }
+      void main(){
+        vec3 c = texture2D(tDiffuse, vUv).rgb * exposure / 0.6;
+        const mat3 I = mat3(vec3(0.59719,0.07600,0.02840), vec3(0.35458,0.90834,0.13383), vec3(0.04823,0.01566,0.83777));
+        const mat3 O = mat3(vec3(1.60475,-0.10208,-0.00327), vec3(-0.53108,1.10813,-0.07276), vec3(-0.07367,-0.00605,1.07602));
+        c = clamp(O * fit(I * c), 0.0, 1.0);
+        c = mix(c * 12.92, 1.055 * pow(c, vec3(1.0/2.4)) - 0.055, step(0.0031308, c));
+        float d = distance(vUv, vec2(0.5));
+        c *= mix(1.0, 0.7, smoothstep(0.42, 0.95, d));
+        gl_FragColor = vec4(c, 1.0);
+      }`,
+  }));
+}
+
+resize();
+
+/* entrada de cámara */
+const intro = { t: reduceMotion ? 1 : 0, from: new THREE.Vector3(-14, 52, 58), to: camera.position.clone() };
+if (intro.t < 1) { camera.position.copy(intro.from); controls.enabled = false; }
 
 /* ───────── Bucle ───────── */
 const clock = new THREE.Clock();
@@ -1552,6 +1683,12 @@ function tick(){
     if (rb.state === 'error') { const on = Math.sin(k*8) > 0; rb.visorMat.emissive.set(on ? '#FF4D4D' : rb.a.color); ti = on ? 3 : .6; }
     else rb.visorMat.emissive.set(rb.a.color);
     rb.visorMat.emissiveIntensity = vi; rb.tipMat.emissiveIntensity = ti;
+    if (t > rb.blink.next) { rb.blink.until = t + 0.12; rb.blink.next = t + 2 + Math.random()*4; }
+    const eyeY = rb.state === 'inactivo' ? 0.35 : t < rb.blink.until ? 0.1 : 1;
+    rb.eyes.forEach(e => { e.scale.y += (eyeY - e.scale.y) * Math.min(1, dt*30); });
+    rb.ring.position.y = 0.2 + Math.sin(k*2.4) * 0.03;
+    rb.ring.rotation.z += dt * (moving ? 4 : 0.8);
+    rb.halo.material.opacity = rb.state === 'inactivo' ? .25 : .5 + Math.sin(k*2)*.08;
 
     // etiqueta
     project(p, rb.tag, 2.55);
@@ -1569,8 +1706,14 @@ function tick(){
   }
   roomTags.forEach(({ r, el }) => project(r.labelPos, el, 0));
 
+  if (intro.t < 1) {
+    intro.t = Math.min(1, intro.t + dt/2.6);
+    const e = 1 - Math.pow(1 - intro.t, 3);
+    camera.position.lerpVectors(intro.from, intro.to, e);
+    if (intro.t >= 1) controls.enabled = true;
+  }
   controls.update();
-  renderer.render(scene, camera);
+  if (composer) composer.render(); else renderer.render(scene, camera);
   requestAnimationFrame(tick);
 }
 function shortAngle(a){ return ((a + Math.PI) % (Math.PI*2) + Math.PI*2) % (Math.PI*2) - Math.PI; }

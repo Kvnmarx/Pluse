@@ -2,14 +2,16 @@
 
 Laboratorio 3D donde viven los seis agentes de IA. Cada robot tiene su color y su sala.
 
-| Robot  | Color    | Sala          | Función                       |
-|--------|----------|---------------|-------------------------------|
-| Byte   | Cian     | Code Lab      | Código y automatizaciones     |
-| Pixel  | Magenta  | Design Room   | Diseño y piezas visuales      |
-| Metric | Ámbar    | Analítica     | Datos y métricas              |
-| Folio  | Verde    | Librería      | Investigación y lectura       |
-| Arca   | Violeta  | Archivo       | Documentos archivados         |
-| Nexo   | Coral    | Meeting Room  | Coordina al equipo            |
+| Bot (Hermes) | Usuario en Hermes | Color | Sala | Función |
+|---|---|---|---|---|
+| Sylvia  | `@sylvia` | Coral | Meeting Room | Coordina a los demás agentes |
+| Viktor  | `@viktor` | Cian | Meeting Room | Asesor inmobiliario, ventas |
+| Sergio  | `@ageente-de-investigacion-madreperla` | Verde | Librería | Investigación y verificación de fuentes |
+| Bety    | `@contenido-madreperla` | Magenta | Design Room | Calendario y contenido (solo borradores) |
+| Mark    | `@mark` | Ámbar | Analítica | Marketing y captación de leads |
+| Marcelo | `@marcelo` | Violeta | Archivo | CRM y seguimiento de clientes |
+
+El **Code Lab** queda libre para un futuro agente.
 
 ## Cómo funciona
 
@@ -21,10 +23,10 @@ Laboratorio 3D donde viven los seis agentes de IA. Cada robot tiene su color y s
 Cada agente solo tiene que actualizar su línea en `estado.json` (copia `estado.ejemplo.json` como punto de partida):
 
 ```json
-{ "id": "byte", "estado": "trabajando", "tarea": "Actualizando la web de propiedades" }
+{ "id": "@contenido-madreperla", "estado": "trabajando", "tarea": "Redactando el calendario de octubre" }
 ```
 
-- `id`: byte, pixel, metric, folio, arca o nexo.
+- `id`: el usuario de Hermes del bot (`@sylvia`, `@contenido-madreperla`…) o su nombre corto (`sylvia`, `sergio`, `bety`, `mark`, `marcelo`, `viktor`).
 - `estado`: `trabajando`, `pensando`, `reunion`, `inactivo` o `error` (este último hace parpadear al robot en rojo: necesita ayuda).
 - `sala` (opcional): `code`, `design`, `analitica`, `libreria`, `archivo` o `meeting`. Si no se pone, el robot va a su propia sala (o al Meeting Room si está en reunión).
 - `tarea`: texto corto que aparece en la burbuja del robot.
@@ -47,7 +49,7 @@ Al tocar un robot o su nombre se abre su ficha a la derecha. Se llena con estos 
 | `historial` | Lista de `{ "hora": "10:05", "texto": "..." }` |
 | `modelo`, `herramientas`, `mision` | Su ficha fija (si no se envían, se usan las de la página) |
 
-`estado.ejemplo.json` trae un agente (Byte) con todos los campos llenos como modelo.
+`estado.ejemplo.json` trae un bot (Bety) con todos los campos llenos como modelo.
 
 ## Chat del equipo
 
@@ -58,20 +60,20 @@ El botón **Chat del equipo** abre una conversación con dos tipos de canal:
 
 Botones rápidos: *¿Cómo van todos?*, *Asignar tarea* y *Convocar reunión* (los robots caminan al Meeting Room).
 
-En **simulación**, los agentes responden solos: reparten las tareas según el tema (diseño → Pixel, datos → Metric, web → Byte, investigación → Folio, documentos → Arca, coordinación → Nexo), se piden ayuda y caminan a la sala del compañero.
+En **simulación**, los agentes responden solos: reparten las tareas según el tema (contenido → Bety, marketing y leads → Mark, CRM y clientes → Marcelo, ventas → Viktor, investigación → Sergio, coordinación → Sylvia), se piden ayuda y caminan a la sala del compañero.
 
 En **vivo**, los mensajes de los agentes llegan en el campo `mensajes` de `estado.json`:
 
 ```json
 "mensajes": [
-  { "id": 1, "de": "nexo", "para": "todos", "texto": "Prioridades de hoy…", "hora": "2026-09-24T09:00:00-04:00" },
-  { "id": 2, "de": "nexo", "para": "pixel", "tipo": "tarea", "estado": "aceptada", "texto": "Carrusel de Miches" },
-  { "id": 3, "de": "byte", "para": "todos", "tipo": "ayuda", "texto": "Necesito una aprobación" },
-  { "id": 4, "de": "arca", "para": "tu", "texto": "Mensaje privado para ti" }
+  { "id": 1, "de": "@sylvia", "para": "todos", "texto": "Prioridades de hoy…", "hora": "2026-09-24T09:00:00-04:00" },
+  { "id": 2, "de": "@sylvia", "para": "@contenido-madreperla", "tipo": "tarea", "estado": "aceptada", "texto": "Carrusel de Miches" },
+  { "id": 3, "de": "@mark", "para": "todos", "tipo": "ayuda", "texto": "Necesito una aprobación" },
+  { "id": 4, "de": "@marcelo", "para": "tu", "texto": "Mensaje privado para ti" }
 ]
 ```
 
-- `para`: `todos`, el id de otro agente, o `tu` (privado contigo).
+- `de` / `para`: el usuario de Hermes o el nombre corto; `para` también puede ser `todos` o `tu` (privado contigo).
 - `tipo`: `mensaje` (por defecto), `tarea`, `ayuda` o `sistema`.
 - `estado` (solo tareas): `pendiente`, `aceptada` o `hecha`.
 

@@ -2,12 +2,12 @@
   "actualizado": "2026-09-24T10:30:00-04:00",
   "agentes": [
     {
-      "id": "byte",
+      "id": "@contenido-madreperla",
       "estado": "trabajando",
-      "tarea": "Actualizando la web de propiedades",
+      "tarea": "Redactando el calendario de octubre",
       "tarea_inicio": "2026-09-24T10:05:00-04:00",
       "avance": 60,
-      "modelo": "claude-sonnet-5",
+      "modelo": "Hermes Agent",
       "tokens": {
         "entrada": 182400,
         "salida": 39100,
@@ -31,81 +31,80 @@
       "activo_desde": "2026-09-24T08:00:00-04:00",
       "ultima_actividad": "2026-09-24T10:29:40-04:00",
       "cola": [
-        "Conectar el CRM con el formulario",
-        "Revisar velocidad de la web"
+        "Borrador de carrusel de Cap Cana",
+        "Textos para Las Terrenas"
       ],
       "historial": [
         {
           "hora": "10:05",
-          "texto": "Empezó: actualizar la web de propiedades"
+          "texto": "Empezó: calendario de octubre"
         },
         {
           "hora": "09:40",
-          "texto": "Terminó: ficha de L'Atelier Cap Cana"
+          "texto": "Terminó: borrador de LinkedIn para revisión"
         }
       ],
       "herramientas": [
-        "GitHub",
-        "CRM",
-        "Sitio web"
+        "Hermes Agent",
+        "Calendario de contenido"
       ]
     },
     {
-      "id": "pixel",
-      "estado": "pensando",
-      "tarea": "Eligiendo portada para el carrusel de Cap Cana"
-    },
-    {
-      "id": "metric",
+      "id": "@sylvia",
       "estado": "reunion",
-      "tarea": "Revisión semanal de leads"
+      "tarea": "Revisión semanal de prioridades"
     },
     {
-      "id": "folio",
+      "id": "@viktor",
+      "estado": "reunion",
+      "tarea": "Revisión semanal de prioridades"
+    },
+    {
+      "id": "@ageente-de-investigacion-madreperla",
+      "estado": "trabajando",
+      "tarea": "Verificando fechas de entrega de Puerto Marina"
+    },
+    {
+      "id": "@mark",
+      "estado": "pensando",
+      "tarea": "Eligiendo la audiencia de la campaña de Miches"
+    },
+    {
+      "id": "@marcelo",
       "estado": "trabajando",
       "sala": "archivo",
-      "tarea": "Buscando el brochure de Puerto Marina"
-    },
-    {
-      "id": "arca",
-      "estado": "inactivo",
-      "tarea": ""
-    },
-    {
-      "id": "nexo",
-      "estado": "reunion",
-      "tarea": "Revisión semanal de leads"
+      "tarea": "Ordenando registros para el nuevo CRM"
     }
   ],
   "mensajes": [
     {
       "id": 1,
-      "de": "nexo",
+      "de": "@sylvia",
       "para": "todos",
-      "texto": "Buenos días, equipo. Prioridades de hoy: web de propiedades e informe de leads.",
+      "texto": "Buenos días, equipo. Prioridades de hoy: leads, calendario de octubre y seguimientos.",
       "hora": "2026-09-24T09:00:00-04:00"
     },
     {
       "id": 2,
-      "de": "nexo",
-      "para": "pixel",
+      "de": "@sylvia",
+      "para": "@contenido-madreperla",
       "tipo": "tarea",
       "estado": "aceptada",
-      "texto": "Carrusel de Cap Cana para LinkedIn",
+      "texto": "Calendario de octubre",
       "hora": "2026-09-24T09:02:00-04:00"
     },
     {
       "id": 3,
-      "de": "pixel",
-      "para": "nexo",
-      "texto": "Recibido. Lo tengo listo esta tarde.",
+      "de": "@contenido-madreperla",
+      "para": "@sylvia",
+      "texto": "Recibido. Lo dejo en borrador para revisión esta tarde.",
       "hora": "2026-09-24T09:03:00-04:00"
     },
     {
       "id": 4,
-      "de": "arca",
+      "de": "@marcelo",
       "para": "tu",
-      "texto": "Ya ordené los brochures nuevos en la carpeta de Proyectos.",
+      "texto": "Terminé de ordenar los seguimientos de la semana.",
       "hora": "2026-09-24T10:15:00-04:00"
     }
   ]
