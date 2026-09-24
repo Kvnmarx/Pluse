@@ -301,7 +301,7 @@
   .ev-form label{font:11px var(--mono);color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
   .card-msg.evt{border-left-color:#E0C27A;background:rgba(224,194,122,.06)}
   .evt-line{align-self:stretch;max-width:100%}
-  .toasts{top:calc(env(safe-area-inset-top,0px) + 64px);right:16px;display:grid;gap:8px;width:min(340px, calc(100% - 32px));pointer-events:none}
+  .toasts{bottom:calc(env(safe-area-inset-bottom,0px) + 76px);left:50%;transform:translateX(-50%);display:grid;gap:8px;width:min(340px, calc(100% - 32px));pointer-events:none}
   .toast{pointer-events:auto;background:var(--panel-solid);border:1px solid #E0C27A;border-radius:12px;padding:10px 12px;display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;box-shadow:0 12px 30px rgba(0,0,0,.45);animation:slidein .28s ease-out}
   .toast .eyebrow{grid-column:1 / 3;color:#E0C27A}
   .toast p{margin:0;font:13px/1.4 var(--body)}
@@ -2576,7 +2576,7 @@ Responde solo con JSON así:
      calendario que elijas o los eventos marcados con #madreperla).
    - Conectado a Hermes: los eventos y avisos llegan del servidor local.  */
 const UMBRALES = ['7d', '2d', '1d', '3h', 'ahora', 'despues'];
-const UMBRAL_LABEL = { '7d':'Falta una semana', '2d':'Faltan 2 días', '1d':'Mañana', '3h':'En menos de 3 horas', ahora:'En curso', despues:'Seguimiento', manual:'Preparación' };
+const UMBRAL_LABEL = { '7d':'Falta una semana', '2d':'Faltan 2 días', '1d':'Menos de un día', '3h':'En menos de 3 horas', ahora:'En curso', despues:'Seguimiento', manual:'Preparación' };
 const AUTO_UMBRALES = ['7d', '2d', '1d', 'despues'];
 const TZ_RD = 'America/Santo_Domingo';
 var eventos = [];                                // {id, titulo, inicio, fin, todoDia, zona, lugar, descripcion, fuente, avisos, preparado}
@@ -2658,7 +2658,7 @@ function normEvent(r, extra = {}){
 }
 function loadLiveEvents(list){
   const next = list.map(x => normEvent(x)).filter(Boolean);
-  const sig = next.map(e => e.id + e.inicio + e.avisos.join('') + (e.preparado || '')).join('|');
+  const sig = JSON.stringify(next);
   evSource = server && server.calendario ? 'hermes-cal' : 'hermes';
   if (sig === evSig) return;
   evSig = sig; eventos = next;
@@ -2669,7 +2669,7 @@ function loadLiveEvents(list){
 function startEventEngine(){
   if (evEngineOn) return;
   evEngineOn = true;
-  if (evSource === 'ejemplo' && !eventos.length) seedSampleEvents();
+  if (evSource === 'ejemplo' && !eventos.length && !calPref()) seedSampleEvents();
   renderEvents(true); drawEventScreens();
 }
 function seedSampleEvents(){
@@ -2695,7 +2695,11 @@ function eventsTick(now){
   if (now - evLastTick < 1000) return;                 // una vez por segundo basta
   evLastTick = now;
   const t = Date.now();
-  if (Math.floor(t / 30000) !== Math.floor((t - 1000) / 30000)) { drawEventScreens(); if (evOpen) renderEvents(true); updateEvBadge(); }
+  if (Math.floor(t / 30000) !== Math.floor((t - 1000) / 30000)) {
+    drawEventScreens(); updateEvBadge();
+    const busy = evPanel.contains(document.activeElement) && /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName);
+    if (evOpen && !busy) renderEvents(true);
+  }
   if (live || !evEngineOn || evBusy || now - evLastFire < 20000) return;
   for (const ev of upcoming(t)) {
     const u = umbralDe(ev, t);
@@ -2712,16 +2716,25 @@ function avisoTexto(ev, u){
   return {
     '7d': `Falta una semana o menos para «${ev.titulo}» (${cuando}).`,
     '2d': `Faltan 2 días para «${ev.titulo}» (${cuando}).`,
-    '1d': `Mañana es «${ev.titulo}» (${cuando}).`,
+    '1d': `${fmtParts(ev.inicio, TZ_RD, { day:'numeric' }) === fmtParts(Date.now(), TZ_RD, { day:'numeric' }) ? 'Hoy' : 'Mañana'} es «${ev.titulo}» (${cuando}).`,
     '3h': `En menos de 3 horas empieza «${ev.titulo}» (${cuando}).`,
     ahora: `Ya empezó «${ev.titulo}».`,
     despues: `Terminó «${ev.titulo}». Es buen momento para el seguimiento.`,
     manual: `María Andrea pidió preparar «${ev.titulo}» (${cuando}).`,
   }[u];
 }
+const AV_KEY = 'habitat-avisos';
+function avisosGuardados(){ try { return JSON.parse(localStorage.getItem(AV_KEY) || '{}'); } catch { return {}; } }
+function guardarAvisos(){
+  if (evSource !== 'google') return;
+  try {
+    const m = {}; eventos.filter(e => e.fuente === 'google').forEach(e => { m[e.id] = { a: e.avisos, p: e.preparado }; });
+    localStorage.setItem(AV_KEY, JSON.stringify(m));
+  } catch {}
+}
 async function fireEvent(ev, u){
   post({ de:'sistema', para:'todos', canal:'equipo', tipo:'evento', evento: ev.id, umbral: u, texto: avisoTexto(ev, u) });
-  renderEvents(true); drawEventScreens(); updateEvBadge();
+  renderEvents(true); drawEventScreens(); updateEvBadge(); guardarAvisos();
   const auto = evSource === 'ejemplo' ? ['2d', '1d', 'despues'] : AUTO_UMBRALES;   // en simulación, sin tanto ruido
   if (auto.includes(u)) await prepareEvent(ev, u);
 }
@@ -2729,22 +2742,22 @@ async function fireEvent(ev, u){
 /* --- preparación: plan por tipo de evento y momento --- */
 const PREP = {
   torneo: {
-    '7d': [['mark','Campaña de invitación al torneo para el segmento golf', true], ['viktor','Lista de clientes con perfil golf para invitar (sin datos sensibles en el chat)', false],
+    '7d': [['mark','Borrador de campaña de invitación al torneo (segmento golf)', true], ['viktor','Lista de clientes con perfil golf para invitar (sin datos sensibles en el chat)', false],
            ['sergio','Confirmar sede, horario y logística del torneo', false], ['bety','Borrador de invitación al torneo', true]],
     '2d': [['marcelo','Confirmar asistentes y programar recordatorios', false], ['viktor','Kit para invitados: fichas de Cap Cana y Cabeza de Toro (Coral Golf Resort)', false],
            ['bety','Borrador de publicación para el día del torneo', true]],
-    '1d': [['marcelo','Recordatorio a los confirmados', true], ['sylvia','Revisar la lista final y el plan del día', false]],
+    '1d': [['marcelo','Borrador de recordatorio para los confirmados', true], ['sylvia','Revisar la lista final y el plan del día', false]],
     despues: [['marcelo','Registrar contactos nuevos y programar su seguimiento', false], ['bety','Borrador de agradecimiento a los asistentes', true], ['mark','Resultados del torneo: contactos, interés y leads', false]],
   },
   visita: {
     '7d': [['viktor','Seleccionar las propiedades del recorrido y la agenda', false], ['bety','Borrador de invitación al recorrido', true], ['sergio','Verificar datos de cada propiedad (con fuente y fecha)', false]],
     '2d': [['marcelo','Confirmar asistentes y horarios', false], ['viktor','Fichas impresas y digitales de cada propiedad', false]],
-    '1d': [['marcelo','Recordatorio a los invitados', true], ['sylvia','Revisar la ruta y los tiempos del recorrido', false]],
+    '1d': [['marcelo','Borrador de recordatorio para los invitados', true], ['sylvia','Revisar la ruta y los tiempos del recorrido', false]],
     despues: [['marcelo','Seguimiento a cada visitante', false], ['bety','Borrador de agradecimiento con las fichas vistas', true]],
   },
   reunion: {
     '7d': [['sergio','Perfil del mercado relevante para los invitados', false], ['viktor','Opciones que encajan con su perfil y horizonte', false]],
-    '2d': [['viktor','Propuesta preliminar para revisión (precios por confirmar)', true], ['marcelo','Confirmar asistencia y detalles', false]],
+    '2d': [['viktor','Borrador de propuesta preliminar (precios por confirmar)', true], ['marcelo','Confirmar asistencia y detalles', false]],
     '1d': [['sylvia','Resumen de la reunión y preguntas clave para María Andrea', false]],
     despues: [['marcelo','Registrar acuerdos y próximos pasos', false], ['bety','Borrador de mensaje de agradecimiento', true]],
   },
@@ -2757,7 +2770,7 @@ const PREP = {
   lanzamiento: {
     '7d': [['bety','Borrador de invitación y publicaciones del lanzamiento', true], ['mark','Audiencia y difusión del lanzamiento', false]],
     '2d': [['viktor','Presentación del proyecto para el evento', false], ['marcelo','Confirmar inscritos', false]],
-    '1d': [['marcelo','Recordatorio a los inscritos', true]],
+    '1d': [['marcelo','Borrador de recordatorio para los inscritos', true]],
     despues: [['mark','Resultados del lanzamiento', false], ['bety','Borrador de resumen para publicar', true]],
   },
   general: {
@@ -2792,7 +2805,7 @@ Reglas: todo lo que vaya a clientes o al público (invitaciones, publicaciones, 
 Responde solo con JSON: {"resumen":"una frase para María Andrea","tareas":[{"para":"bety","texto":"…","aprobacion":true}]}
 Valores válidos de "para": ${AGENTS.map(a => a.id).join(', ')}.`, { modelTier:'default', cache:false });
   const tareas = (Array.isArray(out?.tareas) ? out.tareas : []).filter(x => AGENTS.some(a => a.id === x.para) && typeof x.texto === 'string' && x.texto.trim())
-    .slice(0, 5).map(x => [x.para, x.texto.trim().slice(0, 120), !!x.aprobacion]);
+    .slice(0, 5).map(x => { const t = x.texto.trim().slice(0, 120); return [x.para, x.aprobacion && !/^borrador/i.test(t) ? 'Borrador: ' + t : t, !!x.aprobacion]; });
   if (!tareas.length) throw new Error('plan vacío');
   return { resumen: typeof out.resumen === 'string' ? out.resumen.slice(0, 240) : '', tareas };
 }
@@ -2866,7 +2879,7 @@ function drawEventScreens(){
       let y = 128 + tl.length * 58;
       x.fillStyle = '#8FA7A5'; x.font = '24px sans-serif';
       x.fillText(fechaTexto(ev).split(' (')[0] + (ev.lugar ? ' · ' + ev.lugar : ''), 52, y); y += 70;
-      x.fillStyle = '#E0C27A'; x.font = '700 64px sans-serif'; x.fillText(faltaTexto(ev, now).replace(/^en /, ''), 52, y);
+      x.fillStyle = '#E0C27A'; x.font = '700 64px sans-serif'; x.fillText(now >= ev.inicio ? 'En curso' : faltaTexto(ev, now).replace(/^en /, ''), 52, y);
       const ts = evTasks(ev.id), done = ts.filter(m => m.estado === 'hecha').length;
       if (ts.length) {
         y += 50; x.fillStyle = '#8FA7A5'; x.font = '22px sans-serif'; x.fillText(`Preparación ${done}/${ts.length}`, 52, y);
@@ -2922,6 +2935,7 @@ function renderEvents(force){
   const now = Date.now();
   const list = upcoming(now);
   const focusId = document.activeElement && evPanel.contains(document.activeElement) ? document.activeElement.id : null;
+  const keep = ['evT', 'evF', 'evL'].map(id => document.getElementById(id)?.value || '');   // lo escrito en el formulario
   const nx = nextEvent(now);
   const exp = evExpanded || nx?.id;
   const canEdit = !live || !!server;
@@ -2944,6 +2958,7 @@ function renderEvents(force){
       <div class="apr-err" id="evErr" hidden></div>
       <div class="ev-row"><button class="apr-ok" type="submit">Agregar</button></div>
     </form>` : evSource === 'google' ? `<div class="apr-note">Para agregar un evento, créalo en tu calendario «${esc(evCalName)}»${evCalTag() ? ' con #madreperla en el título o la descripción' : ''}. Aparece aquí en unos minutos.</div>` : ''}`;
+  ['evT', 'evF', 'evL'].forEach((id, i) => { const el = document.getElementById(id); if (el && keep[i]) el.value = keep[i]; });
   if (focusId) { const el = document.getElementById(focusId); if (el) el.focus(); }
 }
 function evItem(ev, now, open, isNext, canEdit){
@@ -2962,7 +2977,7 @@ function evItem(ev, now, open, isNext, canEdit){
       <div class="ev-tags"><span class="tool">${esc(src)}</span><span class="tool">${esc({ torneo:'Torneo', visita:'Visita', feria:'Feria', reunion:'Reunión', lanzamiento:'Lanzamiento', general:'Evento' }[tipoEvento(ev)])}</span>${ev.preparado ? `<span class="tool">Preparado ${hhmm(ev.preparado)}</span>` : ''}</div>
       <div class="d-sec"><div class="eyebrow">Plan de preparación <span>${ts.filter(m => m.estado === 'hecha').length}/${ts.length}</span></div>
         ${ts.length ? `<ul class="ev-plan">${ts.map(m => { const w = who(m.para); return `<li style="--c2:${w.color}"><i></i><span><b>${esc(w.name)}</b> · ${esc(m.texto.replace(' · ' + ev.titulo, ''))}</span><span class="chip tk-${m.estado || 'pendiente'}">${TK_LABEL[m.estado || 'pendiente']}</span></li>`; }).join('')}</ul>`
-          : `<div class="d-small">${live ? 'Sylvia reparte las tareas cuando se acerca el evento, o cuando tocas "Preparar ahora".' : 'Todavía no hay tareas. Se reparten solas a una semana, a 2 días y un día antes, o con "Preparar ahora".'}</div>`}
+          : `<div class="d-small">${live ? 'Sylvia reparte las tareas cuando se acerca el evento, o cuando tocas "Preparar ahora".' : (evSource === 'ejemplo' ? 'Todavía no hay tareas. Se reparten a 2 días y el día antes, o con "Preparar ahora".' : 'Todavía no hay tareas. Se reparten solas a una semana, a 2 días y el día antes, o con "Preparar ahora".')}</div>`}
       </div>
       ${aps ? `<button class="apr-more" data-goapr="1">${aps === 1 ? '1 borrador espera' : aps + ' borradores esperan'} tu aprobación</button>` : ''}
       <div class="ev-row">
@@ -2988,7 +3003,7 @@ evBtn.addEventListener('click', () => evOpen ? closeEvents() : openEvents());
 avEv.addEventListener('click', () => openEvents());
 evPanel.addEventListener('click', async e => {
   if (e.target.closest('#evClose')) return closeEvents();
-  const ex = e.target.closest('[data-exp]'); if (ex) { evExpanded = evExpanded === ex.dataset.exp ? '__none' : ex.dataset.exp; return renderEvents(true); }
+  const ex = e.target.closest('[data-exp]'); if (ex) { evExpanded = ex.getAttribute('aria-expanded') === 'true' ? '__none' : ex.dataset.exp; return renderEvents(true); }
   if (e.target.closest('[data-goapr]')) { closeEvents(); return openApprovals(); }
   const pb = e.target.closest('[data-prep]');
   if (pb) {
@@ -3027,6 +3042,7 @@ evPanel.addEventListener('submit', async e => {
   }
   const ev = normEvent({ id:'man-' + Date.now(), titulo, inicio, lugar, zona: TZ_RD, fuente:'manual' });
   eventos.push(ev); evExpanded = ev.id;
+  ['evT', 'evF', 'evL'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   renderEvents(true); drawEventScreens();
 });
 
@@ -3054,9 +3070,9 @@ function calConnectBlock(){
     <span>${evSource === 'google' ? 'Calendario conectado. Puedes cambiarlo:' : 'Conecta tu Google Calendar. Elige el calendario de eventos de Madreperla (así no aparecen eventos personales), o usa solo los eventos marcados con <b>#madreperla</b>.'}</span>
     <label class="sr" for="calSel">Calendario</label>
     <select id="calSel">
-      ${calList ? '' : '<option value="">Cargando calendarios…</option>'}
+      <option value=""${p ? '' : ' selected'}>${calList ? 'Elige un calendario…' : 'Cargando calendarios…'}</option>
+      <option value="__tag"${p && p.tag ? ' selected' : ''}>Calendario principal: solo eventos con #madreperla en el título</option>
       ${opts}
-      <option value="__tag"${p && p.tag ? ' selected' : ''}>Calendario principal: solo eventos con #madreperla</option>
     </select>
     ${evCalError ? `<div class="apr-err" role="alert">${esc(evCalError)}</div>` : ''}
     <div class="ev-row"><button class="apr-ok" id="calUse" type="button">${evSource === 'google' ? 'Cambiar' : 'Usar este calendario'}</button></div>
@@ -3116,7 +3132,7 @@ function startCalendarWatch(pref){
     const tzCal = pl.timeZone || TZ_RD;
     const prev = new Map(eventos.filter(x => x.fuente === 'google').map(x => [x.id, x]));
     const next = (Array.isArray(pl.events) ? pl.events : []).filter(x => x && x.status !== 'cancelled' && (!x.eventType || x.eventType === 'DEFAULT' || x.eventType === 'FROM_GMAIL'))
-      .filter(x => !pref.tag || /#madreperla/i.test(`${x.summary || ''} ${x.description || ''}`))
+      .filter(x => !pref.tag || /#madreperla/i.test(x.summary || ''))
       .map(x => {
         const allDay = !x.start?.dateTime;
         const zona = x.start?.timeZone || tzCal;
@@ -3124,7 +3140,9 @@ function startCalendarWatch(pref){
         const fin = allDay ? (x.end?.date ? Date.parse(`${x.end.date}T00:00:00${zona === 'America/Bogota' ? '-05:00' : '-04:00'}`) : null) : Date.parse(x.end?.dateTime);
         const e = normEvent({ id:'g-' + x.id, titulo: (x.summary || 'Evento').replace(/#madreperla/ig, '').trim(), inicio: ini, fin: isNaN(fin) ? null : fin, todo_el_dia: allDay, zona,
           lugar: x.location || '', descripcion: String(x.description || '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/#madreperla/ig, '').replace(/\s+\n/g, '\n').trim(), fuente:'google' });
+        const mem = avisosGuardados()[e && e.id];
         if (e && prev.has(e.id)) { e.avisos = prev.get(e.id).avisos; e.preparado = prev.get(e.id).preparado; }
+        else if (e && mem) { e.avisos = mem.a || []; e.preparado = mem.p || null; }
         return e;
       }).filter(Boolean);
     eventos = eventos.filter(x => x.fuente === 'manual').concat(next);

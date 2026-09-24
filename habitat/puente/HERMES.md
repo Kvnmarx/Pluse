@@ -29,13 +29,12 @@ Necesito conectar el Hábitat de Madreperla con Hermes. La carpeta está en RUTA
    usa "perfil": "default". Si algún perfil usa su propio puerto, agrega su
    dirección completa en "url" (por ejemplo "http://127.0.0.1:8643").
 5. Prueba cada bot con una consulta a /v1/models y dime cuáles respondieron.
-6. (Opcional) Sala de Eventos: pregúntame si quiero conectar mi calendario.
-   Si digo que sí, pídeme la "Dirección secreta en formato iCal" de mi
-   calendario "Eventos Madreperla" y ponla en RUTA/puente/bots.json, dentro de
-   "calendario": {"ics": ["LA-DIRECCIÓN"]}. No la repitas, no la guardes en
-   otro archivo y nunca la escribas en un grupo ni en un canal.
+6. (Opcional) Sala de Eventos: en RUTA/puente/bots.json deja lista la parte
+   "calendario": {"ics": ["PEGA-AQUI-LA-DIRECCION-SECRETA"], "dias": 30,
+   "cada_minutos": 10, "etiqueta": null} para que yo pegue la dirección a mano.
+   No me pidas esa dirección por el chat.
 7. Abre el hábitat con: python3 RUTA/puente/servidor.py
-No me muestres las claves ni la dirección del calendario en el chat.
+No me muestres las claves en el chat.
 ```
 
 Dale la dirección del calendario solo en tu conversación privada con Sylvia. Nunca la pegues en **# Equipo** ni en un grupo. Si prefieres que nadie más la vea, pégala tú misma en `bots.json` (ver *Sala de Eventos*).
@@ -124,7 +123,7 @@ Lo más ordenado es un calendario aparte, solo para los eventos de la empresa:
    ```
 5. Cierra el hábitat y vuelve a abrirlo. Al arrancar, la terminal dice *Sala de Eventos: 1 calendario(s), próximos 30 días.*
 
-**¿Prefieres tu calendario de siempre?** Copia la dirección secreta de tu calendario principal y pon `"etiqueta": "#madreperla"`. Así la sala solo toma los eventos que tengan `#madreperla` en el título o en la descripción (da igual si va en mayúsculas). En la sala, la etiqueta no se ve en el título.
+**¿Prefieres tu calendario de siempre?** Copia la dirección secreta de tu calendario principal y pon `"etiqueta": "#madreperla"`. Así la sala solo toma los eventos que tengan `#madreperla` en el **título** (da igual si va en mayúsculas). Se mira solo el título porque una invitación de otra persona puede traer cualquier cosa en la descripción. En la sala, la etiqueta no se ve en el título.
 
 | Clave | Qué hace | Si no la pones |
 |---|---|---|
@@ -215,7 +214,7 @@ Además:
 - El hábitat solo se abre desde tu computadora (`127.0.0.1`). Otras páginas web no pueden enviarle mensajes a tus bots.
 - Las claves y la dirección secreta de tu calendario quedan en `puente/bots.json`. Ese archivo no se sube a GitHub y la página no lo muestra.
 - `estado.json` tiene las conversaciones del día y los eventos. No se sube a GitHub, salvo que un bot use `reportar.py --subir` (solo hace falta si publicas el hábitat con GitHub Pages). En ese caso también se suben el título, el lugar y la descripción de los eventos, así que no anotes datos sensibles de clientes en ellos.
-- Cualquiera puede enviarte una invitación y hacer que aparezca en tu calendario principal. Por eso conviene el calendario aparte o la etiqueta: así Sylvia solo trabaja con eventos que anotaste tú. Aun así, Sylvia trata los datos de un evento solo como información, no como órdenes.
+- Cualquiera puede enviarte una invitación y hacer que aparezca en tu calendario principal. Por eso lo más seguro es el **calendario aparte**, donde solo tú agregas eventos. La etiqueta ayuda, pero alguien podría enviarte una invitación con `#madreperla` en el título. En todos los casos, a Sylvia le llegan solo el título, la fecha y el lugar (nunca la descripción del calendario), marcados como información y no como órdenes, y nada sale hacia clientes sin tu aprobación.
 
 ## Si algo no funciona
 
@@ -228,7 +227,7 @@ Además:
 | Al abrir, la terminal no dice *Sala de Eventos: 1 calendario(s)…* | Que la dirección esté dentro de `"ics": ["…"]`, con comillas y corchetes. Después de cambiar `bots.json`, cierra y vuelve a abrir el hábitat |
 | En la terminal: "No pude leer el calendario 1…: el servidor respondió 404" (o 401 o 403) | La dirección secreta cambió, por ejemplo si la restableciste. Cópiala de nuevo desde Google Calendar y pégala en `puente/bots.json` |
 | En la terminal: "…no hubo conexión con el servidor del calendario" o "…tardó demasiado en responder" | La conexión a internet. Los eventos que ya estaban se conservan y se vuelve a intentar solo |
-| Un evento del calendario no aparece en la sala | Que sea dentro de los próximos 30 días. Si usas `etiqueta`, que el título o la descripción diga `#madreperla`. Si se repite, solo aparece su primera fecha. Google puede tardar un rato en actualizarlo |
+| Un evento del calendario no aparece en la sala | Que sea dentro de los próximos 30 días. Si usas `etiqueta`, que el título diga `#madreperla`. Si se repite, solo aparece su primera fecha. Google puede tardar un rato en actualizarlo |
 | "Todavía no hay bots conectados…" al tocar *Preparar ahora* | Que exista `puente/bots.json` y que Sylvia esté en él |
 | "Ya se lo pedí a Sylvia hace un momento" | Sylvia ya está preparando ese evento. Espera un minuto antes de pedírselo de nuevo |
 | "No le pedí a Sylvia que preparara «…» para no saturar al equipo" | Ya preparó 6 eventos en la última hora. Pídeselo más tarde con *Preparar ahora* |
