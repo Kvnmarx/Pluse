@@ -1,7 +1,25 @@
 {
   "actualizado": "2026-09-24T10:30:00-04:00",
   "agentes": [
-    { "id": "byte",   "estado": "trabajando", "tarea": "Actualizando la web de propiedades" },
+    {
+      "id": "byte",
+      "estado": "trabajando",
+      "tarea": "Actualizando la web de propiedades",
+      "tarea_inicio": "2026-09-24T10:05:00-04:00",
+      "avance": 60,
+      "modelo": "claude-sonnet-5",
+      "tokens": { "entrada": 182400, "salida": 39100, "limite_diario": 400000,
+                  "por_hora": [0, 0, 12000, 18500, 22100, 30400, 25800, 19700, 28000, 31200, 20900, 12900] },
+      "completadas_hoy": 5,
+      "activo_desde": "2026-09-24T08:00:00-04:00",
+      "ultima_actividad": "2026-09-24T10:29:40-04:00",
+      "cola": ["Conectar el CRM con el formulario", "Revisar velocidad de la web"],
+      "historial": [
+        { "hora": "10:05", "texto": "Empezó: actualizar la web de propiedades" },
+        { "hora": "09:40", "texto": "Terminó: ficha de L'Atelier Cap Cana" }
+      ],
+      "herramientas": ["GitHub", "CRM", "Sitio web"]
+    },
     { "id": "pixel",  "estado": "pensando",   "tarea": "Eligiendo portada para el carrusel de Cap Cana" },
     { "id": "metric", "estado": "reunion",    "tarea": "Revisión semanal de leads" },
     { "id": "folio",  "estado": "trabajando", "sala": "archivo", "tarea": "Buscando el brochure de Puerto Marina" },

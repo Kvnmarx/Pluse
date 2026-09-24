@@ -29,6 +29,26 @@ Cada agente solo tiene que actualizar su línea en `estado.json` (copia `estado.
 - `sala` (opcional): `code`, `design`, `analitica`, `libreria`, `archivo` o `meeting`. Si no se pone, el robot va a su propia sala (o al Meeting Room si está en reunión).
 - `tarea`: texto corto que aparece en la burbuja del robot.
 
+### Datos para la ficha del agente (todos opcionales)
+
+Al tocar un robot o su nombre se abre su ficha a la derecha. Se llena con estos campos:
+
+| Campo | Qué muestra |
+|---|---|
+| `tarea_inicio` | Desde qué hora trabaja en la tarea actual (fecha ISO) |
+| `avance` | Porcentaje completado, de 0 a 100 |
+| `tokens.entrada` / `tokens.salida` | Tokens leídos y escritos hoy |
+| `tokens.limite_diario` | Límite del día, para mostrar el % usado |
+| `tokens.por_hora` | Lista de hasta 12 números: tokens de cada una de las últimas horas (el último es la hora actual) |
+| `completadas_hoy` | Tareas terminadas hoy |
+| `activo_desde` | Desde qué hora está encendido hoy |
+| `ultima_actividad` | Hora de su último reporte |
+| `cola` | Lista de sus próximas tareas |
+| `historial` | Lista de `{ "hora": "10:05", "texto": "..." }` |
+| `modelo`, `herramientas`, `mision` | Su ficha fija (si no se envían, se usan las de la página) |
+
+`estado.ejemplo.json` trae un agente (Byte) con todos los campos llenos como modelo.
+
 No pongas en `tarea` datos sensibles de clientes (nombres completos, cédulas, montos): el archivo se puede ver públicamente si la página está publicada.
 
 ## Nota sobre Pluse

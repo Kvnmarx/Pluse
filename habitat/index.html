@@ -43,7 +43,7 @@
 
   /* Roster */
   .roster{top:calc(env(safe-area-inset-top,0px) + 108px);right:16px;width:300px;max-height:calc(100% - 220px);overflow:auto;display:grid;gap:8px;padding-right:2px}
-  .card{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:12px 1fr auto;gap:4px 10px;align-items:center;background:var(--panel);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:12px;padding:10px 12px;transition:border-color .2s, transform .2s}
+  .card{all:unset;pointer-events:auto;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:12px 1fr auto;gap:4px 10px;align-items:center;background:var(--panel);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:12px;padding:10px 12px;transition:border-color .2s, transform .2s}
   .card:hover{border-color:rgba(205,187,147,.4)}
   .card:focus-visible{outline:2px solid var(--champagne);outline-offset:2px}
   .card.sel{border-color:var(--c);box-shadow:0 0 0 1px var(--c) inset}
@@ -73,6 +73,49 @@
   .room{position:absolute;left:0;top:0;transform:translate(-50%,-50%);font:600 12px/1 var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--c);text-shadow:0 0 14px rgba(0,0,0,.9);white-space:nowrap;opacity:.95}
   .room small{display:block;margin-top:4px;font:10px/1 var(--mono);letter-spacing:.08em;color:var(--muted);text-transform:none;text-align:center}
 
+  /* Ficha del agente */
+  .detail{pointer-events:auto;top:calc(env(safe-area-inset-top,0px) + 108px);right:16px;width:348px;max-height:calc(100% - 124px - env(safe-area-inset-top,0px));overflow:auto;background:var(--panel-solid);border:1px solid var(--line);border-top:3px solid var(--c);border-radius:14px;padding:16px;display:grid;gap:18px;box-shadow:0 20px 50px rgba(0,0,0,.45);animation:slidein .28s ease-out}
+  @keyframes slidein{from{transform:translateX(24px);opacity:.3}}
+  .d-head{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center}
+  .d-avatar{width:44px;height:44px;border-radius:12px;background:radial-gradient(circle at 35% 30%, #fff8 0 12%, transparent 13%), var(--c);display:grid;place-items:center;box-shadow:0 0 18px color-mix(in srgb, var(--c) 55%, transparent)}
+  .d-avatar::after{content:"";width:24px;height:7px;border-radius:6px;background:#061619}
+  .d-head h2{margin:0;font:600 18px/1.1 var(--display)}
+  .d-head .sub{font:11px/1.4 var(--mono);color:var(--muted)}
+  .x{all:unset;cursor:pointer;width:32px;height:32px;border-radius:8px;display:grid;place-items:center;color:var(--muted);font-size:20px;line-height:1}
+  .x:hover{background:rgba(255,255,255,.06);color:var(--ivory)} .x:focus-visible{outline:2px solid var(--champagne)}
+  .d-sec{display:grid;gap:8px}
+  .d-sec > .eyebrow{display:flex;justify-content:space-between;gap:8px}
+  .d-sec > .eyebrow span{color:var(--muted);letter-spacing:.06em}
+  .d-task{font:500 15px/1.4 var(--body)}
+  .d-small{font:12px/1.4 var(--mono);color:var(--muted)}
+  .meter{height:8px;border-radius:999px;background:rgba(239,233,221,.08);overflow:hidden}
+  .meter i{display:block;height:100%;border-radius:999px;background:var(--c);transition:width .6s}
+  .alert{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;border:1px solid var(--bad);background:rgba(255,107,107,.08);border-radius:10px;padding:10px 12px;font-size:13px}
+  .alert b{color:var(--bad);font:600 12px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.06em}
+  .hero{display:flex;align-items:baseline;gap:8px;font-variant-numeric:tabular-nums}
+  .hero strong{font:600 28px/1 var(--display);letter-spacing:-.02em}
+  .hero span{font:12px var(--mono);color:var(--muted)}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:8px;font:12px/1.4 var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
+  .split b{display:block;font:500 14px/1.3 var(--mono);color:var(--ivory)}
+  .chart{position:relative}
+  .chart svg{display:block;width:100%;height:auto;overflow:visible}
+  .chart .tip{position:absolute;top:-6px;transform:translate(-50%,-100%);background:var(--ivory);color:#0B252A;font:500 11.5px/1.3 var(--mono);padding:5px 8px;border-radius:6px;white-space:nowrap;pointer-events:none;font-variant-numeric:tabular-nums}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .stat{border:1px solid var(--line);border-radius:10px;padding:10px;display:grid;gap:2px}
+  .stat b{font:600 17px/1.2 var(--display);font-variant-numeric:tabular-nums}
+  .stat span{font:10.5px/1.3 var(--mono);color:var(--muted)}
+  .list{list-style:none;margin:0;padding:0;display:grid;gap:6px;font-size:13px}
+  .list li{display:grid;grid-template-columns:44px 1fr;gap:8px;align-items:baseline}
+  .list li time{font:11px var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
+  .list.queue li{grid-template-columns:18px 1fr}
+  .list.queue li span:first-child{font:11px var(--mono);color:var(--c)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .tool{font:11.5px/1 var(--mono);padding:5px 8px;border-radius:6px;background:rgba(239,233,221,.07);color:var(--ivory)}
+  .kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:12.5px}
+  .kv dt{font:11px/1.6 var(--mono);color:var(--muted)} .kv dd{margin:0}
+  .note{font:11px/1.4 var(--mono);color:var(--warn);border:1px dashed rgba(233,196,106,.4);border-radius:8px;padding:6px 8px}
+  .tag .name{pointer-events:auto;cursor:pointer}
+
   .loading{position:fixed;inset:0;display:grid;place-items:center;z-index:5;background:var(--bg);font:12px var(--mono);color:var(--muted);letter-spacing:.14em;text-transform:uppercase;transition:opacity .6s}
   .loading.done{opacity:0;pointer-events:none}
 
@@ -82,6 +125,7 @@
     .roster{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);right:16px;left:16px;width:auto;max-height:none;display:flex;overflow-x:auto;overflow-y:hidden;gap:8px;scroll-snap-type:x mandatory;padding-bottom:2px}
     .card{flex:0 0 78%;scroll-snap-align:start}
     .feed{display:none}
+    .detail{top:auto;left:16px;right:16px;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);width:auto;max-height:64%;animation:none}
   }
   @media (prefers-reduced-motion: reduce){ .mode.live i{animation:none} }
 </style>
@@ -99,10 +143,12 @@
       <span id="updated">—</span>
     </div>
   </div>
-  <div class="hint">Arrastra para girar · pellizca o rueda para acercar · toca un robot para seguirlo</div>
+  <div class="hint">Arrastra para girar · pellizca o rueda para acercar · toca un robot o su nombre para ver su ficha</div>
 </div>
 
 <div class="ui roster" id="roster" role="list" aria-label="Agentes"></div>
+
+<aside class="ui detail" id="detail" hidden aria-label="Ficha del agente"></aside>
 
 <div class="ui feed" aria-live="polite">
   <span class="eyebrow">Actividad reciente</span>
@@ -143,6 +189,16 @@ const AGENTS = [
 ];
 
 const STATE_LABEL = { trabajando:'Trabajando', pensando:'Pensando', reunion:'En reunión', inactivo:'En pausa', error:'Necesita ayuda' };
+
+/* Ficha fija de cada agente (se puede sobrescribir desde estado.json) */
+const PROFILE = {
+  byte:   { mision:'Construye y mantiene la web, las integraciones con el CRM y las automatizaciones internas.', herramientas:['GitHub','CRM','Sitio web'], modelo:'claude-sonnet-5' },
+  pixel:  { mision:'Crea piezas visuales, presentaciones y publicaciones con la identidad de Madreperla.', herramientas:['Diseño','Banco de fotos','LinkedIn'], modelo:'claude-sonnet-5' },
+  metric: { mision:'Mide leads, alcance y resultados comerciales, y los traduce en informes claros.', herramientas:['CRM','Hojas de cálculo','Analítica web'], modelo:'claude-sonnet-5' },
+  folio:  { mision:'Investiga zonas, tendencias y normativa, y resume lo relevante para el equipo.', herramientas:['Búsqueda web','Google Drive'], modelo:'claude-sonnet-5' },
+  arca:   { mision:'Ordena, clasifica y encuentra documentos, brochures y fichas de proyectos.', herramientas:['Google Drive','Carpeta Proyectos'], modelo:'claude-haiku-4-5' },
+  nexo:   { mision:'Coordina al equipo: asigna tareas, prepara reuniones y consolida los avances.', herramientas:['Calendario','Gmail (borradores)','CRM'], modelo:'claude-opus-5-5' },
+};
 
 /* Tareas de ejemplo para el modo simulación */
 const SIM_TASKS = {
@@ -524,7 +580,7 @@ function buildRobot(a, idx){
   scene.add(g);
 
   const tag = document.createElement('div');
-  tag.className = 'tag'; tag.style.setProperty('--c', a.color);
+  tag.className = 'tag'; tag.dataset.id = a.id; tag.style.setProperty('--c', a.color);
   tag.innerHTML = `<div class="bubble"></div><div class="name">${a.name}<i></i></div>`;
   labelsEl.appendChild(tag);
 
@@ -533,6 +589,12 @@ function buildRobot(a, idx){
     bubble: tag.querySelector('.bubble'), stateEl: tag.querySelector('i'),
     path: [], at: a.home, look: ROOMS[a.home].look.clone(),
     state: 'trabajando', room: a.home, task: '', talkUntil: 0, phase: idx*1.3,
+    info: {
+      modelo: PROFILE[a.id].modelo, herramientas: PROFILE[a.id].herramientas.slice(), mision: PROFILE[a.id].mision,
+      inicio: Date.now(), avance: null, ultima: Date.now(), activoDesde: null,
+      tokens: { entrada: 0, salida: 0, limite: null, porHora: new Array(12).fill(0) },
+      completadas: 0, cola: [], historial: [], historialExt: null,
+    },
   };
 }
 AGENTS.forEach(buildRobot);
@@ -579,8 +641,33 @@ function destinationFor(ag){
   return AGENTS.find(a => a.id === ag.id).home;
 }
 
+function num(v){ return typeof v === 'number' && isFinite(v) ? v : null; }
+function mergeInfo(rb, ag, taskChanged){
+  const I = rb.info;
+  if (typeof ag.modelo === 'string') I.modelo = ag.modelo;
+  if (Array.isArray(ag.herramientas)) I.herramientas = ag.herramientas.map(String).slice(0, 8);
+  if (typeof ag.mision === 'string') I.mision = ag.mision;
+  if (ag.tarea_inicio && !isNaN(Date.parse(ag.tarea_inicio))) I.inicio = Date.parse(ag.tarea_inicio);
+  else if (taskChanged) I.inicio = Date.now();
+  if (num(ag.avance) !== null) I.avance = Math.max(0, Math.min(100, ag.avance));
+  else if (taskChanged) I.avance = null;
+  if (ag.activo_desde && !isNaN(Date.parse(ag.activo_desde))) I.activoDesde = Date.parse(ag.activo_desde);
+  I.ultima = ag.ultima_actividad && !isNaN(Date.parse(ag.ultima_actividad)) ? Date.parse(ag.ultima_actividad) : Date.now();
+  const t = ag.tokens;
+  if (t && typeof t === 'object') {
+    if (num(t.entrada) !== null) I.tokens.entrada = t.entrada;
+    if (num(t.salida) !== null) I.tokens.salida = t.salida;
+    if (num(t.limite_diario) !== null) I.tokens.limite = t.limite_diario;
+    if (Array.isArray(t.por_hora)) { const a = t.por_hora.map(v => num(v) || 0).slice(-12); I.tokens.porHora = new Array(12 - a.length).fill(0).concat(a); }
+  }
+  if (num(ag.completadas_hoy) !== null) I.completadas = ag.completadas_hoy;
+  if (Array.isArray(ag.cola)) I.cola = ag.cola.map(String).slice(0, 5);
+  if (Array.isArray(ag.historial)) I.historialExt = ag.historial.slice(0, 8).map(h => ({ hora: String(h.hora || ''), texto: String(h.texto || '') }));
+}
+
 function applyState(ag, silent){
   const rb = robots[ag.id]; if (!rb) return;
+  mergeInfo(rb, ag, (ag.tarea || '') !== rb.task);
   const estado = STATE_LABEL[ag.estado] ? ag.estado : 'trabajando';
   const dest = destinationFor({ ...ag, estado });
   const changed = estado !== rb.state || dest !== rb.room || (ag.tarea || '') !== rb.task;
@@ -591,7 +678,12 @@ function applyState(ag, silent){
     rb.talkUntil = performance.now() + 6000;
     log(rb, dest);
   }
+  if (changed) {
+    rb.info.historial.unshift({ t: Date.now(), texto: `${STATE_LABEL[rb.state]}${rb.task ? ' · ' + rb.task : ''}` });
+    rb.info.historial.length = Math.min(rb.info.historial.length, 8);
+  }
   renderRoster();
+  if (selected === rb.a.id) renderDetail();
 }
 
 const feedEl = document.getElementById('feed');
@@ -629,7 +721,145 @@ rosterEl.addEventListener('click', e => {
 function select(id){
   selected = id; renderRoster();
   if (id) robots[id].talkUntil = performance.now() + 8000;
+  detailEl.hidden = !id;
+  rosterEl.hidden = !!id;
+  if (id) { renderDetail(); detailEl.scrollTop = 0; }
 }
+
+/* ───────── Ficha del agente ───────── */
+const detailEl = document.getElementById('detail');
+const hhmm = ms => new Date(ms).toLocaleTimeString('es-DO', { hour:'2-digit', minute:'2-digit', hour12:false });
+function fmtTokens(n){
+  if (n >= 1e6) return (n/1e6).toFixed(2).replace('.', ',') + ' M';
+  if (n >= 1e4) return Math.round(n/1e3) + ' k';
+  if (n >= 1e3) return (n/1e3).toFixed(1).replace('.', ',') + ' k';
+  return String(Math.round(n));
+}
+function fmtFull(n){ return Math.round(n).toLocaleString('es-DO'); }
+function fmtDur(ms){
+  const m = Math.max(0, Math.round(ms/60000));
+  if (m < 1) return 'menos de 1 min';
+  if (m < 60) return m + ' min';
+  return Math.floor(m/60) + ' h ' + String(m % 60).padStart(2, '0') + ' min';
+}
+
+function hourChart(rb){
+  const vals = rb.info.tokens.porHora, n = vals.length;
+  const W = 300, H = 92, top = 14, base = 72;
+  const max = Math.max(...vals, 1);
+  const slot = W / n, bw = slot - 4;
+  const nowH = new Date().getHours();
+  const hourOf = i => (nowH - (n - 1 - i) + 24) % 24;
+  let bars = '', hits = '';
+  vals.forEach((v, i) => {
+    const h = v ? Math.max(3, (v / max) * (base - top)) : 0;
+    const x = i*slot + 2, y = base - h, r = Math.min(4, bw/2, h);
+    if (h) bars += `<path d="M${x},${base} V${y + r} Q${x},${y} ${x + r},${y} H${x + bw - r} Q${x + bw},${y} ${x + bw},${y + r} V${base} Z" fill="${rb.a.color}" opacity="${i === n - 1 ? 1 : .72}"/>`;
+    hits += `<rect x="${i*slot}" y="0" width="${slot}" height="${base}" fill="transparent" data-i="${i}" data-v="${v}" data-h="${hourOf(i)}"/>`;
+  });
+  const lbl = (i, anchor) => `<text x="${i*slot + slot/2}" y="${base + 14}" text-anchor="${anchor}" fill="var(--muted)" font-size="10" font-family="IBM Plex Mono, monospace">${String(hourOf(i)).padStart(2,'0')}:00</text>`;
+  return `<div class="chart" id="hourChart">
+    <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Tokens por hora en las últimas 12 horas, máximo ${fmtFull(max)}">
+      <line x1="0" x2="${W}" y1="${top}" y2="${top}" stroke="rgba(239,233,221,.08)"/>
+      <text x="0" y="${top - 4}" fill="var(--muted)" font-size="10" font-family="IBM Plex Mono, monospace">${fmtTokens(max)}</text>
+      ${bars}
+      <line x1="0" x2="${W}" y1="${base}" y2="${base}" stroke="rgba(239,233,221,.22)"/>
+      ${lbl(0, 'start')}${lbl(Math.floor(n/2), 'middle')}
+      <text x="${W - slot/2}" y="${base + 14}" text-anchor="end" fill="var(--ivory)" font-size="10" font-family="IBM Plex Mono, monospace">ahora</text>
+      ${hits}
+    </svg>
+    <div class="tip" hidden></div>
+  </div>`;
+}
+
+function renderDetail(){
+  if (!selected) return;
+  const rb = robots[selected], a = rb.a, I = rb.info, T = I.tokens;
+  const where = rb.room ? ROOMS[rb.room].name : 'Pasillo';
+  const total = T.entrada + T.salida;
+  const pct = T.limite ? Math.min(100, total / T.limite * 100) : null;
+  const now = Date.now();
+  const hist = I.historialExt
+    ? I.historialExt.map(h => `<li><time>${esc(h.hora)}</time><span>${esc(h.texto)}</span></li>`)
+    : I.historial.map(h => `<li><time>${hhmm(h.t)}</time><span>${esc(h.texto)}</span></li>`);
+  detailEl.style.setProperty('--c', a.color);
+  detailEl.innerHTML = `
+    <div class="d-head">
+      <div class="d-avatar" aria-hidden="true"></div>
+      <div><h2>${a.name}</h2><div class="sub">${a.role} · ${where}</div></div>
+      <button class="x" id="closeDetail" aria-label="Cerrar ficha">×</button>
+    </div>
+    ${live ? '' : '<div class="note">Modo simulación: estas cifras son de ejemplo.</div>'}
+    ${rb.state === 'error' ? `<div class="alert" role="status"><span aria-hidden="true">⚠</span><div><b>Necesita ayuda</b><br>${esc(rb.task || 'Revisa este agente.')}</div></div>` : ''}
+
+    <section class="d-sec">
+      <div class="eyebrow">Ahora <span class="chip st-${rb.state}">${STATE_LABEL[rb.state]}</span></div>
+      <div class="d-task">${rb.task ? esc(rb.task) : 'Sin tarea asignada'}</div>
+      ${rb.task ? `<div class="d-small">Desde ${hhmm(I.inicio)} · lleva ${fmtDur(now - I.inicio)}${I.avance !== null ? ` · ${Math.round(I.avance)}% completado` : ''}</div>` : ''}
+      ${I.avance !== null && rb.task ? `<div class="meter" role="progressbar" aria-valuenow="${Math.round(I.avance)}" aria-valuemin="0" aria-valuemax="100"><i style="width:${I.avance}%"></i></div>` : ''}
+    </section>
+
+    <section class="d-sec">
+      <div class="eyebrow">Tokens de hoy ${pct !== null ? `<span>${Math.round(pct)}% del límite</span>` : ''}</div>
+      <div class="hero"><strong>${fmtTokens(total)}</strong><span>${T.limite ? 'de ' + fmtTokens(T.limite) + ' diarios' : 'tokens'}</span></div>
+      ${pct !== null ? `<div class="meter" role="progressbar" aria-label="Uso del límite diario" aria-valuenow="${Math.round(pct)}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct}%;${pct > 85 ? 'background:var(--warn)' : ''}"></i></div>` : ''}
+      <div class="split">
+        <div>Entrada (lee)<b>${fmtFull(T.entrada)}</b></div>
+        <div>Salida (escribe)<b>${fmtFull(T.salida)}</b></div>
+      </div>
+      <div class="d-small">Por hora · últimas 12 horas</div>
+      ${hourChart(rb)}
+    </section>
+
+    <section class="d-sec">
+      <div class="eyebrow">Hoy</div>
+      <div class="stats">
+        <div class="stat"><b>${I.completadas}</b><span>tareas terminadas</span></div>
+        <div class="stat"><b>${I.activoDesde ? fmtDur(now - I.activoDesde).replace(' min','m').replace(' h ','h ') : '—'}</b><span>tiempo activo</span></div>
+        <div class="stat"><b>${hhmm(I.ultima)}</b><span>último reporte</span></div>
+      </div>
+    </section>
+
+    ${I.cola.length ? `<section class="d-sec">
+      <div class="eyebrow">Próximo en su lista <span>${I.cola.length}</span></div>
+      <ol class="list queue">${I.cola.map((c, i) => `<li><span>${i + 1}</span><span>${esc(c)}</span></li>`).join('')}</ol>
+    </section>` : ''}
+
+    <section class="d-sec">
+      <div class="eyebrow">Historial reciente</div>
+      ${hist.length ? `<ol class="list">${hist.join('')}</ol>` : '<div class="d-small">Aún no hay actividad registrada.</div>'}
+    </section>
+
+    <section class="d-sec">
+      <div class="eyebrow">Ficha</div>
+      <dl class="kv">
+        <dt>Modelo</dt><dd>${esc(I.modelo || '—')}</dd>
+        <dt>Sala base</dt><dd>${ROOMS[a.home].name}</dd>
+        <dt>Misión</dt><dd>${esc(I.mision)}</dd>
+      </dl>
+      <div class="chips">${I.herramientas.map(h => `<span class="tool">${esc(h)}</span>`).join('')}</div>
+    </section>`;
+}
+
+detailEl.addEventListener('click', e => { if (e.target.closest('#closeDetail')) select(null); });
+detailEl.addEventListener('pointermove', e => {
+  const chart = e.target.closest('#hourChart'); if (!chart) return;
+  const tip = chart.querySelector('.tip');
+  const r = e.target.closest('rect[data-i]');
+  if (!r) { tip.hidden = true; return; }
+  const box = chart.getBoundingClientRect(), rb = r.getBoundingClientRect();
+  const h = +r.dataset.h;
+  tip.textContent = `${String(h).padStart(2,'0')}:00–${String((h + 1) % 24).padStart(2,'0')}:00 · ${fmtFull(+r.dataset.v)} tokens`;
+  tip.style.left = Math.max(60, Math.min(box.width - 60, rb.left - box.left + rb.width/2)) + 'px';
+  tip.hidden = false;
+});
+detailEl.addEventListener('pointerleave', () => { const t = detailEl.querySelector('.tip'); if (t) t.hidden = true; });
+setInterval(() => { if (selected && !detailEl.querySelector('.tip:not([hidden])')) renderDetail(); }, 5000);
+
+/* clic en el nombre flotante de un robot */
+labelsEl.addEventListener('click', e => {
+  const tag = e.target.closest('.tag[data-id]'); if (tag) select(tag.dataset.id);
+});
 
 /* modo en vivo: lee estado.json */
 const modeEl = document.getElementById('mode'), modeText = document.getElementById('modeText'), updatedEl = document.getElementById('updated');
@@ -656,8 +886,52 @@ async function poll(){
 
 /* modo simulación */
 function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+const SIM_WEIGHT = { byte:1.4, pixel:1, metric:.9, folio:1.2, arca:.4, nexo:1.1 };
+function seedSim(){
+  const start = new Date(); start.setHours(8, 0, 0, 0);
+  const nowH = new Date().getHours();
+  AGENTS.forEach(a => {
+    const I = robots[a.id].info, w = SIM_WEIGHT[a.id];
+    I.tokens.porHora = new Array(12).fill(0).map((_, i) => {
+      const h = (nowH - (11 - i) + 24) % 24;
+      return h < 8 || h > 20 ? 0 : Math.round((6000 + Math.random()*22000) * w);
+    });
+    const sum = I.tokens.porHora.reduce((x, y) => x + y, 0);
+    I.tokens.entrada = Math.round(sum * .82); I.tokens.salida = sum - I.tokens.entrada;
+    I.tokens.limite = 400000;
+    I.completadas = 2 + Math.floor(Math.random()*8);
+    I.activoDesde = Math.min(start.getTime(), Date.now() - 3600e3);
+    I.avance = 10 + Math.random()*60;
+    I.inicio = Date.now() - (5 + Math.random()*40) * 60000;
+    I.cola = SIM_TASKS[a.id].filter(t => t !== robots[a.id].task).slice(0, 2 + Math.floor(Math.random()*2));
+  });
+}
+function simTokens(){
+  AGENTS.forEach(a => {
+    const rb = robots[a.id], I = rb.info;
+    if (rb.state === 'inactivo' || rb.state === 'error') return;
+    const add = Math.round((200 + Math.random()*1300) * SIM_WEIGHT[a.id]);
+    const out = Math.round(add * (rb.state === 'pensando' ? .1 : .22));
+    I.tokens.entrada += add - out; I.tokens.salida += out;
+    I.tokens.porHora[11] += add;
+    if (I.avance !== null && rb.state === 'trabajando') I.avance = Math.min(98, I.avance + Math.random()*4);
+    I.ultima = Date.now();
+  });
+}
+function simAssign(a, estado, tarea, extra = {}){
+  const I = robots[a.id].info;
+  if (robots[a.id].task && tarea !== robots[a.id].task && robots[a.id].state === 'trabajando') {
+    I.completadas++;
+    I.cola = I.cola.filter(t => t !== tarea);
+    if (I.cola.length < 2) I.cola.push(pick(SIM_TASKS[a.id].filter(t => t !== tarea && !I.cola.includes(t))) || '');
+    I.cola = I.cola.filter(Boolean);
+  }
+  applyState({ id:a.id, estado, tarea, avance: estado === 'trabajando' ? 5 : undefined, ...extra });
+}
 let meetingUntil = 0;
 function simStep(){
+  simTokens();
+  if (selected && !detailEl.querySelector('.tip:not([hidden])')) renderDetail();
   const now = performance.now();
   if (now > meetingUntil && Math.random() < .12) {
     meetingUntil = now + 22000;
@@ -667,13 +941,14 @@ function simStep(){
     return;
   }
   if (now < meetingUntil) return;
+  if (Math.random() < .55) return;          // los agentes no cambian de tarea tan seguido
   const a = pick(AGENTS);
   const roll = Math.random();
-  if (roll < .6) applyState({ id:a.id, estado:'trabajando', tarea:pick(SIM_TASKS[a.id]) });
-  else if (roll < .75) applyState({ id:a.id, estado:'pensando', tarea:'Evaluando la mejor forma de ' + pick(SIM_TASKS[a.id]).toLowerCase() });
-  else if (roll < .87) applyState({ id:a.id, estado:'trabajando', sala: a.home === 'libreria' ? 'archivo' : 'libreria', tarea:'Consultando referencias' });
-  else if (roll < .97) applyState({ id:a.id, estado:'inactivo', tarea:'' });
-  else applyState({ id:a.id, estado:'error', tarea:'Espera una aprobación del equipo' });
+  if (roll < .6) simAssign(a, 'trabajando', pick(SIM_TASKS[a.id]));
+  else if (roll < .75) simAssign(a, 'pensando', 'Planificando: ' + pick(SIM_TASKS[a.id]).toLowerCase());
+  else if (roll < .87) simAssign(a, 'trabajando', 'Consultando referencias', { sala: a.home === 'libreria' ? 'archivo' : 'libreria' });
+  else if (roll < .97) simAssign(a, 'inactivo', '');
+  else simAssign(a, 'error', 'Espera una aprobación del equipo');
 }
 function startSim(){
   modeEl.className = 'mode'; modeText.textContent = 'Simulación';
@@ -681,6 +956,7 @@ function startSim(){
   setTimeout(poll, REFRESCO_MS);   // sigue buscando estado.json por si se conecta
   if (simTimer) return;
   AGENTS.forEach(a => applyState({ id:a.id, estado:'trabajando', tarea:pick(SIM_TASKS[a.id]) }, true));
+  seedSim();
   simTimer = setInterval(simStep, 3500);
 }
 function stopSim(){ if (simTimer) { clearInterval(simTimer); simTimer = null; } }
