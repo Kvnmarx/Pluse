@@ -8,22 +8,105 @@
       "tarea_inicio": "2026-09-24T10:05:00-04:00",
       "avance": 60,
       "modelo": "claude-sonnet-5",
-      "tokens": { "entrada": 182400, "salida": 39100, "limite_diario": 400000,
-                  "por_hora": [0, 0, 12000, 18500, 22100, 30400, 25800, 19700, 28000, 31200, 20900, 12900] },
+      "tokens": {
+        "entrada": 182400,
+        "salida": 39100,
+        "limite_diario": 400000,
+        "por_hora": [
+          0,
+          0,
+          12000,
+          18500,
+          22100,
+          30400,
+          25800,
+          19700,
+          28000,
+          31200,
+          20900,
+          12900
+        ]
+      },
       "completadas_hoy": 5,
       "activo_desde": "2026-09-24T08:00:00-04:00",
       "ultima_actividad": "2026-09-24T10:29:40-04:00",
-      "cola": ["Conectar el CRM con el formulario", "Revisar velocidad de la web"],
-      "historial": [
-        { "hora": "10:05", "texto": "Empezó: actualizar la web de propiedades" },
-        { "hora": "09:40", "texto": "Terminó: ficha de L'Atelier Cap Cana" }
+      "cola": [
+        "Conectar el CRM con el formulario",
+        "Revisar velocidad de la web"
       ],
-      "herramientas": ["GitHub", "CRM", "Sitio web"]
+      "historial": [
+        {
+          "hora": "10:05",
+          "texto": "Empezó: actualizar la web de propiedades"
+        },
+        {
+          "hora": "09:40",
+          "texto": "Terminó: ficha de L'Atelier Cap Cana"
+        }
+      ],
+      "herramientas": [
+        "GitHub",
+        "CRM",
+        "Sitio web"
+      ]
     },
-    { "id": "pixel",  "estado": "pensando",   "tarea": "Eligiendo portada para el carrusel de Cap Cana" },
-    { "id": "metric", "estado": "reunion",    "tarea": "Revisión semanal de leads" },
-    { "id": "folio",  "estado": "trabajando", "sala": "archivo", "tarea": "Buscando el brochure de Puerto Marina" },
-    { "id": "arca",   "estado": "inactivo",   "tarea": "" },
-    { "id": "nexo",   "estado": "reunion",    "tarea": "Revisión semanal de leads" }
+    {
+      "id": "pixel",
+      "estado": "pensando",
+      "tarea": "Eligiendo portada para el carrusel de Cap Cana"
+    },
+    {
+      "id": "metric",
+      "estado": "reunion",
+      "tarea": "Revisión semanal de leads"
+    },
+    {
+      "id": "folio",
+      "estado": "trabajando",
+      "sala": "archivo",
+      "tarea": "Buscando el brochure de Puerto Marina"
+    },
+    {
+      "id": "arca",
+      "estado": "inactivo",
+      "tarea": ""
+    },
+    {
+      "id": "nexo",
+      "estado": "reunion",
+      "tarea": "Revisión semanal de leads"
+    }
+  ],
+  "mensajes": [
+    {
+      "id": 1,
+      "de": "nexo",
+      "para": "todos",
+      "texto": "Buenos días, equipo. Prioridades de hoy: web de propiedades e informe de leads.",
+      "hora": "2026-09-24T09:00:00-04:00"
+    },
+    {
+      "id": 2,
+      "de": "nexo",
+      "para": "pixel",
+      "tipo": "tarea",
+      "estado": "aceptada",
+      "texto": "Carrusel de Cap Cana para LinkedIn",
+      "hora": "2026-09-24T09:02:00-04:00"
+    },
+    {
+      "id": 3,
+      "de": "pixel",
+      "para": "nexo",
+      "texto": "Recibido. Lo tengo listo esta tarde.",
+      "hora": "2026-09-24T09:03:00-04:00"
+    },
+    {
+      "id": 4,
+      "de": "arca",
+      "para": "tu",
+      "texto": "Ya ordené los brochures nuevos en la carpeta de Proyectos.",
+      "hora": "2026-09-24T10:15:00-04:00"
+    }
   ]
 }

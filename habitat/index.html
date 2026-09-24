@@ -22,6 +22,7 @@
     --body:"IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
     --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
   }
+  [hidden]{display:none!important}
   html,body{height:100%;margin:0}
   body{background:var(--bg);color:var(--ivory);font:14px/1.45 var(--body);overflow:hidden}
   #scene{position:fixed;inset:0;display:block;width:100%;height:100%;touch-action:none}
@@ -116,6 +117,58 @@
   .note{font:11px/1.4 var(--mono);color:var(--warn);border:1px dashed rgba(233,196,106,.4);border-radius:8px;padding:6px 8px}
   .tag .name{pointer-events:auto;cursor:pointer}
 
+  /* Chat del equipo */
+  .chatbtn{all:unset;pointer-events:auto;cursor:pointer;margin-top:6px;display:inline-flex;align-items:center;gap:8px;justify-self:start;font:600 12px/1 var(--display);letter-spacing:.02em;padding:9px 12px;border-radius:10px;background:var(--champagne);color:#0B252A}
+  .chatbtn:hover{filter:brightness(1.08)} .chatbtn:focus-visible{outline:2px solid var(--ivory);outline-offset:2px}
+  .badge{min-width:18px;height:18px;padding:0 5px;box-sizing:border-box;border-radius:999px;background:#0B252A;color:var(--ivory);font:600 10.5px/18px var(--mono);text-align:center}
+  .chat{pointer-events:auto;top:calc(env(safe-area-inset-top,0px) + 16px);left:16px;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);width:min(720px, calc(100% - 380px));display:grid;grid-template-columns:210px 1fr;background:var(--panel-solid);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.5);z-index:4}
+  .ch-list{border-right:1px solid var(--line);padding:14px 10px;display:flex;flex-direction:column;gap:4px;overflow:auto}
+  .ch-list .eyebrow{padding:4px 8px 6px}
+  .ch-item{all:unset;cursor:pointer;display:grid;grid-template-columns:22px 1fr auto;gap:8px;align-items:center;padding:8px;border-radius:9px;color:var(--ivory)}
+  .ch-item:hover{background:rgba(239,233,221,.05)} .ch-item:focus-visible{outline:2px solid var(--champagne)}
+  .ch-item.on{background:rgba(205,187,147,.12)}
+  .ch-item .av{width:22px;height:22px;border-radius:7px;background:var(--c);display:grid;place-items:center;font:600 10px/1 var(--display);color:#061619}
+  .ch-item .nm{font:500 13px/1.2 var(--body);display:grid;gap:1px}
+  .ch-item .nm small{font:10.5px/1.2 var(--mono);color:var(--muted)}
+  .ch-item .badge{background:var(--champagne);color:#0B252A}
+  .ch-main{display:grid;grid-template-rows:auto 1fr auto auto auto;min-height:0}
+  .ch-head{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line)}
+  .ch-head h2{margin:0;font:600 15px/1.2 var(--display)}
+  .ch-head .sub{font:11px/1.3 var(--mono);color:var(--muted)}
+  .ch-head .grow{flex:1;min-width:0}
+  .ch-msgs{overflow:auto;padding:14px;display:flex;flex-direction:column;gap:12px;min-height:0}
+  .msg{display:grid;grid-template-columns:28px 1fr;gap:10px;max-width:92%}
+  .msg .av{width:28px;height:28px;border-radius:8px;background:var(--c);display:grid;place-items:center;font:600 11px/1 var(--display);color:#061619}
+  .msg .who{font:600 12.5px/1.3 var(--body);display:flex;gap:6px;align-items:baseline;flex-wrap:wrap}
+  .msg .who .to{font:11px var(--mono);color:var(--muted);font-weight:400}
+  .msg .who time{font:10.5px var(--mono);color:var(--muted);font-weight:400;font-variant-numeric:tabular-nums}
+  .msg .txt{font-size:13.5px;line-height:1.45;color:var(--ivory);opacity:.92;overflow-wrap:anywhere}
+  .msg.mine{align-self:flex-end;grid-template-columns:1fr}
+  .msg.mine .av{display:none}
+  .msg.mine .body{background:var(--ivory);color:#0B252A;border-radius:12px 12px 4px 12px;padding:8px 12px}
+  .msg.mine .txt{color:#0B252A;opacity:1}
+  .msg.mine .who{color:#0B252A} .msg.mine .who time,.msg.mine .who .to{color:#50605f}
+  .card-msg{margin-top:6px;border:1px solid var(--line);border-left:3px solid var(--c2, var(--champagne));border-radius:10px;padding:9px 11px;display:grid;gap:4px;background:rgba(239,233,221,.03)}
+  .card-msg .top{display:flex;justify-content:space-between;gap:8px;align-items:center}
+  .card-msg .route{font:11px var(--mono);color:var(--muted)}
+  .card-msg .what{font:500 13.5px/1.4 var(--body)}
+  .card-msg.help{border-left-color:var(--bad)}
+  .tk-pendiente{color:var(--warn)} .tk-aceptada{color:var(--ok)} .tk-hecha{color:var(--muted)}
+  .sysline{align-self:center;font:11px/1.4 var(--mono);color:var(--muted);text-align:center;padding:2px 10px}
+  .ch-typing{min-height:18px;padding:0 14px;font:11.5px/18px var(--mono);color:var(--muted)}
+  .ch-quick{display:flex;gap:6px;flex-wrap:wrap;padding:6px 14px 0}
+  .qk{all:unset;cursor:pointer;font:11.5px/1 var(--mono);padding:6px 9px;border-radius:999px;border:1px solid var(--line);color:var(--ivory)}
+  .qk:hover{border-color:var(--champagne)} .qk:focus-visible{outline:2px solid var(--champagne)}
+  .ch-form{display:flex;gap:8px;padding:10px 14px 14px}
+  .ch-form input{flex:1;min-width:0;background:rgba(239,233,221,.06);border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--ivory);font:14px var(--body)}
+  .ch-form input:focus{outline:none;border-color:var(--champagne)}
+  .ch-form button{all:unset;cursor:pointer;padding:0 16px;border-radius:10px;background:var(--champagne);color:#0B252A;font:600 12.5px/1 var(--display)}
+  .ch-form button:focus-visible{outline:2px solid var(--ivory)}
+  .ch-note{padding:0 14px;font:11px/1.4 var(--mono);color:var(--warn)}
+  .d-chat{all:unset;cursor:pointer;justify-self:start;font:600 12px/1 var(--display);padding:9px 12px;border-radius:10px;border:1px solid var(--c);color:var(--ivory)}
+  .d-chat:focus-visible{outline:2px solid var(--champagne)}
+  body.chat-open .feed{display:none}
+
   .loading{position:fixed;inset:0;display:grid;place-items:center;z-index:5;background:var(--bg);font:12px var(--mono);color:var(--muted);letter-spacing:.14em;text-transform:uppercase;transition:opacity .6s}
   .loading.done{opacity:0;pointer-events:none}
 
@@ -125,6 +178,11 @@
     .roster{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);right:16px;left:16px;width:auto;max-height:none;display:flex;overflow-x:auto;overflow-y:hidden;gap:8px;scroll-snap-type:x mandatory;padding-bottom:2px}
     .card{flex:0 0 78%;scroll-snap-align:start}
     .feed{display:none}
+    .chat{left:0;right:0;top:0;bottom:0;width:auto;border-radius:0;grid-template-columns:1fr;grid-template-rows:auto 1fr;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+    .ch-list{flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line);padding:10px}
+    .ch-list .eyebrow{display:none}
+    .ch-item{grid-template-columns:22px auto auto;flex:0 0 auto}
+    .ch-item .nm small{display:none}
     .detail{top:auto;left:16px;right:16px;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);width:auto;max-height:64%;animation:none}
   }
   @media (prefers-reduced-motion: reduce){ .mode.live i{animation:none} }
@@ -142,11 +200,28 @@
       <span class="mode" id="mode"><i></i><span id="modeText">Simulación</span></span>
       <span id="updated">—</span>
     </div>
+    <button class="chatbtn" id="chatBtn" aria-controls="chat">Chat del equipo <span class="badge" id="chatBadge" hidden>0</span></button>
   </div>
   <div class="hint">Arrastra para girar · pellizca o rueda para acercar · toca un robot o su nombre para ver su ficha</div>
 </div>
 
 <div class="ui roster" id="roster" role="list" aria-label="Agentes"></div>
+
+<section class="ui chat" id="chat" hidden aria-label="Chat del equipo">
+  <nav class="ch-list" id="chList" aria-label="Conversaciones"></nav>
+  <div class="ch-main">
+    <header class="ch-head" id="chHead"></header>
+    <div class="ch-msgs" id="chMsgs" role="log" aria-live="polite"></div>
+    <div class="ch-typing" id="chTyping"></div>
+    <div class="ch-quick" id="chQuick"></div>
+    <div class="ch-note" id="chNote" hidden></div>
+    <form class="ch-form" id="chForm">
+      <label for="chInput" hidden>Mensaje</label>
+      <input id="chInput" autocomplete="off" maxlength="400">
+      <button type="submit">Enviar</button>
+    </form>
+  </div>
+</section>
 
 <aside class="ui detail" id="detail" hidden aria-label="Ficha del agente"></aside>
 
@@ -838,10 +913,14 @@ function renderDetail(){
         <dt>Misión</dt><dd>${esc(I.mision)}</dd>
       </dl>
       <div class="chips">${I.herramientas.map(h => `<span class="tool">${esc(h)}</span>`).join('')}</div>
-    </section>`;
+    </section>
+    <button class="d-chat" id="chatWith">Chatear con ${a.name}</button>`;
 }
 
-detailEl.addEventListener('click', e => { if (e.target.closest('#closeDetail')) select(null); });
+detailEl.addEventListener('click', e => {
+  if (e.target.closest('#closeDetail')) select(null);
+  if (e.target.closest('#chatWith')) openChat(selected);
+});
 detailEl.addEventListener('pointermove', e => {
   const chart = e.target.closest('#hourChart'); if (!chart) return;
   const tip = chart.querySelector('.tip');
@@ -875,6 +954,7 @@ async function poll(){
     live = true; stopSim();
     modeEl.className = 'mode live'; modeText.textContent = 'En vivo';
     data.agentes.forEach(ag => applyState(ag, false));
+    if (Array.isArray(data.mensajes)) loadLiveMessages(data.mensajes);
     const when = data.actualizado ? new Date(data.actualizado) : new Date();
     updatedEl.textContent = 'Actualizado ' + when.toLocaleString('es-DO', { hour:'2-digit', minute:'2-digit', day:'2-digit', month:'short', hour12:false });
     if (first) setInterval(poll, REFRESCO_MS);
@@ -940,7 +1020,7 @@ function simStep(){
     setTimeout(() => AGENTS.forEach(a => { if (robots[a.id].state === 'reunion') applyState({ id:a.id, estado:'trabajando', tarea:pick(SIM_TASKS[a.id]) }); }), 22000);
     return;
   }
-  if (now < meetingUntil) return;
+  if (now < meetingUntil || sceneBusy) return;
   if (Math.random() < .55) return;          // los agentes no cambian de tarea tan seguido
   const a = pick(AGENTS);
   const roll = Math.random();
@@ -948,7 +1028,7 @@ function simStep(){
   else if (roll < .75) simAssign(a, 'pensando', 'Planificando: ' + pick(SIM_TASKS[a.id]).toLowerCase());
   else if (roll < .87) simAssign(a, 'trabajando', 'Consultando referencias', { sala: a.home === 'libreria' ? 'archivo' : 'libreria' });
   else if (roll < .97) simAssign(a, 'inactivo', '');
-  else simAssign(a, 'error', 'Espera una aprobación del equipo');
+  else { simAssign(a, 'error', 'Espera una aprobación del equipo'); helpFlow(a); }
 }
 function startSim(){
   modeEl.className = 'mode'; modeText.textContent = 'Simulación';
@@ -958,8 +1038,360 @@ function startSim(){
   AGENTS.forEach(a => applyState({ id:a.id, estado:'trabajando', tarea:pick(SIM_TASKS[a.id]) }, true));
   seedSim();
   simTimer = setInterval(simStep, 3500);
+  startChatter();
 }
 function stopSim(){ if (simTimer) { clearInterval(simTimer); simTimer = null; } }
+
+/* ───────── Chat del equipo ─────────
+   Canal "Equipo": todos los agentes y las conversaciones entre ellos.
+   Canales privados: tú con cada agente.
+   En modo simulación los agentes responden solos; en vivo, los mensajes
+   llegan en el campo "mensajes" de estado.json.                          */
+
+const ME = { id:'tu', name:'Tú', color:'#EFE9DD' };
+const who = id => id === 'tu' ? ME : AGENTS.find(a => a.id === id) || { id, name:id, color:'#8FA7A5' };
+const localMsgs = [];
+let liveMsgs = [];
+let msgSeq = 0, channel = 'equipo', chatOpen = false, sceneBusy = false;
+const unread = { equipo:0 }; AGENTS.forEach(a => unread[a.id] = 0);
+const typing = {};                       // canal → id del agente que escribe
+const seenLive = new Set();
+
+const chatEl = document.getElementById('chat'), chList = document.getElementById('chList'),
+      chHead = document.getElementById('chHead'), chMsgs = document.getElementById('chMsgs'),
+      chTyping = document.getElementById('chTyping'), chQuick = document.getElementById('chQuick'),
+      chForm = document.getElementById('chForm'), chInput = document.getElementById('chInput'),
+      chNote = document.getElementById('chNote'), chatBtn = document.getElementById('chatBtn'),
+      chatBadge = document.getElementById('chatBadge');
+
+const TK_LABEL = { pendiente:'Pendiente', aceptada:'Aceptada', hecha:'Hecha' };
+function chanOf(m){
+  if (m.canal) return m.canal;
+  if (m.de === 'tu' && m.para !== 'todos' && AGENTS.some(a => a.id === m.para)) return m.para;
+  if (m.para === 'tu') return m.de;
+  return 'equipo';
+}
+function allMsgs(){ return liveMsgs.concat(localMsgs).sort((a, b) => a.t - b.t); }
+
+function post(m){
+  m.id = m.id || 'l' + (++msgSeq); m.t = m.t || Date.now(); m.tipo = m.tipo || 'mensaje';
+  localMsgs.push(m); if (localMsgs.length > 300) localMsgs.shift();
+  notify(m);
+  renderChat();
+  return m;
+}
+function notify(m){
+  const ch = chanOf(m);
+  if (m.de !== 'tu' && !(chatOpen && channel === ch)) unread[ch]++;
+  const rb = robots[m.de];
+  if (rb) {
+    rb.say = m.tipo === 'tarea' ? `Tarea para ${who(m.para).name}: ${m.texto}` : m.tipo === 'ayuda' ? `Pido ayuda: ${m.texto}` : m.texto;
+    if (rb.say.length > 110) rb.say = rb.say.slice(0, 107) + '…';
+    rb.sayUntil = performance.now() + 6000;
+  }
+  if (m.tipo === 'tarea' && robots[m.para]) {
+    const I = robots[m.para].info;
+    if (!I.cola.includes(m.texto)) { I.cola.push(m.texto); I.cola = I.cola.slice(-5); }
+    if (selected === m.para) renderDetail();
+  }
+}
+function setTaskState(m, estado){ m.estado = estado; renderChat(); }
+
+/* escribir con pausa natural */
+const wait = ms => new Promise(r => setTimeout(r, ms));
+async function say(de, para, texto, extra = {}, delay){
+  const ch = chanOf({ de, para, ...extra });
+  typing[ch] = de; renderTyping();
+  await wait(delay ?? 900 + Math.min(2200, texto.length * 22));
+  if (typing[ch] === de) delete typing[ch];
+  renderTyping();
+  return post({ de, para, texto, ...extra });
+}
+
+/* ---------- a quién le toca ---------- */
+const SKILLS = [
+  ['pixel',  /dise[nñ]|foto|carrusel|imagen|pieza|presentaci|visual|logo|portada|video/i],
+  ['metric', /dato|lead|m[eé]trica|informe|reporte|alcance|n[uú]mero|an[aá]lisis|tablero|estad[ií]stic/i],
+  ['folio',  /investig|mercado|tendencia|noticia|zona|confotur|ley|resum|lee |leer/i],
+  ['arca',   /document|brochure|archiv|carpeta|ficha|pdf|contrato|orden/i],
+  ['byte',   /web|c[oó]digo|p[aá]gina|formulario|autom|integra|crm|sitio|app/i],
+  ['nexo',   /reuni[oó]n|agenda|coordina|prioridad|planifica/i],
+];
+function mentioned(text){
+  const m = text.match(/@([a-záéíóúñ]+)/i);
+  if (!m) return null;
+  const a = AGENTS.find(a => a.name.toLowerCase() === m[1].toLowerCase());
+  return a ? a.id : null;
+}
+function route(text){ for (const [id, re] of SKILLS) if (re.test(text)) return id; return null; }
+const isTask   = t => /tarea|asigna|prepara|hazme|haz |necesito|puedes|podr[ií]as|revisa|crea|busca|actualiza|dise[nñ]a|investiga|env[ií]a|arma|redacta/i.test(t);
+const isStatus = t => /c[oó]mo va|estado|avance|en qu[eé] est|qu[eé] hac/i.test(t);
+const isMeet   = t => /reuni[oó]n|junta|re[uú]nanse/i.test(t);
+const clean    = t => t.replace(/@[a-záéíóúñ]+/ig, '').replace(/^\s*(tarea|asigna(r)?( tarea)?)\s*:?\s*/i, '').replace(/^\s*(por favor,?\s*)?(necesito( que)?|puedes|podr[ií]as|hazme)\s+/i, '').replace(/[?¿]/g, '').replace(/\s+/g, ' ').trim();
+const cap      = t => t.charAt(0).toUpperCase() + t.slice(1);
+
+function statusLine(id){
+  const rb = robots[id], I = rb.info;
+  if (rb.state === 'inactivo') return 'Estoy en pausa ahora mismo. Puedo tomar algo nuevo si lo necesitas.';
+  if (rb.state === 'error') return `Estoy detenido: ${rb.task.toLowerCase()}.`;
+  if (rb.state === 'reunion') return `Estoy en la reunión: ${rb.task}.`;
+  if (!rb.task) return 'Estoy disponible. Puedo tomar una tarea nueva.';
+  return `${rb.state === 'pensando' ? 'Estoy planificando' : 'Estoy con'} «${rb.task}»${I.avance !== null ? `, al ${Math.round(I.avance)}%` : ''}. ${I.cola.length ? `Después sigo con «${I.cola[0]}».` : 'No tengo nada más en la lista.'}`;
+}
+const GREET = {
+  byte:'Aquí Byte. Si es algo de la web, el CRM o una automatización, cuenta conmigo.',
+  pixel:'Hola, soy Pixel. ¿Qué pieza visual necesitas?',
+  metric:'Metric al habla. Dime qué quieres medir y te traigo los números.',
+  folio:'Hola, soy Folio. Puedo investigar o resumir lo que necesites.',
+  arca:'Arca por aquí. Si buscas un documento, probablemente sé dónde está.',
+  nexo:'Hola, soy Nexo. Dime qué necesitas y lo reparto en el equipo.',
+};
+
+/* ---------- respuestas (modo simulación) ---------- */
+async function assignFlow(from, to, texto, inTeam = true){
+  const extra = { tipo:'tarea', estado:'pendiente', canal: inTeam ? 'equipo' : undefined };
+  const card = from === 'tu' ? post({ de:'tu', para:to, texto, ...extra }) : await say(from, to, texto, extra, 700);
+  const back = inTeam ? 'todos' : 'tu';
+  await wait(1400);
+  setTaskState(card, 'aceptada');
+  await say(to, back, pick([
+    `Recibido. Lo agrego a mi lista; queda en la posición ${robots[to].info.cola.length}.`,
+    `Entendido, me encargo. Te aviso cuando esté listo.`,
+    `Hecho, lo tomo. Empiezo en cuanto termine lo actual.`,
+  ]));
+  setTimeout(async () => {
+    if (live) return;
+    setTaskState(card, 'hecha');
+    const I = robots[to].info; I.cola = I.cola.filter(t => t !== texto); I.completadas++;
+    await say(to, back, `Listo: «${texto}».${from !== 'tu' ? ` ${who(from).name}, ya lo tienes.` : ''}`);
+  }, 40000 + Math.random()*40000);
+}
+
+async function replyToUser(ch, text){
+  if (live) return;                                   // en vivo responden los agentes reales
+  const target = mentioned(text);
+  const body = clean(text);
+  if (ch !== 'equipo') {                              // conversación privada
+    const id = ch;
+    if (isStatus(text)) return say(id, 'tu', statusLine(id));
+    if (isTask(text) && body.length > 3) {
+      const best = route(body);
+      if (best && best !== id && id !== 'nexo') {
+        await say(id, 'tu', `Esto le corresponde más a ${who(best).name}. Se lo paso y le doy seguimiento.`);
+        return assignFlow(id, best, cap(body));
+      }
+      if (id === 'nexo' && best && best !== 'nexo') {
+        await say('nexo', 'tu', `Perfecto. Se lo asigno a ${who(best).name}.`);
+        return assignFlow('nexo', best, cap(body));
+      }
+      return assignFlow('tu', id, cap(body), false);
+    }
+    return say(id, 'tu', /hola|buen/i.test(text) ? GREET[id] : pick([
+      'Anotado. ¿Quieres que lo convierta en una tarea?',
+      'Tomo nota. Si necesitas que haga algo concreto, dímelo y lo agrego a mi lista.',
+      'Entendido. ¿Hay algún plazo que deba tener en cuenta?',
+    ]));
+  }
+  // canal Equipo
+  if (isMeet(text)) {
+    await say('nexo', 'todos', 'Convoco a todo el equipo al Meeting Room.');
+    const tema = body.length > 10 ? cap(body) : 'Reunión convocada desde el chat';
+    AGENTS.forEach(a => applyState({ id:a.id, estado:'reunion', tarea:tema }));
+    meetingUntil = performance.now() + 25000;
+    setTimeout(() => AGENTS.forEach(a => { if (robots[a.id].state === 'reunion') applyState({ id:a.id, estado:'trabajando', tarea:pick(SIM_TASKS[a.id]) }); }), 25000);
+    return;
+  }
+  if (isStatus(text) && !target) {
+    for (const a of AGENTS) await say(a.id, 'todos', statusLine(a.id), {}, 700 + Math.random()*700);
+    return;
+  }
+  if (isTask(text) && body.length > 3) {
+    const to = target || route(body) || 'nexo';
+    if (target) return assignFlow('tu', to, cap(body), true);
+    await say('nexo', 'todos', to === 'nexo' ? 'Lo tomo yo y lo organizo.' : `Se lo asigno a ${who(to).name}.`);
+    return assignFlow('nexo', to, cap(body));
+  }
+  if (target) return say(target, 'todos', GREET[target]);
+  return say('nexo', 'todos', 'Anotado. Si quieres que alguien se encargue, escribe la tarea o menciona a un agente con @.');
+}
+
+/* ---------- conversaciones entre agentes (simulación) ---------- */
+const SCENES = [
+  [ ['metric','pixel','Pixel, el carrusel de Cap Cana tuvo 32% más alcance que el promedio. ¿Preparamos uno similar para Cabeza de Toro?'],
+    ['pixel','metric','Buena idea. Lo armo con la misma estructura y te paso la versión para comparar.'],
+    ['metric','pixel','Carrusel de Cabeza de Toro con la estructura del de Cap Cana', 'tarea'] ],
+  [ ['pixel','arca','Arca, ¿tienes las fotos aprobadas de Velero at Bayahibe?'],
+    ['arca','pixel','Sí, están en Proyectos › Velero at Bayahibe › Fotos aprobadas. Te dejo la ruta en tu lista.'] ],
+  [ ['nexo','todos','Buenos días, equipo. Prioridades de hoy: web de propiedades, informe de leads y brochure de Puerto Marina.'],
+    ['byte','todos','Me encargo de la web.'],
+    ['metric','todos','El informe de leads estará listo antes del mediodía.'],
+    ['arca','todos','Busco la última versión del brochure y se la paso a Pixel.'] ],
+  [ ['byte','folio','Folio, ¿qué beneficios de CONFOTUR puedo mencionar en la ficha de la web?'],
+    ['folio','byte','Te preparo un resumen corto. Las cifras hay que verificarlas con el equipo antes de publicarlas.'],
+    ['byte','folio','Resumen de beneficios CONFOTUR para la web', 'tarea'] ],
+  [ ['folio','metric','Encontré un informe nuevo sobre ocupación hotelera en Bávaro. ¿Te sirve para el tablero?'],
+    ['metric','folio','Sí, pásamelo y lo cruzo con nuestros leads por zona.'] ],
+  [ ['arca','nexo','Terminé de ordenar los brochures nuevos. ¿Cuál es la siguiente prioridad?'],
+    ['nexo','arca','Indexar los documentos de L\'Atelier Cap Cana', 'tarea'] ],
+  [ ['nexo','byte','Byte, ¿cómo vas con el formulario del CRM?'],
+    ['byte','nexo','Al 70%. Me falta probarlo con un lead de ejemplo.'],
+    ['nexo','byte','Perfecto. Avísame cuando esté listo y lo revisamos juntos.'] ],
+  [ ['pixel','todos','Terminé la paleta para la presentación de Cana Bay. ¿Alguien quiere revisarla antes de enviarla al equipo?'],
+    ['nexo','todos','Déjala en la carpeta de revisión; María Andrea la aprueba antes de que salga.'] ],
+];
+
+async function runScene(scene){
+  if (sceneBusy || live) return;
+  sceneBusy = true;
+  // el primero camina a la sala del otro si le habla directo
+  const [a0, b0] = scene[0];
+  const visit = b0 !== 'todos' && Math.random() < .6 && robots[a0].state !== 'reunion';
+  const prev = visit ? { estado: robots[a0].state, tarea: robots[a0].task } : null;
+  if (visit) { applyState({ id:a0, estado:'trabajando', sala: AGENTS.find(a => a.id === b0).home, tarea:`Conversando con ${who(b0).name}` }); await wait(4500); }
+  try {
+    for (const [de, para, texto, tipo] of scene) {
+      if (live) break;
+      if (tipo === 'tarea') await assignFlow(de, para, texto);
+      else await say(de, para, texto);
+      await wait(900);
+    }
+  } finally {
+    if (visit && !live) applyState({ id:a0, estado: prev.estado === 'reunion' ? 'trabajando' : prev.estado, tarea: prev.tarea || pick(SIM_TASKS[a0]) });
+    sceneBusy = false;
+  }
+}
+
+async function helpFlow(a){
+  if (live) return;
+  await wait(1200);
+  await say(a.id, 'todos', 'Necesito una aprobación antes de continuar. ¿Alguien puede revisar el borrador conmigo?', { tipo:'ayuda' });
+  const helper = a.id === 'nexo' ? 'metric' : 'nexo';
+  await say(helper, 'todos', `Voy para allá, ${a.name}. Si hace falta, se lo escalo a María Andrea.`);
+  applyState({ id:helper, estado:'trabajando', sala:a.home, tarea:`Ayudando a ${a.name}` });
+  await wait(14000);
+  if (live) return;
+  await say(a.id, 'todos', `Gracias, ${who(helper).name}. Resuelto, sigo con lo mío.`);
+  applyState({ id:a.id, estado:'trabajando', tarea:pick(SIM_TASKS[a.id]) });
+  applyState({ id:helper, estado:'trabajando', tarea:pick(SIM_TASKS[helper]) });
+}
+
+let chatterTimer = null;
+function startChatter(){
+  if (chatterTimer) return;
+  if (!localMsgs.length) {
+    post({ de:'sistema', para:'todos', tipo:'sistema', texto:'Conversación de ejemplo · modo simulación' });
+    setTimeout(() => runScene(SCENES[2]), 1500);
+  }
+  chatterTimer = setInterval(() => { if (Math.random() < .7) runScene(pick(SCENES)); }, 16000);
+}
+
+/* ---------- mensajes en vivo ---------- */
+function loadLiveMessages(list){
+  const next = list.slice(-300).map((m, i) => ({
+    id: 'v' + (m.id ?? i), de: String(m.de || ''), para: String(m.para || 'todos'), texto: String(m.texto || ''),
+    tipo: ['mensaje','tarea','ayuda','sistema'].includes(m.tipo) ? m.tipo : 'mensaje',
+    estado: TK_LABEL[m.estado] ? m.estado : (m.tipo === 'tarea' ? 'pendiente' : undefined),
+    t: m.hora && !isNaN(Date.parse(m.hora)) ? Date.parse(m.hora) : Date.now(),
+  })).filter(m => m.texto);
+  next.forEach(m => { if (!seenLive.has(m.id)) { seenLive.add(m.id); if (liveMsgs.length) notify(m); } });
+  liveMsgs = next;
+  renderChat();
+}
+
+/* ---------- interfaz ---------- */
+function initials(n){ return n === 'Tú' ? 'TÚ' : n.slice(0, 1); }
+function lastOf(ch){ const l = allMsgs().filter(m => chanOf(m) === ch && m.tipo !== 'sistema'); return l[l.length - 1]; }
+
+function renderChat(){
+  const total = Object.values(unread).reduce((x, y) => x + y, 0);
+  chatBadge.hidden = !total; chatBadge.textContent = total > 99 ? '99+' : total;
+  if (!chatOpen) return;
+
+  const item = (id, name, color, sub) => `<button class="ch-item${channel === id ? ' on' : ''}" data-ch="${id}" style="--c:${color}">
+      <span class="av">${id === 'equipo' ? '#' : initials(name)}</span>
+      <span class="nm">${name}<small>${sub}</small></span>
+      ${unread[id] ? `<span class="badge">${unread[id]}</span>` : '<span></span>'}
+    </button>`;
+  chList.innerHTML = `<span class="eyebrow">Canal</span>${item('equipo', 'Equipo', '#CDBB93', 'Todos los agentes')}
+    <span class="eyebrow">Privado</span>${AGENTS.map(a => item(a.id, a.name, a.color, STATE_LABEL[robots[a.id].state])).join('')}`;
+
+  const isTeam = channel === 'equipo', ag = isTeam ? null : who(channel);
+  chHead.innerHTML = `<div class="grow"><h2>${isTeam ? '# Equipo' : ag.name}</h2>
+      <div class="sub">${isTeam ? 'Los seis agentes y tú · menciona con @Nombre' : `${ag.role} · ${STATE_LABEL[robots[ag.id].state]} · ${robots[ag.id].room ? ROOMS[robots[ag.id].room].name : 'Pasillo'}`}</div></div>
+    <button class="x" id="chClose" aria-label="Cerrar chat">×</button>`;
+
+  const near = chMsgs.scrollHeight - chMsgs.scrollTop - chMsgs.clientHeight < 80;
+  const list = allMsgs().filter(m => chanOf(m) === channel);
+  chMsgs.innerHTML = list.length ? list.map(renderMsg).join('') : `<div class="sysline">${isTeam ? 'Aún no hay mensajes en el canal.' : `Escríbele a ${ag.name}. Puedes pedirle una tarea o preguntarle cómo va.`}</div>`;
+  if (near || list[list.length - 1]?.de === 'tu') chMsgs.scrollTop = chMsgs.scrollHeight;
+
+  const qs = isTeam
+    ? [['¿Cómo van todos?', '¿Cómo van todos?'], ['Asignar tarea', '@Pixel tarea: '], ['Convocar reunión', 'Reunión: revisión de prioridades']]
+    : [['¿Cómo vas?', '¿Cómo vas?'], ['Asignarle tarea', 'Tarea: '], ['Saludar', 'Hola, ' + ag.name]];
+  chQuick.innerHTML = qs.map(([l, v]) => `<button class="qk" type="button" data-v="${esc(v)}">${l}</button>`).join('');
+  chInput.placeholder = isTeam ? 'Escribe al equipo… (usa @Nombre para mencionar)' : `Escribe a ${ag.name}…`;
+  chNote.hidden = !live;
+  chNote.textContent = 'En vivo: tus mensajes quedan en esta pantalla. Para que lleguen a tus agentes hay que conectarlos (ver LEEME).';
+  renderTyping();
+}
+
+function renderMsg(m){
+  if (m.tipo === 'sistema') return `<div class="sysline">${esc(m.texto)}</div>`;
+  const w = who(m.de), mine = m.de === 'tu';
+  const to = channel === 'equipo' && m.para !== 'todos' && m.tipo !== 'tarea' ? `<span class="to">→ ${esc(who(m.para).name)}</span>` : '';
+  let content = `<div class="txt">${esc(m.texto)}</div>`;
+  if (m.tipo === 'tarea') {
+    const dest = who(m.para);
+    content = `<div class="card-msg" style="--c2:${dest.color}">
+      <div class="top"><span class="eyebrow">Tarea asignada</span><span class="chip tk-${m.estado || 'pendiente'}">${TK_LABEL[m.estado || 'pendiente']}</span></div>
+      <div class="route">${esc(w.name)} → ${esc(dest.name)}</div>
+      <div class="what">${esc(m.texto)}</div></div>`;
+  } else if (m.tipo === 'ayuda') {
+    content = `<div class="card-msg help"><span class="eyebrow" style="color:var(--bad)">Pide ayuda</span><div class="what">${esc(m.texto)}</div></div>`;
+  }
+  return `<div class="msg${mine ? ' mine' : ''}" style="--c:${w.color}">
+    <span class="av" aria-hidden="true">${esc(initials(w.name))}</span>
+    <div class="body"><div class="who">${esc(w.name)} ${to}<time>${hhmm(m.t)}</time></div>${content}</div>
+  </div>`;
+}
+function renderTyping(){
+  const id = typing[channel];
+  chTyping.textContent = chatOpen && id ? `${who(id).name} está escribiendo…` : '';
+}
+
+function openChat(ch){
+  chatOpen = true; channel = ch || channel;
+  unread[channel] = 0;
+  chatEl.hidden = false; document.body.classList.add('chat-open');
+  chatBtn.setAttribute('aria-expanded', 'true');
+  renderChat();
+  chMsgs.scrollTop = chMsgs.scrollHeight;
+  if (window.innerWidth >= 760) chInput.focus();
+}
+function closeChat(){
+  chatOpen = false; chatEl.hidden = true; document.body.classList.remove('chat-open');
+  chatBtn.setAttribute('aria-expanded', 'false');
+  renderChat();
+}
+chatBtn.addEventListener('click', () => chatOpen ? closeChat() : openChat());
+chList.addEventListener('click', e => {
+  const b = e.target.closest('[data-ch]'); if (!b) return;
+  channel = b.dataset.ch; unread[channel] = 0; renderChat(); chMsgs.scrollTop = chMsgs.scrollHeight;
+});
+chHead.addEventListener('click', e => { if (e.target.closest('#chClose')) closeChat(); });
+chQuick.addEventListener('click', e => {
+  const b = e.target.closest('.qk'); if (!b) return;
+  chInput.value = b.dataset.v; chInput.focus();
+  if (!/[:\s]$/.test(b.dataset.v)) chForm.requestSubmit();
+});
+chForm.addEventListener('submit', e => {
+  e.preventDefault();
+  const text = chInput.value.trim(); if (!text) return;
+  chInput.value = '';
+  const ch = channel;
+  post({ de:'tu', para: ch === 'equipo' ? 'todos' : ch, texto:text });
+  replyToUser(ch, text);
+});
 
 /* ───────── Interacción ───────── */
 
@@ -974,7 +1406,10 @@ canvas.addEventListener('pointerup', e => {
   const hits = ray.intersectObjects(Object.values(robots).flatMap(r => r.hitboxes), false);
   select(hits.length ? hits[0].object.userData.agent : null);
 });
-window.addEventListener('keydown', e => { if (e.key === 'Escape') select(null); });
+window.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if (chatOpen) closeChat(); else select(null);
+});
 
 /* etiquetas de sala */
 const roomTags = Object.values(ROOMS).map(r => {
@@ -1049,9 +1484,11 @@ function tick(){
     // etiqueta
     project(p, rb.tag, 2.55);
     rb.stateEl.textContent = rb.state === 'pensando' ? '…' : STATE_LABEL[rb.state].toLowerCase();
-    const talk = (now < rb.talkUntil || selected === rb.a.id) && rb.task;
+    const saying = rb.say && now < rb.sayUntil;
+    const text = saying ? rb.say : rb.task;
+    const talk = (saying || now < rb.talkUntil || selected === rb.a.id) && text;
     rb.tag.classList.toggle('talk', !!talk);
-    if (talk && rb.bubble.textContent !== rb.task) rb.bubble.textContent = rb.task;
+    if (talk && rb.bubble.textContent !== text) rb.bubble.textContent = text;
   }
 
   if (selected) {

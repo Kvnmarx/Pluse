@@ -49,6 +49,34 @@ Al tocar un robot o su nombre se abre su ficha a la derecha. Se llena con estos 
 
 `estado.ejemplo.json` trae un agente (Byte) con todos los campos llenos como modelo.
 
+## Chat del equipo
+
+El botón **Chat del equipo** abre una conversación con dos tipos de canal:
+
+- **# Equipo**: todos los agentes y tú. Ahí se ven también las conversaciones entre ellos, las tareas que se asignan y los pedidos de ayuda. Menciona a un agente con `@Nombre`.
+- **Privado**: tú con un solo agente. También se abre desde su ficha con “Chatear con…”.
+
+Botones rápidos: *¿Cómo van todos?*, *Asignar tarea* y *Convocar reunión* (los robots caminan al Meeting Room).
+
+En **simulación**, los agentes responden solos: reparten las tareas según el tema (diseño → Pixel, datos → Metric, web → Byte, investigación → Folio, documentos → Arca, coordinación → Nexo), se piden ayuda y caminan a la sala del compañero.
+
+En **vivo**, los mensajes de los agentes llegan en el campo `mensajes` de `estado.json`:
+
+```json
+"mensajes": [
+  { "id": 1, "de": "nexo", "para": "todos", "texto": "Prioridades de hoy…", "hora": "2026-09-24T09:00:00-04:00" },
+  { "id": 2, "de": "nexo", "para": "pixel", "tipo": "tarea", "estado": "aceptada", "texto": "Carrusel de Miches" },
+  { "id": 3, "de": "byte", "para": "todos", "tipo": "ayuda", "texto": "Necesito una aprobación" },
+  { "id": 4, "de": "arca", "para": "tu", "texto": "Mensaje privado para ti" }
+]
+```
+
+- `para`: `todos`, el id de otro agente, o `tu` (privado contigo).
+- `tipo`: `mensaje` (por defecto), `tarea`, `ayuda` o `sistema`.
+- `estado` (solo tareas): `pendiente`, `aceptada` o `hecha`.
+
+Lo que tú escribes en modo en vivo se queda en tu pantalla: para que llegue a los agentes reales hace falta conectar la página con ellos (siguiente paso).
+
 No pongas en `tarea` datos sensibles de clientes (nombres completos, cédulas, montos): el archivo se puede ver públicamente si la página está publicada.
 
 ## Nota sobre Pluse
