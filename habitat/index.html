@@ -218,6 +218,60 @@
   .tag.me .name{border-color:#E6D3A8;background:rgba(40,34,22,.85)}
   body.chat-open .avbar{display:none}
 
+  /* Presentaciones */
+  .nowbar{top:calc(env(safe-area-inset-top,0px) + 16px);left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;background:var(--panel-solid);border:1px solid var(--c, var(--champagne));border-radius:999px;padding:6px 6px 6px 14px;max-width:min(460px, calc(100% - 32px));box-shadow:0 10px 30px rgba(0,0,0,.4)}
+  .nowbar .dot{width:9px;height:9px;border-radius:50%;background:var(--c, var(--champagne));box-shadow:0 0 10px var(--c, var(--champagne));animation:pulse 1.6s infinite;flex:none}
+  .nb-text{font:500 12.5px/1.3 var(--body);color:var(--ivory);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .nb-text b{font-weight:600}
+  .nb-btn{all:unset;cursor:pointer;flex:none;padding:7px 12px;border-radius:999px;background:var(--champagne);color:#0B252A;font:600 11.5px/1 var(--display)}
+  .nb-btn:focus-visible{outline:2px solid var(--ivory);outline-offset:2px}
+  .viewer{position:fixed;inset:0;z-index:7;display:grid;place-items:center;padding-block:calc(env(safe-area-inset-top,0px) + 16px) calc(env(safe-area-inset-bottom,0px) + 16px);padding-inline:16px;background:rgba(2,9,11,.74);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+  .vw-box{width:min(1000px, 100%);max-height:100%;display:grid;grid-template-rows:auto 1fr auto;background:var(--panel-solid);border:1px solid var(--line);border-top:3px solid var(--c);border-radius:16px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.55)}
+  .vw-head{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line)}
+  .vw-av{width:36px;height:36px;border-radius:10px;background:var(--c)}
+  .vw-hgroup{display:grid;gap:3px;min-width:0}
+  .vw-head h2{margin:0;font:600 18px/1.2 var(--display);text-wrap:balance}
+  .vw-head .sub{font:11.5px/1.3 var(--mono);color:var(--muted)}
+  .vw-body{overflow:auto;padding:20px;min-height:0}
+  .vw-foot{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:12px 16px;border-top:1px solid var(--line)}
+  .vw-foot .note{flex:1 1 220px}
+  .vw-nav{display:flex;gap:8px;align-items:center}
+  .vw-btn{all:unset;cursor:pointer;padding:8px 14px;border-radius:9px;border:1px solid var(--line);color:var(--ivory);font:500 12.5px/1 var(--body)}
+  .vw-btn.pri{background:var(--champagne);border-color:var(--champagne);color:#0B252A;font-weight:600}
+  .vw-btn:focus-visible{outline:2px solid var(--champagne);outline-offset:2px}
+  .vw-btn[disabled]{opacity:.4;cursor:default}
+  .vw-count{font:12px var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
+  .slide{aspect-ratio:16/9;max-width:100%;border-radius:12px;background:radial-gradient(120% 90% at 85% 10%, color-mix(in srgb, var(--c) 22%, transparent), transparent 55%), linear-gradient(160deg, #0E3238, #081B1F);border:1px solid var(--line);padding:clamp(18px, 4vw, 44px);box-sizing:border-box;display:grid;align-content:center;gap:clamp(10px, 2vw, 22px);position:relative;overflow:hidden}
+  .slide::after{content:"";position:absolute;left:clamp(18px, 4vw, 44px);bottom:clamp(14px, 3vw, 28px);width:56px;height:3px;border-radius:2px;background:var(--c)}
+  .slide h3{margin:0;font:600 clamp(20px, 3.6vw, 38px)/1.12 var(--display);letter-spacing:-.01em;text-wrap:balance;color:var(--ivory)}
+  .slide ul{margin:0;padding:0;list-style:none;display:grid;gap:clamp(6px, 1.2vw, 12px)}
+  .slide li{font:400 clamp(14px, 2vw, 21px)/1.4 var(--body);color:var(--ivory);opacity:.9;padding-left:22px;position:relative}
+  .slide li::before{content:"";position:absolute;left:0;top:.62em;width:8px;height:8px;border-radius:50%;background:var(--c)}
+  .slide .snote{font:12.5px/1.5 var(--mono);color:var(--muted)}
+  .dots{display:flex;gap:6px;justify-content:center;margin-top:12px}
+  .dots i{width:7px;height:7px;border-radius:50%;background:rgba(239,233,221,.2)} .dots i.on{background:var(--c)}
+  .doc{max-width:68ch;margin:0 auto;display:grid;gap:18px}
+  .doc h3{margin:0 0 4px;font:600 16px/1.3 var(--display);color:var(--ivory)}
+  .doc p{margin:0;font:15px/1.65 var(--body);color:var(--ivory);opacity:.9;white-space:pre-wrap}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));gap:10px;margin-bottom:18px}
+  .kpi{border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:4px}
+  .kpi span{font:11px/1.3 var(--mono);color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+  .kpi b{font:600 26px/1.1 var(--display);font-variant-numeric:tabular-nums;color:var(--ivory)}
+  .kpi small{font:12px/1.3 var(--body);color:var(--muted)}
+  .charts{display:grid;grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));gap:14px}
+  .chartbox{border:1px solid var(--line);border-radius:12px;padding:12px 14px;position:relative}
+  .chartbox h4{margin:0 0 8px;font:600 13px/1.3 var(--body);color:var(--ivory)}
+  .chartbox svg{display:block;width:100%;height:auto;overflow:visible}
+  .chartbox .tip{position:absolute;transform:translate(-50%,-100%);background:var(--ivory);color:#0B252A;font:500 11.5px/1.3 var(--mono);padding:5px 8px;border-radius:6px;white-space:nowrap;pointer-events:none}
+  .card-msg.pres{border-left-color:var(--c2, var(--champagne))}
+  .card-msg .open-pres{all:unset;cursor:pointer;justify-self:start;margin-top:4px;padding:6px 10px;border-radius:8px;background:var(--champagne);color:#0B252A;font:600 11.5px/1 var(--display)}
+  .card-msg .open-pres:focus-visible{outline:2px solid var(--ivory)}
+  .d-pres{all:unset;cursor:pointer;display:grid;gap:2px;padding:8px 10px;border:1px solid var(--line);border-radius:9px}
+  .d-pres:hover{border-color:var(--c)} .d-pres:focus-visible{outline:2px solid var(--champagne)}
+  .d-pres b{font:500 13px/1.3 var(--body)} .d-pres small{font:11px var(--mono);color:var(--muted)}
+  body.presenting .hint{display:none}
+  @media (max-width: 760px){ .nowbar{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 190px)} .vw-body{padding:14px} }
+
   .loading{position:fixed;inset:0;display:grid;place-items:center;z-index:5;background:var(--bg);font:12px var(--mono);color:var(--muted);letter-spacing:.14em;text-transform:uppercase;transition:opacity .6s}
   .loading.done{opacity:0;pointer-events:none}
 
@@ -299,6 +353,24 @@
 
 <aside class="ui detail" id="detail" hidden aria-label="Ficha del agente"></aside>
 <aside class="ui detail apr" id="aprPanel" hidden aria-label="Aprobaciones"></aside>
+
+<div class="ui nowbar" id="nowbar" hidden>
+  <span class="dot" aria-hidden="true"></span>
+  <span class="nb-text" id="nbText"></span>
+  <button class="nb-btn" id="nbOpen" type="button">Ver en grande</button>
+</div>
+
+<div class="viewer" id="viewer" hidden role="dialog" aria-modal="true" aria-labelledby="vwTitle">
+  <div class="vw-box" id="vwBox">
+    <header class="vw-head">
+      <span class="vw-av" id="vwAv" aria-hidden="true"></span>
+      <div class="vw-hgroup"><span class="eyebrow" id="vwKind"></span><h2 id="vwTitle"></h2><div class="sub" id="vwSub"></div></div>
+      <button class="x" id="vwClose" aria-label="Cerrar presentación">×</button>
+    </header>
+    <div class="vw-body" id="vwBody"></div>
+    <footer class="vw-foot" id="vwFoot"></footer>
+  </div>
+</div>
 
 <div class="ui feed" aria-live="polite">
   <span class="eyebrow">Actividad reciente</span>
@@ -508,6 +580,7 @@ function roomAt(p){
 
 /* ───────── Salas ───────── */
 var APR_SCREEN = null;                           // pantalla del tablero de aprobaciones
+var PRES_SCREEN = null, PODIUM = null;           // pantalla de presentaciones y atril
 const W = 15, D = 11, WALL_H = 2.1, DOOR = 2.6;
 const updaters = [];   // animaciones de mobiliario
 
@@ -808,6 +881,21 @@ const FURNITURE = {
       const leaf = new THREE.Mesh(new THREE.IcosahedronGeometry(0.55, 1), new THREE.MeshStandardMaterial({ color:'#3E7D5A', roughness:.8, flatShading:true }));
       leaf.position.set(px, 1.05, pz); leaf.scale.y = 1.25; leaf.castShadow = true; g.add(leaf);
     });
+    // pantalla de presentaciones en la pared norte, entre las dos puertas
+    {
+      const z = c.z - r.d/2 + 0.7;
+      box(7.6, 3.5, 0.14, M.dark, c.x, 2.05, z, g);
+      [-3.2, 3.2].forEach(x => box(0.12, 0.35, 0.3, M.metal, c.x + x, 0.18, z, g));
+      const cv = document.createElement('canvas'); cv.width = 1024; cv.height = 448;
+      const tex = new THREE.CanvasTexture(cv); tex.encoding = THREE.sRGBEncoding;
+      const mesh = screen(tex, 7.2, 3.15, new THREE.Vector3(c.x, 2.05, z + 0.08), 0, g);
+      PRES_SCREEN = { cv, tex, mesh, pos: new THREE.Vector3(c.x, 1.6, z) };
+      // atril del presentador
+      const ax = c.x - 4.6, az = z + 1.6;
+      box(0.7, 1.05, 0.45, M.ivory, ax, 0.53, az, g);
+      const edge = box(0.72, 0.04, 0.47, glow('#CDBB93', 1.2), ax, 1.07, az, g); edge.castShadow = false;
+      PODIUM = new THREE.Vector3(ax + 0.2, 0, az + 0.75);
+    }
     r.spot = r.seats[0];  r.look = c;
   },
 
@@ -1088,7 +1176,7 @@ function applyState(ag, silent){
   const changed = estado !== rb.state || dest !== rb.room || (ag.tarea || '') !== rb.task;
   const moved = dest !== rb.room || (estado === 'reunion') !== (rb.state === 'reunion');
   rb.state = estado; rb.task = ag.tarea || ''; rb.room = dest;
-  if (moved || !rb.path.length && dest !== rb.at) routeTo(rb, dest, estado);
+  if (!rb.presenting && (moved || !rb.path.length && dest !== rb.at)) routeTo(rb, dest, estado);
   if (changed && !silent) {
     rb.talkUntil = performance.now() + 6000;
     log(rb, dest);
@@ -1256,12 +1344,15 @@ function renderDetail(){
       </dl>
       <div class="chips">${I.herramientas.map(h => `<span class="tool">${esc(h)}</span>`).join('')}</div>
     </section>
+    ${(() => { const mine = presentations.filter(x => x.de === a.id).slice(-3).reverse();
+      return mine.length ? `<section class="d-sec"><div class="eyebrow">Presentaciones</div>${mine.map(x => `<button class="d-pres" data-pres="${esc(x.id)}"><b>${esc(x.titulo)}</b><small>${PRES_TIPO[x.tipo]} · ${hhmm(x.t)}</small></button>`).join('')}</section>` : ''; })()}
     <button class="d-chat" id="chatWith">Chatear con ${a.name}</button>`;
 }
 
 detailEl.addEventListener('click', e => {
   if (e.target.closest('#closeDetail')) select(null);
   if (e.target.closest('#chatWith')) openChat(selected);
+  const pb = e.target.closest('[data-pres]'); if (pb) openViewer(pb.dataset.pres);
 });
 detailEl.addEventListener('pointermove', e => {
   const chart = e.target.closest('#hourChart'); if (!chart) return;
@@ -1316,6 +1407,7 @@ async function poll(){
     data.agentes.forEach(ag => applyState(ag, false));
     if (Array.isArray(data.mensajes)) loadLiveMessages(data.mensajes);
     if (Array.isArray(data.aprobaciones)) loadLiveApprovals(data.aprobaciones);
+    if (Array.isArray(data.presentaciones)) loadLivePresentations(data.presentaciones);
     if (Array.isArray(data.escribiendo)) {
       for (const k in typing) delete typing[k];
       data.escribiendo.forEach(e => { const id = resolveId(e.bot); typing[e.canal === 'equipo' ? 'equipo' : resolveId(e.canal)] = id; });
@@ -1380,15 +1472,17 @@ function simStep(){
   if (selected && !detailEl.querySelector('.tip:not([hidden])')) renderDetail();
   const now = performance.now();
   if (now > meetingUntil && Math.random() < .12) {
-    meetingUntil = now + 22000;
+    meetingUntil = now + 60000;
     const tema = pick(['Revisión semanal de leads','Planificación de contenido de octubre','Prioridades del CRM','Lanzamiento de nuevo proyecto']);
     AGENTS.forEach(a => { if (a.id === 'sylvia' || Math.random() < .7) applyState({ id:a.id, estado:'reunion', tarea:tema }); });
-    setTimeout(() => AGENTS.forEach(a => { if (robots[a.id].state === 'reunion') applyState({ id:a.id, estado:'trabajando', tarea:pick(SIM_TASKS[a.id]) }); }), 22000);
+    setTimeout(() => simPresent(), 8000);
+    setTimeout(() => AGENTS.forEach(a => { if (robots[a.id].state === 'reunion') applyState({ id:a.id, estado:'trabajando', tarea:pick(SIM_TASKS[a.id]) }); }), 60000);
     return;
   }
   if (now < meetingUntil || sceneBusy) return;
   if (Math.random() < .55) return;          // los agentes no cambian de tarea tan seguido
   const a = pick(AGENTS);
+  if (robots[a.id].presenting) return;
   const roll = Math.random();
   if (roll < .6) simAssign(a, 'trabajando', pick(SIM_TASKS[a.id]));
   else if (roll < .75) simAssign(a, 'pensando', 'Planificando: ' + pick(SIM_TASKS[a.id]).toLowerCase());
@@ -1599,6 +1693,7 @@ async function replyToUser(ch, text){
   if (live) return;                                   // en vivo responden los agentes reales
   const target = mentioned(text);
   const body = clean(text);
+  if (isPresentReq(text)) return presentRequest(ch, target, body || text);
   const special = isMeet(text) && ch === 'equipo' || isStatus(text) && !(ch === 'equipo' && target);
   if (aiState === 'on' && !special) {
     try { return await aiReply(ch, text); }
@@ -1636,8 +1731,9 @@ async function replyToUser(ch, text){
     const tema = body.length > 10 ? cap(body) : 'Reunión convocada desde el chat';
     AGENTS.forEach(a => applyState({ id:a.id, estado:'reunion', tarea:tema }));
     avatarToSeat();
-    meetingUntil = performance.now() + 25000;
-    setTimeout(() => AGENTS.forEach(a => { if (robots[a.id].state === 'reunion') applyState({ id:a.id, estado:'trabajando', tarea:pick(SIM_TASKS[a.id]) }); }), 25000);
+    meetingUntil = performance.now() + 60000;
+    setTimeout(() => simPresent(), 8000);
+    setTimeout(() => AGENTS.forEach(a => { if (robots[a.id].state === 'reunion') applyState({ id:a.id, estado:'trabajando', tarea:pick(SIM_TASKS[a.id]) }); }), 60000);
     return;
   }
   if (isStatus(text) && !target) {
@@ -1731,7 +1827,8 @@ function startChatter(){
 function loadLiveMessages(list){
   const next = list.slice(-300).map((m, i) => ({
     id: 'v' + (m.id ?? i), de: resolveId(m.de), para: ['todos','tu'].includes(m.para) || !m.para ? (m.para || 'todos') : resolveId(m.para), texto: String(m.texto || ''),
-    tipo: ['mensaje','tarea','ayuda','sistema'].includes(m.tipo) ? m.tipo : 'mensaje',
+    tipo: ['mensaje','tarea','ayuda','sistema','presentacion'].includes(m.tipo) ? m.tipo : 'mensaje',
+    ref: m.ref ? 'v' + m.ref : undefined,
     estado: TK_LABEL[m.estado] ? m.estado : (m.tipo === 'tarea' ? 'pendiente' : undefined),
     t: m.hora && !isNaN(Date.parse(m.hora)) ? Date.parse(m.hora) : Date.now(),
     canal: m.canal ? (m.canal === 'equipo' ? 'equipo' : resolveId(m.canal)) : undefined,
@@ -1774,7 +1871,7 @@ function renderChat(){
 
   const qs = isTeam
     ? [['¿Cómo van todos?', '¿Cómo van todos?'], ['Asignar tarea', '@Bety tarea: '], ['Convocar reunión', 'Reunión: revisión de prioridades']]
-    : [['¿Cómo vas?', '¿Cómo vas?'], ['Asignarle tarea', 'Tarea: '], ['Saludar', 'Hola, ' + ag.name]];
+    : [['¿Cómo vas?', '¿Cómo vas?'], ['Asignarle tarea', 'Tarea: '], ['Pedir presentación', 'Preséntame tus resultados en el Meeting Room']];
   chQuick.innerHTML = qs.map(([l, v]) => `<button class="qk" type="button" data-v="${esc(v)}">${l}</button>`).join('');
   chInput.placeholder = isTeam ? 'Escribe al equipo… (usa @Nombre para mencionar)' : `Escribe a ${ag.name}…`;
   if (live && server) { chNote.hidden = false; chNote.textContent = 'Conectado a Hermes: tus mensajes llegan a los bots de tu computadora.'; }
@@ -1797,6 +1894,12 @@ function renderMsg(m){
       <div class="what">${esc(m.texto)}</div></div>`;
   } else if (m.tipo === 'ayuda') {
     content = `<div class="card-msg help"><span class="eyebrow" style="color:var(--bad)">Pide ayuda</span><div class="what">${esc(m.texto)}</div></div>`;
+  } else if (m.tipo === 'presentacion') {
+    const pr = presentations.find(x => x.id === m.ref);
+    content = `<div class="card-msg pres" style="--c2:${w.color}">
+      <span class="eyebrow">${pr ? PRES_TIPO[pr.tipo] : 'Presentación'}</span>
+      <div class="what">${esc(pr ? pr.titulo : m.texto)}</div>
+      ${pr ? `<button class="open-pres" data-pres="${esc(pr.id)}">Abrir</button>` : ''}</div>`;
   }
   return `<div class="msg${mine ? ' mine' : ''}" style="--c:${w.color}">
     <span class="av" aria-hidden="true">${esc(initials(w.name))}</span>
@@ -1828,6 +1931,7 @@ chList.addEventListener('click', e => {
   channel = b.dataset.ch; unread[channel] = 0; renderChat(); chMsgs.scrollTop = chMsgs.scrollHeight;
 });
 chHead.addEventListener('click', e => { if (e.target.closest('#chClose')) closeChat(); });
+chMsgs.addEventListener('click', e => { const b = e.target.closest('[data-pres]'); if (b) openViewer(b.dataset.pres); });
 chQuick.addEventListener('click', e => {
   const b = e.target.closest('.qk'); if (!b) return;
   chInput.value = b.dataset.v; chInput.focus();
@@ -2051,6 +2155,310 @@ async function simApprovalReply(a){
   }
 }
 
+/* ───────── Presentaciones ─────────
+   Los bots muestran su trabajo como diapositivas, documento o dashboard.
+   Se ven en la pantalla grande del Meeting Room y en grande en el visor.  */
+const PRES_TIPO = { slides:'Presentación', documento:'Documento', dashboard:'Dashboard' };
+var presentations = [];
+let presActive = null, presPage = 0, presClock = 0, presEndsAt = 0;
+const viewerState = { open:false, id:null, i:0 };
+const nowbar = document.getElementById('nowbar'), nbText = document.getElementById('nbText'),
+      viewerEl = document.getElementById('viewer'), vwBody = document.getElementById('vwBody'), vwFoot = document.getElementById('vwFoot');
+
+function normPres(r, extra = {}){
+  const str = (v, n = 400) => String(v ?? '').trim().slice(0, n);
+  const arr = v => Array.isArray(v) ? v : [];
+  const tipo = PRES_TIPO[r.tipo] ? r.tipo : (r.kpis || r.series ? 'dashboard' : r.secciones ? 'documento' : 'slides');
+  const slides = arr(r.slides).slice(0, 20).map(x => ({ titulo: str(x.titulo, 140), puntos: arr(x.puntos).slice(0, 8).map(y => str(y, 240)).filter(Boolean), nota: str(x.nota, 400) })).filter(x => x.titulo || x.puntos.length);
+  const secciones = arr(r.secciones).slice(0, 20).map(x => ({ titulo: str(x.titulo, 140), texto: str(x.texto, 4000) })).filter(x => x.titulo || x.texto);
+  const kpis = arr(r.kpis).slice(0, 6).map(k => ({ nombre: str(k.nombre, 60), valor: str(k.valor, 24), cambio: str(k.cambio, 80) })).filter(k => k.nombre);
+  const series = arr(r.series).slice(0, 3).map(x => ({ nombre: str(x.nombre, 80), tipo: x.tipo === 'linea' ? 'linea' : 'barras',
+    puntos: arr(x.puntos).slice(0, 24).map(q => Array.isArray(q) ? [str(q[0], 24), Number(q[1]) || 0] : [str(q.x ?? q.etiqueta, 24), Number(q.y ?? q.valor) || 0]) })).filter(x => x.puntos.length);
+  const titulo = str(r.titulo, 140) || 'Presentación';
+  if (tipo === 'slides' && !slides.length) slides.push({ titulo, puntos: [], nota: '' });
+  return { id: extra.id || 'p' + (++msgSeq), de: extra.de || resolveId(r.de), titulo, tipo, slides, secciones, kpis, series,
+           t: extra.t || Date.now(), ejemplo: !!extra.ejemplo };
+}
+const presPages = pr => pr.tipo === 'slides' ? pr.slides.length : pr.tipo === 'documento' ? Math.max(1, pr.secciones.length) : 1;
+
+/* --- pantalla grande en 3D --- */
+function wrapLines(x, text, maxW, maxLines){
+  const words = String(text).split(/\s+/); const lines = []; let cur = '';
+  for (const w of words) { const t = cur ? cur + ' ' + w : w; if (x.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; if (lines.length === maxLines) break; } else cur = t; }
+  if (lines.length < maxLines && cur) lines.push(cur);
+  if (lines.length === maxLines && words.join(' ').length > lines.join(' ').length + 1) lines[maxLines - 1] = lines[maxLines - 1].replace(/.{0,2}$/, '…');
+  return lines;
+}
+function drawPresScreen(){
+  if (!PRES_SCREEN) return;
+  const { cv, tex } = PRES_SCREEN, x = cv.getContext('2d'), w = cv.width, h = cv.height;
+  const pr = presActive;
+  const g = x.createLinearGradient(0, 0, w, h); g.addColorStop(0, '#0E3238'); g.addColorStop(1, '#071A1E');
+  x.fillStyle = g; x.fillRect(0, 0, w, h);
+  if (!pr) {
+    x.fillStyle = '#CDBB93'; x.font = '600 30px sans-serif'; x.fillText('MEETING ROOM', 56, 110);
+    x.fillStyle = '#EFE9DD'; x.font = '600 58px sans-serif'; x.fillText('Madreperla', 56, 190);
+    x.fillStyle = '#8FA7A5'; x.font = '26px sans-serif';
+    x.fillText(presentations.length ? `Última: ${presentations[presentations.length - 1].titulo}`.slice(0, 60) : 'Sin presentación en curso', 56, 250);
+    tex.needsUpdate = true; return;
+  }
+  const col = robots[pr.de]?.a.color || '#CDBB93', name = robots[pr.de]?.a.name || '';
+  x.fillStyle = col; x.fillRect(0, 0, 14, h);
+  x.fillStyle = '#8FA7A5'; x.font = '22px sans-serif';
+  x.fillText(`${name} · ${PRES_TIPO[pr.tipo]}${pr.ejemplo ? ' · ejemplo' : ''}`, 56, 52);
+  const n = presPages(pr), i = presPage % n;
+  if (pr.tipo === 'dashboard') {
+    x.fillStyle = '#EFE9DD'; x.font = '600 40px sans-serif'; x.fillText(pr.titulo.slice(0, 44), 56, 108);
+    pr.kpis.slice(0, 4).forEach((k, j) => {
+      const bx = 56 + j * 230, by = 140;
+      x.strokeStyle = 'rgba(205,187,147,.3)'; x.lineWidth = 2; x.strokeRect(bx, by, 210, 110);
+      x.fillStyle = '#8FA7A5'; x.font = '18px sans-serif'; x.fillText(k.nombre.slice(0, 20), bx + 16, by + 32);
+      x.fillStyle = '#EFE9DD'; x.font = '600 44px sans-serif'; x.fillText(k.valor.slice(0, 9), bx + 16, by + 84);
+    });
+    const se = pr.series[0];
+    if (se) {
+      const max = Math.max(...se.puntos.map(q => q[1]), 1), bw = (w - 112) / se.puntos.length;
+      se.puntos.forEach((q, j) => { const bh = (q[1] / max) * 130; x.fillStyle = col; x.fillRect(56 + j * bw + 4, 410 - bh, bw - 8, bh); });
+      x.fillStyle = 'rgba(239,233,221,.3)'; x.fillRect(56, 410, w - 112, 2);
+    }
+  } else {
+    const item = pr.tipo === 'slides' ? pr.slides[i] : (pr.secciones[i] || { titulo: pr.titulo, texto: '' });
+    x.fillStyle = '#EFE9DD'; x.font = '600 46px sans-serif';
+    const tl = wrapLines(x, item.titulo || pr.titulo, w - 120, 2); tl.forEach((l, j) => x.fillText(l, 56, 118 + j * 54));
+    let y = 118 + tl.length * 54 + 26;
+    x.font = '28px sans-serif'; x.fillStyle = 'rgba(239,233,221,.9)';
+    const pts = pr.tipo === 'slides' ? item.puntos : [item.texto];
+    for (const pt of pts) {
+      const lines = wrapLines(x, pt, w - 150, pr.tipo === 'slides' ? 2 : 5);
+      if (pr.tipo === 'slides') { x.fillStyle = col; x.beginPath(); x.arc(64, y - 9, 7, 0, Math.PI * 2); x.fill(); x.fillStyle = 'rgba(239,233,221,.9)'; }
+      for (const l of lines) { if (y > h - 40) break; x.fillText(l, pr.tipo === 'slides' ? 88 : 56, y); y += 36; }
+      y += 10;
+    }
+  }
+  if (n > 1) { x.fillStyle = '#8FA7A5'; x.font = '20px sans-serif'; x.fillText(`${i + 1} / ${n}`, w - 110, h - 26); }
+  tex.needsUpdate = true;
+}
+
+/* --- inicio y fin --- */
+function startPresentation(pr, opts = {}){
+  if (!presentations.some(q => q.id === pr.id)) presentations.push(pr);
+  if (presActive && presActive.id !== pr.id) endPresentation(true);
+  presActive = pr; presPage = 0; presClock = 0;
+  presEndsAt = opts.live ? 0 : performance.now() + Math.max(30000, presPages(pr) * 8000 + 8000);
+  const rb = robots[pr.de];
+  if (rb && PODIUM) {
+    rb.presenting = true;
+    rb.path = planPath(rb.at, rb.g.position, 'meeting', PODIUM.clone());
+    rb.at = 'meeting'; rb.look = ROOMS.meeting.center.clone();
+  }
+  drawPresScreen(); renderNowBar();
+  if (selected) renderDetail();
+}
+function endPresentation(silent){
+  const pr = presActive; if (!pr) return;
+  presActive = null;
+  const rb = robots[pr.de];
+  if (rb) { rb.presenting = false; routeTo(rb, rb.room, rb.state); }
+  drawPresScreen(); renderNowBar();
+}
+function presTick(dt, now){
+  if (!presActive) return;
+  presClock += dt;
+  if (presClock > 7) { presClock = 0; presPage++; drawPresScreen(); }
+  if (presEndsAt && now > presEndsAt) endPresentation();
+}
+function renderNowBar(){
+  const pr = presActive;
+  nowbar.hidden = !pr;
+  document.body.classList.toggle('presenting', !!pr);
+  if (!pr) return;
+  const rb = robots[pr.de];
+  nowbar.style.setProperty('--c', rb?.a.color || '#CDBB93');
+  nbText.innerHTML = `<b>${esc(rb?.a.name || 'Un agente')}</b> presenta · ${esc(pr.titulo)}`;
+}
+document.getElementById('nbOpen').addEventListener('click', () => { if (presActive) openViewer(presActive.id); });
+
+/* --- visor en grande --- */
+function openViewer(id){
+  const pr = presentations.find(q => q.id === id); if (!pr) return;
+  viewerState.open = true; viewerState.id = id; viewerState.i = 0;
+  viewerEl.hidden = false; renderViewer();
+  document.getElementById('vwClose').focus();
+}
+function closeViewer(){ viewerState.open = false; viewerEl.hidden = true; }
+function viewerStep(d){
+  const pr = presentations.find(q => q.id === viewerState.id); if (!pr || pr.tipo !== 'slides') return;
+  viewerState.i = Math.max(0, Math.min(pr.slides.length - 1, viewerState.i + d)); renderViewer();
+}
+function barChart(se, col, idx){
+  const W = 520, H = 220, top = 16, base = 178, left = 8;
+  const max = Math.max(...se.puntos.map(q => q[1]), 1), n = se.puntos.length;
+  const slot = (W - left) / n, bw = Math.max(6, slot - 6);
+  const maxI = se.puntos.findIndex(q => q[1] === max);
+  let marks = '', hits = '', labels = '';
+  if (se.tipo === 'linea') {
+    const pts = se.puntos.map((q, i) => [left + i * slot + slot/2, base - (q[1] / max) * (base - top)]);
+    marks = `<polyline fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round" points="${pts.map(p => p.join(',')).join(' ')}"/>` +
+      pts.map((p, i) => `<circle cx="${p[0]}" cy="${p[1]}" r="${i === maxI || i === n - 1 ? 4.5 : 3}" fill="${col}" stroke="#0B252A" stroke-width="2"/>`).join('');
+  } else {
+    se.puntos.forEach((q, i) => {
+      const h = q[1] > 0 ? Math.max(3, (q[1] / max) * (base - top)) : 0, x = left + i * slot + 3, y = base - h, r = Math.min(4, bw/2, h);
+      if (h) marks += `<path d="M${x},${base} V${y + r} Q${x},${y} ${x + r},${y} H${x + bw - r} Q${x + bw},${y} ${x + bw},${y + r} V${base} Z" fill="${col}" opacity="${i === maxI ? 1 : .75}"/>`;
+    });
+  }
+  se.puntos.forEach((q, i) => {
+    hits += `<rect x="${left + i * slot}" y="0" width="${slot}" height="${base}" fill="transparent" data-l="${esc(q[0])}" data-v="${q[1]}"/>`;
+    if (n <= 8 || i % Math.ceil(n / 8) === 0) labels += `<text x="${left + i * slot + slot/2}" y="${base + 18}" text-anchor="middle" fill="var(--muted)" font-size="11" font-family="IBM Plex Mono, monospace">${esc(q[0].slice(0, 10))}</text>`;
+  });
+  const mx = left + maxI * slot + slot/2, my = base - (max / max) * (base - top) - 8;
+  return `<div class="chartbox" data-chart="${idx}"><h4>${esc(se.nombre || 'Serie')}</h4>
+    <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(se.nombre)}: máximo ${max.toLocaleString('es-DO')} en ${esc(se.puntos[maxI][0])}">
+      <line x1="${left}" x2="${W}" y1="${top}" y2="${top}" stroke="rgba(239,233,221,.08)"/>
+      <line x1="${left}" x2="${W}" y1="${(top + base)/2}" y2="${(top + base)/2}" stroke="rgba(239,233,221,.06)"/>
+      ${marks}
+      <text x="${Math.min(W - 20, Math.max(20, mx))}" y="${Math.max(12, my)}" text-anchor="middle" fill="var(--ivory)" font-size="12" font-family="IBM Plex Mono, monospace">${max.toLocaleString('es-DO')}</text>
+      <line x1="${left}" x2="${W}" y1="${base}" y2="${base}" stroke="rgba(239,233,221,.25)"/>
+      ${labels}${hits}
+    </svg><div class="tip" hidden></div></div>`;
+}
+function renderViewer(){
+  const pr = presentations.find(q => q.id === viewerState.id); if (!pr) return closeViewer();
+  const rb = robots[pr.de], col = rb?.a.color || '#CDBB93';
+  document.getElementById('vwBox').style.setProperty('--c', col);
+  document.getElementById('vwKind').textContent = PRES_TIPO[pr.tipo];
+  document.getElementById('vwTitle').textContent = pr.titulo;
+  document.getElementById('vwSub').textContent = `${rb?.a.name || ''} · ${rb?.a.role || ''} · ${hhmm(pr.t)}`;
+  let body = '';
+  if (pr.tipo === 'slides') {
+    const sl = pr.slides[viewerState.i];
+    body = `<div class="slide" style="--c:${col}"><h3>${esc(sl.titulo)}</h3>${sl.puntos.length ? `<ul>${sl.puntos.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}${sl.nota ? `<div class="snote">${esc(sl.nota)}</div>` : ''}</div>
+      <div class="dots" style="--c:${col}" aria-hidden="true">${pr.slides.map((_, i) => `<i class="${i === viewerState.i ? 'on' : ''}"></i>`).join('')}</div>`;
+  } else if (pr.tipo === 'documento') {
+    body = `<article class="doc">${pr.secciones.map(x => `<section>${x.titulo ? `<h3>${esc(x.titulo)}</h3>` : ''}<p>${esc(x.texto)}</p></section>`).join('') || '<p>Documento sin contenido.</p>'}</article>`;
+  } else {
+    body = `${pr.kpis.length ? `<div class="kpis">${pr.kpis.map(k => `<div class="kpi"><span>${esc(k.nombre)}</span><b>${esc(k.valor)}</b>${k.cambio ? `<small>${esc(k.cambio)}</small>` : ''}</div>`).join('')}</div>` : ''}
+      <div class="charts">${pr.series.map((se, i) => barChart(se, col, i)).join('')}</div>`;
+  }
+  vwBody.innerHTML = body;
+  const n = pr.slides.length;
+  vwFoot.innerHTML = `${pr.ejemplo ? '<span class="note">Contenido de ejemplo (modo simulación).</span>' : '<span></span>'}
+    <div class="vw-nav">
+      ${pr.tipo === 'slides' ? `<button class="vw-btn" data-step="-1"${viewerState.i === 0 ? ' disabled' : ''}>Anterior</button><span class="vw-count">${viewerState.i + 1} / ${n}</span><button class="vw-btn" data-step="1"${viewerState.i >= n - 1 ? ' disabled' : ''}>Siguiente</button>` : ''}
+      <button class="vw-btn pri" data-comment="1">Comentar a ${esc(rb?.a.name || 'su autor')}</button>
+    </div>`;
+}
+viewerEl.addEventListener('click', e => {
+  if (e.target === viewerEl || e.target.closest('#vwClose')) return closeViewer();
+  const st = e.target.closest('[data-step]'); if (st) return viewerStep(+st.dataset.step);
+  if (e.target.closest('[data-comment]')) {
+    const pr = presentations.find(q => q.id === viewerState.id);
+    closeViewer(); openChat(pr.de);
+    chInput.value = `Sobre «${pr.titulo}»: `; chInput.focus();
+  }
+});
+viewerEl.addEventListener('pointermove', e => {
+  const box = e.target.closest('.chartbox'); if (!box) return;
+  const tip = box.querySelector('.tip'), r = e.target.closest('rect[data-l]');
+  if (!r) { tip.hidden = true; return; }
+  const b = box.getBoundingClientRect(), rr = r.getBoundingClientRect();
+  tip.textContent = `${r.dataset.l}: ${(+r.dataset.v).toLocaleString('es-DO')}`;
+  tip.style.left = Math.max(50, Math.min(b.width - 50, rr.left - b.left + rr.width/2)) + 'px';
+  tip.style.top = '34px'; tip.hidden = false;
+});
+viewerEl.addEventListener('pointerleave', () => viewerEl.querySelectorAll('.tip').forEach(t => t.hidden = true), true);
+
+/* --- en vivo (Hermes, con reportar.py --presentar) --- */
+let presSig = '';
+function loadLivePresentations(list){
+  const sig = list.map(q => q.id + (q.activa ? '*' : '')).join('|');
+  if (sig === presSig) return;
+  presSig = sig;
+  presentations = list.slice(-30).map(q => normPres(q, { id: 'v' + q.id, de: resolveId(q.de), t: Date.parse(q.hora) || Date.now() }));
+  const act = list.filter(q => q.activa && Date.now() - (Date.parse(q.hora) || 0) < 30 * 60000).pop();
+  const want = act ? 'v' + act.id : null;
+  if (want && (!presActive || presActive.id !== want)) startPresentation(presentations.find(q => q.id === want), { live:true });
+  else if (!want && presActive) endPresentation();
+  liveSig = ''; renderChat();
+}
+
+/* --- simulación: ejemplos por agente --- */
+const SIM_PRES = {
+  mark: { tipo:'dashboard', titulo:'Leads de la semana', kpis:[
+      { nombre:'Leads nuevos', valor:'38', cambio:'+12% frente a la semana anterior' },
+      { nombre:'Tasa de respuesta', valor:'64%', cambio:'+5 puntos' },
+      { nombre:'Visitas agendadas', valor:'5', cambio:'2 en Cap Cana' },
+      { nombre:'Costo por lead', valor:'—', cambio:'por confirmar' }],
+    series:[ { nombre:'Leads por día', tipo:'barras', puntos:[['Lun',4],['Mar',7],['Mié',5],['Jue',8],['Vie',6],['Sáb',5],['Dom',3]] },
+             { nombre:'Leads por zona', tipo:'barras', puntos:[['Cap Cana',14],['Bávaro',9],['Cana Bay',6],['Miches',5],['Las Terrenas',4]] } ] },
+  bety: { tipo:'slides', titulo:'Calendario de contenido de octubre', slides:[
+      { titulo:'Octubre: criterio antes de invertir', puntos:['12 publicaciones en LinkedIn, tres por semana','Tono sereno y consultivo, sin urgencia','Todo queda en borrador hasta tu aprobación'] },
+      { titulo:'Semana 1 · Criterio', puntos:['Carrusel: cinco preguntas antes de comprar','Texto: el horizonte de una inversión patrimonial'] },
+      { titulo:'Semana 2 · Destinos', puntos:['Cap Cana: calma, marina y golf','Miches: naturaleza y lujo sostenible'] },
+      { titulo:'Semana 3 · Proceso', puntos:['Video corto: cómo acompañamos una decisión','Testimonio, solo con permiso del cliente'] },
+      { titulo:'Siguiente paso', puntos:['Revisar los borradores de la semana 1','Aprobar el calendario para empezar el lunes'] }] },
+  sergio: { tipo:'documento', titulo:'Novedades en Miches', secciones:[
+      { titulo:'Resumen', texto:'Miches se consolida como destino emergente de ecoturismo y desarrollos de lujo sostenible. Este informe reúne lo que encontramos esta semana.' },
+      { titulo:'Lo que verificamos', texto:'Cada dato de este documento tiene su fuente y su fecha en la carpeta de investigación. Solo incluimos información de fuentes oficiales o de los propios desarrolladores.' },
+      { titulo:'Por verificar', texto:'Las cifras de ocupación y los plazos de entrega de nuevos proyectos quedan marcados "por verificar" hasta confirmarlos. No deben usarse con clientes todavía.' },
+      { titulo:'Recomendación', texto:'Preparar una ficha de zona para inversionistas con perfil de segunda residencia, revisada por María Andrea antes de compartirla.' }] },
+  viktor: { tipo:'slides', titulo:'Propuesta de visita en Cap Cana', slides:[
+      { titulo:'Objetivo de la visita', puntos:['Dos inversionistas con perfil patrimonial','Conocer tres villas seleccionadas','Decidir con criterio, sin prisa'] },
+      { titulo:'Recorrido propuesto', puntos:['Mañana: villas frente al campo de golf','Almuerzo en la marina','Tarde: reunión con María Andrea'] },
+      { titulo:'Por confirmar', puntos:['Precios y condiciones: los confirma una persona autorizada','Fechas según la agenda de los clientes'] }] },
+  marcelo: { tipo:'dashboard', titulo:'Seguimiento de clientes', kpis:[
+      { nombre:'Seguimientos pendientes', valor:'12', cambio:'4 de esta semana' },
+      { nombre:'Respondidos', valor:'8', cambio:'esta semana' },
+      { nombre:'Migración al nuevo CRM', valor:'60%', cambio:'en curso' }],
+    series:[ { nombre:'Clientes por etapa', tipo:'barras', puntos:[['Nuevo',5],['En conversación',4],['Visita agendada',2],['En pausa',1]] } ] },
+  sylvia: { tipo:'documento', titulo:'Resumen de la semana', secciones:[
+      { titulo:'Avances', texto:'Calendario de octubre en revisión, informe de leads listo y propuesta de visita en Cap Cana preparada.' },
+      { titulo:'Pendiente de tu decisión', texto:'Dos borradores esperan tu aprobación en el tablero del Meeting Room.' },
+      { titulo:'Prioridades de la próxima semana', texto:'Cerrar el calendario, avanzar la migración al nuevo CRM y verificar las novedades de Miches.' }] },
+};
+let lastPresenter = null;
+async function simPresent(forId){
+  if (live) return;
+  const ids = Object.keys(SIM_PRES).filter(id => robots[id] && robots[id].state === 'reunion' && id !== lastPresenter);
+  const id = forId || pick(ids.length ? ids : Object.keys(SIM_PRES));
+  lastPresenter = id;
+  const pr = normPres(SIM_PRES[id], { de:id, ejemplo:true });
+  startPresentation(pr);
+  await say(id, 'todos', `Les comparto «${pr.titulo}» en la pantalla.`, { tipo:'presentacion', ref: pr.id });
+}
+
+/* --- pedir una presentación desde el chat --- */
+const isPresentReq = t => /pres[eé]nta|presentaci[oó]n|diapositiva|slides|dashboard|mu[eé]strame (tus|los) resultados|exp[oó]n/i.test(t);
+async function presentRequest(ch, target, body){
+  const id = ch !== 'equipo' ? ch : (target || route(body) || 'sylvia');
+  const replyTo = ch === 'equipo' ? 'todos' : 'tu';
+  const rb = robots[id];
+  let pr = null;
+  if (aiState === 'on') {
+    const ch2 = ch === 'equipo' ? 'equipo' : id;
+    typing[ch2] = id; renderTyping();
+    try {
+      const out = await sampler.json(`Eres ${rb.a.name}, agente de IA del equipo interno de Madreperla Realtors (bienes raíces de lujo en República Dominicana). Tu función: ${rb.info.mision}
+María Andrea, fundadora, te pidió: «${body}».
+Prepara una presentación breve para mostrar en la pantalla del Meeting Room. Elige el formato que mejor sirva:
+- "slides": de 3 a 6 diapositivas con 2 a 4 puntos cortos cada una.
+- "documento": de 3 a 5 secciones de uno o dos párrafos.
+- "dashboard": 3 o 4 indicadores y 1 o 2 series de datos (máximo 8 puntos cada una).
+Reglas: español, tono profesional y sereno. No inventes datos reales: toda cifra es de ejemplo y el campo "cambio" o el texto debe decir "ejemplo" o "por confirmar". No incluyas datos de clientes. No prometas rentabilidad.
+Responde solo con JSON así:
+{"titulo":"…","tipo":"slides","slides":[{"titulo":"…","puntos":["…"]}],"secciones":[{"titulo":"…","texto":"…"}],"kpis":[{"nombre":"…","valor":"…","cambio":"…"}],"series":[{"nombre":"…","tipo":"barras","puntos":[["etiqueta",0]]}]}`, { modelTier:'default', cache:false });
+      pr = normPres(out || {}, { de:id, ejemplo:true });
+    } catch (e) {
+      if (['not_granted','sampling_disabled','not_declared','capability_disabled','capability_removed'].includes(e?.code)) { aiState = 'off'; renderChat(); }
+      pr = null;
+    } finally { if (typing[ch === 'equipo' ? 'equipo' : id] === id) delete typing[ch === 'equipo' ? 'equipo' : id]; renderTyping(); }
+  }
+  if (!pr) pr = normPres(SIM_PRES[id] || SIM_PRES.sylvia, { de:id, ejemplo:true });
+  await say(id, replyTo, 'Listo. Lo presento en la pantalla del Meeting Room.', { tipo:'presentacion', ref: pr.id }, 400);
+  if (robots[id].state !== 'reunion') applyState({ id, estado:'reunion', sala:'meeting', tarea:`Presentando: ${pr.titulo}` });
+  startPresentation(pr);
+  setTimeout(() => { if (!live && robots[id].state === 'reunion' && !presActive) applyState({ id, estado:'trabajando', tarea: pick(SIM_TASKS[id]) }); }, presPages(pr) * 8000 + 12000);
+}
+
 /* ───────── Interacción ───────── */
 
 const ray = new THREE.Raycaster(), ptr = new THREE.Vector2();
@@ -2064,11 +2472,18 @@ canvas.addEventListener('pointerup', e => {
   const hits = ray.intersectObjects(Object.values(robots).flatMap(r => r.hitboxes), false);
   if (hits.length) return select(hits[0].object.userData.agent);
   if (APR_SCREEN && ray.intersectObject(APR_SCREEN.mesh, false).length) return openApprovals();
+  if (PRES_SCREEN && ray.intersectObject(PRES_SCREEN.mesh, false).length) { const last = presActive || presentations[presentations.length - 1]; if (last) return openViewer(last.id); }
   if (selected) return select(null);               // primer toque cierra la ficha
   const fh = ray.intersectObject(floor, false);
   if (fh.length) moveAvatar(fh[0].point);
 });
 window.addEventListener('keydown', e => {
+  if (viewerState.open) {
+    if (e.key === 'ArrowRight') { viewerStep(1); e.preventDefault(); }
+    else if (e.key === 'ArrowLeft') { viewerStep(-1); e.preventDefault(); }
+    else if (e.key === 'Escape') closeViewer();
+    return;
+  }
   if (e.key !== 'Escape') return;
   if (chatOpen) closeChat(); else if (aprOpen) closeApprovals(); else select(null);
 });
@@ -2268,9 +2683,12 @@ function tick(){
         const ang = Math.atan2(tmp.x, tmp.z);
         rb.g.rotation.y += shortAngle(ang - rb.g.rotation.y) * Math.min(1, dt*10);
       }
-    } else if (rb.look) {
-      const ang = Math.atan2(rb.look.x - p.x, rb.look.z - p.z);
-      rb.g.rotation.y += shortAngle(ang - rb.g.rotation.y) * Math.min(1, dt*4);
+    } else if (rb.look || (presActive && rb.at === 'meeting')) {
+      const L = presActive && rb.at === 'meeting' && !rb.presenting && PRES_SCREEN ? PRES_SCREEN.pos : rb.look;
+      if (L) {
+        const ang = Math.atan2(L.x - p.x, L.z - p.z);
+        rb.g.rotation.y += shortAngle(ang - rb.g.rotation.y) * Math.min(1, dt*4);
+      }
     } else if (rb.state === 'inactivo' && !rb.isMe && Math.random() < dt*0.15) {
       rb.path = planPath(null, p, null, corridorPoint());
     }
@@ -2316,6 +2734,7 @@ function tick(){
   }
   avatarWorld(now);
   updateDayNight(dt);
+  presTick(dt, now);
   roomTags.forEach(({ r, el }) => project(r.labelPos, el, 0));
 
   if (intro.t < 1) {
@@ -2333,6 +2752,7 @@ function shortAngle(a){ return ((a + Math.PI) % (Math.PI*2) + Math.PI*2) % (Math
 renderRoster();
 renderApprovals(true);
 drawAprScreen();
+drawPresScreen();
 detectServer().then(poll);
 tick();
 document.getElementById('loading').classList.add('done');

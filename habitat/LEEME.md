@@ -19,6 +19,8 @@ El **Code Lab** queda libre para un futuro agente. El **Meeting Room** está en 
 
 **Aprobaciones:** el botón *Aprobaciones* (y la pantalla del Meeting Room) muestra lo que los bots te dejan para revisar. *Aprobar* pide un segundo toque para confirmar. *Devolver* pide un comentario con lo que hay que ajustar. Los bots con algo pendiente muestran un punto champagne junto a su nombre.
 
+**Presentaciones:** en las reuniones, los bots pueden mostrar su trabajo como **diapositivas**, **documento** o **dashboard** (indicadores y gráficos). El presentador camina al atril, los demás miran la pantalla grande del Meeting Room y arriba aparece *"… presenta"* con el botón *Ver en grande*. También quedan en el chat y en la ficha de cada bot. Para pedir una, usa *Pedir presentación* en el chat privado o escribe "preséntame…". Los bots de Hermes presentan con `reportar.py --presentar` (ver `puente/HERMES.md`).
+
 **Día y noche:** la luz sigue la hora real de Santo Domingo. En el selector junto al reloj puedes ver el laboratorio de mañana, al mediodía, al atardecer o de noche.
 
 ## Cómo funciona

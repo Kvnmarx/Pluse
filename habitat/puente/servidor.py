@@ -108,6 +108,7 @@ def instrucciones(bot, canal):
         'Responde en español, en pocas frases (máximo 4), con tono profesional y cercano: es una conversación interna. '
         'Si te pide una tarea, confírmala y trabájala según tus instrucciones habituales; puedes reportar avances con reportar.py. '
         'Si necesitas su visto bueno, pídelo con reportar.py --aprobacion. '
+        'Si te pide presentar resultados, usa reportar.py --presentar con --formato slides, documento o dashboard. '
         'Nunca envíes ni publiques nada hacia clientes sin una aprobación explícita de María Andrea, '
         'y no decidas temas legales, contractuales ni precios finales. '
         f'Equipo: {equipo}.'

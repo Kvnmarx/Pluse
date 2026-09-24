@@ -11,6 +11,8 @@ Ejemplos:
   python3 reportar.py --bot @sylvia --mensaje "Prioridades de hoy: leads y calendario" --para todos
   python3 reportar.py --bot @sylvia --tarea-para @contenido-madreperla --mensaje "Calendario de octubre"
   python3 reportar.py --bot @contenido-madreperla --aprobacion "Carrusel de Cap Cana" --detalle "Texto del borrador…"
+  python3 reportar.py --bot @mark --presentar "Leads de la semana" --formato dashboard --archivo leads.json
+  python3 reportar.py --bot @contenido-madreperla --presentar "Calendario de octubre" --formato slides --archivo calendario.md
   python3 reportar.py --bot @mark --tokens-entrada 1200 --tokens-salida 300
   python3 reportar.py --bot @marcelo --estado inactivo --subir
 
@@ -29,6 +31,8 @@ SALAS = ['code', 'design', 'analitica', 'libreria', 'archivo', 'ventas', 'meetin
 CLASES = ['borrador', 'propuesta', 'consulta']
 MAX_MENSAJES = 200
 MAX_APROBACIONES = 60
+MAX_PRESENTACIONES = 30
+FORMATOS = ['slides', 'documento', 'dashboard']
 MAX_HISTORIAL = 8
 
 
@@ -83,6 +87,7 @@ def guardar(data, t=None):
     data['actualizado'] = (t or ahora()).isoformat()
     data['mensajes'] = data.get('mensajes', [])[-MAX_MENSAJES:]
     data['aprobaciones'] = data.get('aprobaciones', [])[-MAX_APROBACIONES:]
+    data['presentaciones'] = data.get('presentaciones', [])[-MAX_PRESENTACIONES:]
     tmp = ESTADO + '.tmp'
     with open(tmp, 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
@@ -139,6 +144,63 @@ def agregar_aprobacion(data, de, titulo, detalle='', clase='borrador', t=None):
     return a
 
 
+def leer_presentacion(formato, texto):
+    """Convierte el contenido a la forma que muestra el hábitat.
+
+    - JSON: se usa tal cual (slides / secciones / kpis / series).
+    - slides en texto: diapositivas separadas por una línea '---'; la línea que
+      empieza con '#' es el título y las que empiezan con '-' o '*' son puntos.
+    - documento en texto: cada '#' o '##' abre una sección con su texto.
+    """
+    texto = (texto or '').strip()
+    if texto.startswith('{'):
+        return json.loads(texto)
+    if formato == 'dashboard':
+        raise ValueError('Un dashboard necesita contenido en JSON con "kpis" y "series".')
+    if formato == 'slides':
+        slides = []
+        for bloque in [b.strip() for b in texto.split('\n---') if b.strip()]:
+            s = {'titulo': '', 'puntos': [], 'nota': ''}
+            for linea in bloque.splitlines():
+                l = linea.strip()
+                if not l or l == '---':
+                    continue
+                if l.startswith('#') and not s['titulo']:
+                    s['titulo'] = l.lstrip('#').strip()
+                elif l[:2] in ('- ', '* '):
+                    s['puntos'].append(l[2:].strip())
+                elif not s['titulo']:
+                    s['titulo'] = l
+                else:
+                    s['nota'] = (s['nota'] + ' ' + l).strip()
+            slides.append(s)
+        return {'slides': slides}
+    secciones, actual = [], None
+    for linea in texto.splitlines():
+        if linea.strip().startswith('#'):
+            actual = {'titulo': linea.strip().lstrip('#').strip(), 'texto': ''}
+            secciones.append(actual)
+        else:
+            if actual is None:
+                actual = {'titulo': '', 'texto': ''}
+                secciones.append(actual)
+            actual['texto'] = (actual['texto'] + '\n' + linea).strip('\n')
+    return {'secciones': [x for x in secciones if x['titulo'] or x['texto'].strip()]}
+
+
+def agregar_presentacion(data, de, titulo, formato, contenido, t=None):
+    t = t or ahora()
+    for x in data.setdefault('presentaciones', []):
+        x['activa'] = False                          # solo una en pantalla a la vez
+    pr = {'id': nuevo_id(t, de), 'de': de, 'titulo': titulo, 'tipo': formato, 'hora': t.isoformat(), 'activa': True}
+    for k in ('slides', 'secciones', 'kpis', 'series'):
+        if k in contenido:
+            pr[k] = contenido[k]
+    data['presentaciones'].append(pr)
+    agregar_mensaje(data, de, titulo, para='todos', tipo='presentacion', t=t, ref=pr['id'])
+    return pr
+
+
 def git(*args):
     return subprocess.run(['git', '-C', os.path.dirname(ESTADO), *args], capture_output=True, text=True)
 
@@ -181,12 +243,24 @@ def main():
     ap.add_argument('--aprobacion', help='Pide la aprobación de María Andrea: título corto')
     ap.add_argument('--detalle', default='', help='Texto completo de lo que hay que aprobar')
     ap.add_argument('--clase', choices=CLASES, default='borrador', help='borrador, propuesta o consulta')
+    ap.add_argument('--presentar', help='Presenta un trabajo en la pantalla del Meeting Room: título')
+    ap.add_argument('--formato', choices=FORMATOS, default='slides', help='slides, documento o dashboard')
+    ap.add_argument('--archivo', help='Archivo con el contenido (texto o JSON)')
+    ap.add_argument('--contenido', help='Contenido directo (texto o JSON), si no usas --archivo')
+    ap.add_argument('--terminar-presentacion', action='store_true', help='Apaga la pantalla del Meeting Room')
     ap.add_argument('--subir', action='store_true', help='Además, sube estado.json a GitHub')
     ap.add_argument('--sin-subir', action='store_true', help=argparse.SUPPRESS)   # compatibilidad
     a = ap.parse_args()
 
     bot = handle(a.bot)
     t = ahora()
+    contenido = None
+    if a.presentar:
+        try:
+            crudo = open(a.archivo, encoding='utf-8').read() if a.archivo else (a.contenido or '')
+            contenido = leer_presentacion(a.formato, crudo)
+        except (OSError, ValueError) as e:
+            sys.exit(f'No pude leer el contenido de la presentación: {e}')
 
     try:
         with Bloqueo():
@@ -228,6 +302,14 @@ def main():
                         otro['cola'] = (otro.get('cola', []) + [a.mensaje])[-5:]
                 else:
                     agregar_mensaje(data, bot, a.mensaje, para=handle(a.para), tipo=a.tipo, t=t)
+
+            if a.presentar:
+                agregar_presentacion(data, bot, a.presentar, a.formato, contenido, t)
+                ag['estado'], ag['sala'] = 'reunion', 'meeting'
+                ag.setdefault('historial', []).insert(0, {'hora': t.strftime('%H:%M'), 'texto': 'Presentó: ' + a.presentar})
+            if a.terminar_presentacion:
+                for x in data.get('presentaciones', []):
+                    x['activa'] = False
 
             if a.aprobacion:
                 agregar_aprobacion(data, bot, a.aprobacion, a.detalle, a.clase, t)

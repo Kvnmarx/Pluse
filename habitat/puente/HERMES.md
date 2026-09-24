@@ -69,6 +69,16 @@ Reporta tu trabajo al Hábitat de Madreperla con la terminal:
 - Para asignar una tarea:  --mensaje "tarea" --tarea-para @otro-bot
 - Para pedir aprobación a María Andrea (antes de enviar o publicar algo):
     --aprobacion "Título corto" --detalle "Texto completo" --clase borrador|propuesta|consulta
+- Para presentar tu trabajo en la pantalla del Meeting Room:
+    --presentar "Título" --formato slides|documento|dashboard --archivo RUTA_DEL_ARCHIVO
+  · slides: texto con diapositivas separadas por una línea ---; la línea con # es
+    el título y las líneas con - son los puntos.
+  · documento: texto con secciones que empiezan con # o ##.
+  · dashboard: archivo JSON así:
+    {"kpis":[{"nombre":"Leads nuevos","valor":"38","cambio":"+12%"}],
+     "series":[{"nombre":"Leads por día","tipo":"barras","puntos":[["Lun",4],["Mar",7]]}]}
+    ("tipo" puede ser "barras" o "linea").
+  · Para apagar la pantalla al terminar: --terminar-presentacion
 
 Textos cortos y profesionales. Nunca incluyas datos sensibles de clientes
 (cédulas, cuentas, montos, teléfonos). Nada se envía ni se publica hacia
@@ -83,6 +93,7 @@ clientes sin la aprobación de María Andrea.
 | Escribes en **# Equipo** | Le llega a Sylvia, o al bot que menciones con @ |
 | Apruebas o devuelves una solicitud | El bot recibe tu decisión y tu comentario, y te confirma qué hará |
 | Convocas una reunión | Todos van al Meeting Room por 10 minutos y Sylvia abre la reunión |
+| Le pides a un bot que presente | Prepara su presentación y la muestra con `--presentar`: camina al atril y aparece en la pantalla grande |
 
 Además:
 - Cuando un bot le asigna una tarea a otro con `--tarea-para`, se la hace llegar. Para evitar bucles, el límite es de 6 reenvíos cada 10 minutos.
