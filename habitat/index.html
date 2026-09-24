@@ -272,6 +272,43 @@
   body.presenting .hint{display:none}
   @media (max-width: 760px){ .nowbar{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 190px)} .vw-body{padding:14px} }
 
+  /* Sala de Eventos */
+  .evbtn{border-color:#E0C27A;color:#E0C27A} .evbtn .badge{background:#E0C27A;color:#0B252A}
+  .evp{--c:#E0C27A}
+  .ev-src{font:11.5px/1.45 var(--mono);color:var(--muted)}
+  .ev-src b{color:var(--ivory);font-weight:500}
+  .ev-conn{border:1px dashed rgba(224,194,122,.45);border-radius:10px;padding:10px 12px;display:grid;gap:8px;font-size:12.5px;line-height:1.45}
+  .ev-conn select,.ev-form input{width:100%;box-sizing:border-box;background:rgba(239,233,221,.06);border:1px solid var(--line);border-radius:8px;color:var(--ivory);font:13px var(--body);padding:8px 10px}
+  .ev-conn select:focus-visible,.ev-form input:focus{outline:none;border-color:#E0C27A}
+  .ev-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .ev-list{display:grid;gap:10px}
+  .ev-item{border:1px solid var(--line);border-left:3px solid var(--c);border-radius:12px;padding:12px;display:grid;gap:8px;background:rgba(239,233,221,.02)}
+  .ev-item.next{border-color:rgba(224,194,122,.5);background:rgba(224,194,122,.05)}
+  .ev-head{all:unset;cursor:pointer;display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:start}
+  .ev-head:focus-visible{outline:2px solid #E0C27A;outline-offset:2px;border-radius:6px}
+  .ev-title{font:600 14.5px/1.3 var(--body);text-wrap:balance}
+  .ev-when{grid-column:1 / 3;font:12px/1.4 var(--mono);color:var(--muted)}
+  .ev-cd{font:600 12px/1 var(--mono);padding:5px 8px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+  .cd-lejos{color:var(--muted)} .cd-semana{color:#E0C27A} .cd-pronto{color:var(--warn)} .cd-hoy{color:var(--meet)} .cd-curso{color:var(--ok)} .cd-fin{color:var(--idle)}
+  .ev-big{font:600 26px/1.1 var(--display);color:var(--ivory);font-variant-numeric:tabular-nums}
+  .ev-desc{font-size:13px;line-height:1.5;opacity:.88;white-space:pre-wrap;overflow-wrap:anywhere}
+  .ev-plan{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+  .ev-plan li{display:grid;grid-template-columns:10px 1fr auto;gap:8px;align-items:baseline;font-size:12.5px;line-height:1.4}
+  .ev-plan li i{width:8px;height:8px;border-radius:50%;background:var(--c2);align-self:center}
+  .ev-plan li b{font-weight:600}
+  .ev-tags{display:flex;gap:6px;flex-wrap:wrap}
+  .ev-form{display:grid;gap:8px;border-top:1px solid var(--line);padding-top:12px}
+  .ev-form label{font:11px var(--mono);color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+  .card-msg.evt{border-left-color:#E0C27A;background:rgba(224,194,122,.06)}
+  .evt-line{align-self:stretch;max-width:100%}
+  .toasts{top:calc(env(safe-area-inset-top,0px) + 64px);right:16px;display:grid;gap:8px;width:min(340px, calc(100% - 32px));pointer-events:none}
+  .toast{pointer-events:auto;background:var(--panel-solid);border:1px solid #E0C27A;border-radius:12px;padding:10px 12px;display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;box-shadow:0 12px 30px rgba(0,0,0,.45);animation:slidein .28s ease-out}
+  .toast .eyebrow{grid-column:1 / 3;color:#E0C27A}
+  .toast p{margin:0;font:13px/1.4 var(--body)}
+  .toast button{all:unset;cursor:pointer;padding:6px 10px;border-radius:8px;background:#E0C27A;color:#0B252A;font:600 11.5px/1 var(--display)}
+  .toast button:focus-visible{outline:2px solid var(--ivory)}
+  @media (max-width: 760px){ .toasts{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 250px)} }
+
   .loading{position:fixed;inset:0;display:grid;place-items:center;z-index:5;background:var(--bg);font:12px var(--mono);color:var(--muted);letter-spacing:.14em;text-transform:uppercase;transition:opacity .6s}
   .loading.done{opacity:0;pointer-events:none}
 
@@ -319,6 +356,7 @@
     <div class="acts">
       <button class="chatbtn" id="chatBtn" aria-controls="chat">Chat del equipo <span class="badge" id="chatBadge" hidden>0</span></button>
       <button class="aprbtn" id="aprBtn" aria-controls="aprPanel">Aprobaciones <span class="badge" id="aprBadge" hidden>0</span></button>
+      <button class="aprbtn evbtn" id="evBtn" aria-controls="evPanel">Eventos <span class="badge" id="evBadge" hidden>0</span></button>
     </div>
   </div>
   <div class="hint">Arrastra para girar · pellizca o rueda para acercar · toca un robot o su nombre para ver su ficha</div>
@@ -332,6 +370,7 @@
   <button class="av-btn av-talk" id="avTalk" type="button" hidden>Hablar</button>
   <button class="av-btn" id="avMeet" type="button" hidden>Convocar reunión</button>
   <button class="av-btn" id="avApr" type="button" hidden>Ver aprobaciones</button>
+  <button class="av-btn" id="avEv" type="button" hidden>Ver eventos</button>
   <span class="av-hint">Toca el piso para caminar</span>
 </div>
 
@@ -353,6 +392,8 @@
 
 <aside class="ui detail" id="detail" hidden aria-label="Ficha del agente"></aside>
 <aside class="ui detail apr" id="aprPanel" hidden aria-label="Aprobaciones"></aside>
+<aside class="ui detail evp" id="evPanel" hidden aria-label="Eventos"></aside>
+<div class="ui toasts" id="toasts" aria-live="polite"></div>
 
 <div class="ui nowbar" id="nowbar" hidden>
   <span class="dot" aria-hidden="true"></span>
@@ -407,6 +448,7 @@ const ROOMS = {
   libreria:  { name:'Librería',       sub:'Investigación',          x:-17.4, z: 14.1 },
   archivo:   { name:'Archivo',        sub:'CRM y documentos',       x:    0, z: 14.1 },
   ventas:    { name:'Sala de Ventas', sub:'Propuestas y clientes',  x: 17.4, z: 14.1 },
+  eventos:   { name:'Sala de Eventos', sub:'Calendario y preparación', x: 20.3, z: 0, w:11.4, d:12, color:'#E0C27A', fija:true },
   meeting:   { name:'Meeting Room',   sub:'Sala principal',         x:    0, z:    0, w:24, d:12,
                doorsX:[-6, 6] },
 };
@@ -533,7 +575,8 @@ function strip(x, z, w, d){
   m.rotation.x = -Math.PI/2; m.position.set(x, 0.02, z); m.receiveShadow = true; scene.add(m);
 }
 strip(0, -7.3, 52, 2.6); strip(0, 7.3, 52, 2.6);            // pasillos arriba y abajo del Meeting Room
-strip(-18.95, 0, 13.9, 12); strip(18.95, 0, 13.9, 12);       // plazas a los lados
+strip(-18.95, 0, 13.9, 12);                                  // plaza a la izquierda
+strip(13.3, 0, 2.6, 12);                                     // paso entre el Meeting Room y la Sala de Eventos
 for (const xx of [-8.7, 8.7]) { strip(xx, -14.1, 2.4, 11); strip(xx, 14.1, 2.4, 11); }   // pasos entre salas
 for (const zz of [-8.6, -6, 6, 8.6]) box(52, 0.03, 0.05, glow('#CDBB93', .7), 0, 0.04, zz);
 
@@ -541,10 +584,11 @@ for (const zz of [-8.6, -6, 6, 8.6]) box(52, 0.03, 0.05, glow('#CDBB93', .7), 0,
 const NODES = {}, EDGES = {};
 function node(k, x, z){ NODES[k] = new THREE.Vector3(x, 0, z); EDGES[k] = []; }
 function link(a, b){ EDGES[a].push(b); EDGES[b].push(a); }
-const NX = [-17.4, -6, 0, 6, 17.4];
+const NX = [-17.4, -6, 0, 6, 13.3, 17.4, 20.3];
 NX.forEach(x => { node('T' + x, x, -7.3); node('B' + x, x, 7.3); });
 for (let i = 1; i < NX.length; i++) { link('T'+NX[i-1], 'T'+NX[i]); link('B'+NX[i-1], 'B'+NX[i]); }
-link('T-17.4', 'B-17.4'); link('T17.4', 'B17.4');              // por las plazas laterales
+link('T-17.4', 'B-17.4');                                     // por la plaza de la izquierda
+link('T13.3', 'B13.3');                                       // por el paso junto a la Sala de Eventos
 const EDGE_LIST = Object.keys(EDGES).flatMap(a => EDGES[a].filter(b => a < b).map(b => [a, b]));
 
 function shortest(a, b){
@@ -581,6 +625,7 @@ function roomAt(p){
 /* ───────── Salas ───────── */
 var APR_SCREEN = null;                           // pantalla del tablero de aprobaciones
 var PRES_SCREEN = null, PODIUM = null;           // pantalla de presentaciones y atril
+var EV_SCREEN = null, EV_CAL = null;             // tablero y calendario de la Sala de Eventos
 const W = 15, D = 11, WALL_H = 2.1, DOOR = 2.6;
 const updaters = [];   // animaciones de mobiliario
 
@@ -592,8 +637,8 @@ function toWorld(room, lx, lb){      // lb > 0 = hacia la pared del fondo
 function buildRoom(key){
   const r = ROOMS[key];
   const owner = AGENTS.find(a => a.home === key);
-  r.color = owner ? owner.color : '#8FB3B5';          // sala sin residente
-  if (!owner) r.sub += ' · libre';
+  r.color = owner ? owner.color : (r.color || '#8FB3B5');   // sala sin residente
+  if (!owner && !r.fija) r.sub += ' · libre';
   r.w = r.w || W; r.d = r.d || D;
   const Wr = r.w, Dr = r.d;
   const s = Math.sign(r.z);
@@ -899,6 +944,56 @@ const FURNITURE = {
     r.spot = r.seats[0];  r.look = c;
   },
 
+  eventos(r, g){
+    const c = r.center.clone();
+    // mesa de planificación con un holograma de ubicación
+    const tx = c.x - 0.3, tz = c.z + 0.2;
+    box(4.2, 0.1, 1.9, M.desk, tx, 0.88, tz, g);
+    [-1.6, 1.6].forEach(x => box(0.3, 0.84, 1.5, M.metal, tx + x, 0.42, tz, g));
+    const pin = new THREE.Group(); pin.position.set(tx, 1.75, tz); g.add(pin);
+    const cone = new THREE.Mesh(new THREE.ConeGeometry(0.22, 0.55, 24), glow(r.color, 1.6)); cone.rotation.x = Math.PI; cone.position.y = -0.1;
+    const ball = new THREE.Mesh(new THREE.SphereGeometry(0.24, 24, 16), glow(r.color, 1.6)); ball.position.y = 0.26;
+    const halo = new THREE.Mesh(new THREE.TorusGeometry(0.55, 0.02, 8, 64), glow('#EFE9DD', 1.2)); halo.rotation.x = Math.PI/2; halo.position.y = -0.5;
+    pin.add(cone, ball, halo);
+    updaters.push((dt, t) => { pin.rotation.y += dt * .7; pin.position.y = 1.75 + Math.sin(t * 1.4) * .07; halo.scale.setScalar(1 + (Math.sin(t * 2) * .5 + .5) * .25); });
+    // tablero de cuenta regresiva en la pared este
+    {
+      const x = c.x + r.w/2 - 0.15;
+      box(0.14, 3.4, 7.2, M.dark, x, 2.0, c.z, g);
+      const cv = document.createElement('canvas'); cv.width = 1024; cv.height = 480;
+      const tex = new THREE.CanvasTexture(cv); tex.encoding = THREE.sRGBEncoding;
+      const mesh = screen(tex, 6.8, 3.15, new THREE.Vector3(x - 0.08, 2.0, c.z), -Math.PI/2, g);
+      EV_SCREEN = { cv, tex, mesh };
+    }
+    // calendario del mes en un atril
+    {
+      const px = c.x - 3.9, pz = c.z - 4.3;
+      box(3.4, 2.4, 0.1, M.dark, px, 1.75, pz, g);
+      [-1.4, 1.4].forEach(x => box(0.08, 0.6, 0.08, M.metal, px + x, 0.3, pz, g));
+      const cv = document.createElement('canvas'); cv.width = 560; cv.height = 400;
+      const tex = new THREE.CanvasTexture(cv); tex.encoding = THREE.sRGBEncoding;
+      const mesh = screen(tex, 3.2, 2.25, new THREE.Vector3(px, 1.75, pz + 0.06), 0, g);
+      EV_CAL = { cv, tex, mesh };
+    }
+    // green de práctica con bandera
+    {
+      const gx = c.x + 3.1, gz = c.z + 4.0;
+      const green = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.55, 0.05, 48), new THREE.MeshStandardMaterial({ color:'#2F7A4F', roughness:.9 }));
+      green.scale.z = .75; green.position.set(gx, 0.09, gz); green.receiveShadow = true; g.add(green);
+      const hole = new THREE.Mesh(new THREE.CircleGeometry(0.09, 20), new THREE.MeshBasicMaterial({ color:'#061619' }));
+      hole.rotation.x = -Math.PI/2; hole.position.set(gx + 0.5, 0.12, gz - 0.2); g.add(hole);
+      cyl(0.015, 0.015, 1.4, M.ivory, gx + 0.5, 0.8, gz - 0.2, 8, g);
+      const shape = new THREE.Shape(); shape.moveTo(0, 0); shape.lineTo(0.5, -0.15); shape.lineTo(0, -0.3);
+      const flag = new THREE.Mesh(new THREE.ShapeGeometry(shape), new THREE.MeshStandardMaterial({ color:r.color, emissive:r.color, emissiveIntensity:.5, side:THREE.DoubleSide }));
+      flag.position.set(gx + 0.5, 1.5, gz - 0.2); g.add(flag);
+      updaters.push((dt, t) => { flag.rotation.y = Math.sin(t * 2.2) * .35; });
+      const ball2 = new THREE.Mesh(new THREE.SphereGeometry(0.05, 12, 10), M.ivory); ball2.position.set(gx - 0.6, 0.16, gz + 0.3); g.add(ball2);
+    }
+    // alrededor de la mesa se reúnen quienes preparan un evento
+    r.visitSpots = [[-1.4, -1.55], [0, -1.55], [1.4, -1.55], [-1.4, 1.95], [0, 1.95], [1.4, 1.95]].map(([dx, dz]) => new THREE.Vector3(tx + dx, 0, tz + dz));
+    r.spot = r.visitSpots[1]; r.look = new THREE.Vector3(tx, 0, tz);
+  },
+
   ventas(r, g){
     const s = Math.sign(r.z);
     // mesa de presentación con maqueta giratoria de una villa
@@ -1116,6 +1211,7 @@ function spotFor(id, roomKey, state){
   if (id === 'tu') return r.seats ? { pos: r.seats[7].clone(), look: r.center.clone() } : { pos: toWorld(r, 0, -2.4), look: r.center.clone() };
   const idx = AGENTS.findIndex(a => a.id === id);
   if (roomKey === 'meeting') { const seat = r.seats[idx % 7]; return { pos: seat.clone(), look: seatLook(seat) }; }
+  if (r.visitSpots) return { pos: r.visitSpots[idx % r.visitSpots.length].clone(), look: r.look.clone() };
   if (AGENTS[idx].home === roomKey) return { pos: r.spot.clone(), look: r.look.clone() };
   // visitante: se ubica en la sala sin chocar con el anfitrión
   const off = ((idx % 3) - 1) * 1.4;
@@ -1224,10 +1320,11 @@ rosterEl.addEventListener('click', e => {
 });
 function select(id){
   if (id && aprOpen) closeApprovals();
+  if (id && evOpen) closeEvents();
   selected = id; renderRoster();
   if (id) robots[id].talkUntil = performance.now() + 8000;
   detailEl.hidden = !id;
-  rosterEl.hidden = !!id || aprOpen;
+  rosterEl.hidden = !!id || aprOpen || evOpen;
   if (id) { renderDetail(); detailEl.scrollTop = 0; }
 }
 
@@ -1408,6 +1505,7 @@ async function poll(){
     if (Array.isArray(data.mensajes)) loadLiveMessages(data.mensajes);
     if (Array.isArray(data.aprobaciones)) loadLiveApprovals(data.aprobaciones);
     if (Array.isArray(data.presentaciones)) loadLivePresentations(data.presentaciones);
+    if (Array.isArray(data.eventos)) loadLiveEvents(data.eventos);
     if (Array.isArray(data.escribiendo)) {
       for (const k in typing) delete typing[k];
       data.escribiendo.forEach(e => { const id = resolveId(e.bot); typing[e.canal === 'equipo' ? 'equipo' : resolveId(e.canal)] = id; });
@@ -1500,6 +1598,7 @@ function startSim(){
   simTimer = setInterval(simStep, 3500);
   startChatter();
   startSimApprovals();
+  startEventEngine();
 }
 function stopSim(){ if (simTimer) { clearInterval(simTimer); simTimer = null; } }
 
@@ -1542,6 +1641,7 @@ function post(m){
   return m;
 }
 function notify(m){
+  if (m.tipo === 'evento') showToast(m);
   const ch = chanOf(m);
   if (m.de !== 'tu' && !(chatOpen && channel === ch)) unread[ch]++;
   const rb = m.de === 'tu' ? avatar : robots[m.de];
@@ -1556,7 +1656,7 @@ function notify(m){
     if (selected === m.para) renderDetail();
   }
 }
-function setTaskState(m, estado){ m.estado = estado; renderChat(); }
+function setTaskState(m, estado){ m.estado = estado; renderChat(); if (m.evento) renderEvents(true); }
 
 /* escribir con pausa natural */
 const wait = ms => new Promise(r => setTimeout(r, ms));
@@ -1670,8 +1770,8 @@ Valores válidos de "para": ${AGENTS.map(a => a.id).join(', ')}.`;
 }
 
 /* ---------- respuestas (modo simulación) ---------- */
-async function assignFlow(from, to, texto, inTeam = true){
-  const extra = { tipo:'tarea', estado:'pendiente', canal: inTeam ? 'equipo' : undefined };
+async function assignFlow(from, to, texto, inTeam = true, evento){
+  const extra = { tipo:'tarea', estado:'pendiente', canal: inTeam ? 'equipo' : undefined, evento };
   const card = from === 'tu' ? post({ de:'tu', para:to, texto, ...extra }) : await say(from, to, texto, extra, 700);
   const back = inTeam ? 'todos' : 'tu';
   await wait(1400);
@@ -1827,8 +1927,9 @@ function startChatter(){
 function loadLiveMessages(list){
   const next = list.slice(-300).map((m, i) => ({
     id: 'v' + (m.id ?? i), de: resolveId(m.de), para: ['todos','tu'].includes(m.para) || !m.para ? (m.para || 'todos') : resolveId(m.para), texto: String(m.texto || ''),
-    tipo: ['mensaje','tarea','ayuda','sistema','presentacion'].includes(m.tipo) ? m.tipo : 'mensaje',
+    tipo: ['mensaje','tarea','ayuda','sistema','presentacion','evento'].includes(m.tipo) ? m.tipo : 'mensaje',
     ref: m.ref ? 'v' + m.ref : undefined,
+    evento: m.evento ? String(m.evento) : undefined, umbral: m.umbral ? String(m.umbral) : undefined,
     estado: TK_LABEL[m.estado] ? m.estado : (m.tipo === 'tarea' ? 'pendiente' : undefined),
     t: m.hora && !isNaN(Date.parse(m.hora)) ? Date.parse(m.hora) : Date.now(),
     canal: m.canal ? (m.canal === 'equipo' ? 'equipo' : resolveId(m.canal)) : undefined,
@@ -1883,6 +1984,10 @@ function renderChat(){
 
 function renderMsg(m){
   if (m.tipo === 'sistema') return `<div class="sysline">${esc(m.texto)}</div>`;
+  if (m.tipo === 'evento') return `<div class="evt-line"><div class="card-msg evt">
+      <div class="top"><span class="eyebrow" style="color:#E0C27A">Sala de Eventos · ${esc(UMBRAL_LABEL[m.umbral] || 'Aviso')}</span><time class="route">${hhmm(m.t)}</time></div>
+      <div class="what">${esc(m.texto)}</div>
+      ${m.evento ? `<button class="open-pres" data-evento="${esc(m.evento)}">Ver evento</button>` : ''}</div></div>`;
   const w = who(m.de), mine = m.de === 'tu';
   const to = channel === 'equipo' && m.para !== 'todos' && m.tipo !== 'tarea' ? `<span class="to">→ ${esc(who(m.para).name)}</span>` : '';
   let content = `<div class="txt">${esc(m.texto)}</div>`;
@@ -1931,7 +2036,10 @@ chList.addEventListener('click', e => {
   channel = b.dataset.ch; unread[channel] = 0; renderChat(); chMsgs.scrollTop = chMsgs.scrollHeight;
 });
 chHead.addEventListener('click', e => { if (e.target.closest('#chClose')) closeChat(); });
-chMsgs.addEventListener('click', e => { const b = e.target.closest('[data-pres]'); if (b) openViewer(b.dataset.pres); });
+chMsgs.addEventListener('click', e => {
+  const b = e.target.closest('[data-pres]'); if (b) return openViewer(b.dataset.pres);
+  const ev = e.target.closest('[data-evento]'); if (ev) { closeChat(); openEvents(ev.dataset.evento); }
+});
 chQuick.addEventListener('click', e => {
   const b = e.target.closest('.qk'); if (!b) return;
   chInput.value = b.dataset.v; chInput.focus();
@@ -2060,6 +2168,7 @@ function aprItem(a, canDecide){
 
 function openApprovals(){
   if (selected) select(null);
+  if (evOpen) closeEvents();
   aprOpen = true; aprPanel.hidden = false; rosterEl.hidden = true;
   aprBtn.setAttribute('aria-expanded', 'true');
   renderApprovals(true); aprPanel.scrollTop = 0;
@@ -2067,7 +2176,7 @@ function openApprovals(){
 function closeApprovals(){
   aprOpen = false; aprPanel.hidden = true;
   aprBtn.setAttribute('aria-expanded', 'false');
-  if (!selected) rosterEl.hidden = false;
+  if (!selected && !evOpen) rosterEl.hidden = false;
 }
 aprBtn.addEventListener('click', () => aprOpen ? closeApprovals() : openApprovals());
 avApr.addEventListener('click', openApprovals);
@@ -2459,6 +2568,573 @@ Responde solo con JSON así:
   setTimeout(() => { if (!live && robots[id].state === 'reunion' && !presActive) applyState({ id, estado:'trabajando', tarea: pick(SIM_TASKS[id]) }); }, presPages(pr) * 8000 + 12000);
 }
 
+/* ───────── Sala de Eventos ─────────
+   Lee el calendario, avisa cuando se acerca un evento y prepara al equipo.
+   - Simulación: eventos de ejemplo.
+   - claude.ai: Google Calendar con el conector de tu cuenta (solo el
+     calendario que elijas o los eventos marcados con #madreperla).
+   - Conectado a Hermes: los eventos y avisos llegan del servidor local.  */
+const UMBRALES = ['7d', '2d', '1d', '3h', 'ahora', 'despues'];
+const UMBRAL_LABEL = { '7d':'Falta una semana', '2d':'Faltan 2 días', '1d':'Mañana', '3h':'En menos de 3 horas', ahora:'En curso', despues:'Seguimiento', manual:'Preparación' };
+const AUTO_UMBRALES = ['7d', '2d', '1d', 'despues'];
+const TZ_RD = 'America/Santo_Domingo';
+var eventos = [];                                // {id, titulo, inicio, fin, todoDia, zona, lugar, descripcion, fuente, avisos, preparado}
+let evOpen = false, evExpanded = null, evSource = 'ejemplo', evCalName = '', evCalError = '', evSig = '', evEngineOn = false;
+let evLastFire = 0, evLastTick = 0, evBusy = false;
+const evPanel = document.getElementById('evPanel'), evBtn = document.getElementById('evBtn'), evBadge = document.getElementById('evBadge'),
+      avEv = document.getElementById('avEv'), toastsEl = document.getElementById('toasts');
+
+const H = 3600e3, DAY = 24 * H;
+function evFin(ev){ return ev.fin || (ev.todoDia ? ev.inicio + DAY : ev.inicio + 2 * H); }
+function umbralDe(ev, now){
+  const dt = ev.inicio - now, fin = evFin(ev);
+  if (now >= fin) return now - fin < 3 * DAY ? 'despues' : null;
+  if (dt <= 0) return 'ahora';
+  if (dt <= 3 * H) return '3h';
+  if (dt <= DAY) return '1d';
+  if (dt <= 2 * DAY) return '2d';
+  if (dt <= 7 * DAY) return '7d';
+  return null;
+}
+function fmtParts(ms, zona, opts){
+  try { return new Intl.DateTimeFormat('es-DO', { timeZone: zona || TZ_RD, ...opts }).format(new Date(ms)); }
+  catch { return new Intl.DateTimeFormat('es-DO', { timeZone: TZ_RD, ...opts }).format(new Date(ms)); }
+}
+const CIUDADES = { Bogota:'Bogotá', Santo_Domingo:'Santo Domingo', New_York:'Nueva York', Mexico_City:'Ciudad de México', Panama:'Panamá', Lima:'Lima', Madrid:'Madrid', Caracas:'Caracas', Puerto_Rico:'Puerto Rico', Miami:'Miami', Sao_Paulo:'São Paulo', Buenos_Aires:'Buenos Aires' };
+function ciudad(zona){ if (!zona) return ''; const k = zona.split('/').pop(); return CIUDADES[k] || k.replace(/_/g, ' '); }
+function fechaTexto(ev){
+  const zona = ev.zona || TZ_RD;
+  const dia = fmtParts(ev.inicio, zona, { weekday:'long', day:'numeric', month:'long' });
+  if (ev.todoDia) return `${dia} · todo el día`;
+  const hora = fmtParts(ev.inicio, zona, { hour:'2-digit', minute:'2-digit', hourCycle:'h23' });
+  let out = `${dia} · ${hora}`;
+  if (zona !== TZ_RD) out += ` (hora de ${ciudad(zona)}; ${fmtParts(ev.inicio, TZ_RD, { hour:'2-digit', minute:'2-digit', hourCycle:'h23' })} en Santo Domingo)`;
+  return out;
+}
+function faltaTexto(ev, now){
+  const dt = ev.inicio - now, fin = evFin(ev);
+  if (now >= fin) { const d = Math.floor((now - fin) / DAY); return d < 1 ? 'terminó hoy' : d === 1 ? 'terminó ayer' : `terminó hace ${d} días`; }
+  if (dt <= 0) return 'en curso';
+  if (dt < H) return `en ${Math.max(1, Math.round(dt / 60000))} min`;
+  if (dt < DAY) return `en ${Math.round(dt / H)} h`;
+  if (dt < 36 * H) { const h = Math.round((dt - DAY) / H); return h ? `en 1 día y ${h} h` : 'en 1 día'; }
+  return `en ${Math.round(dt / DAY)} días`;
+}
+function cdClase(ev, now){
+  const dt = ev.inicio - now;
+  if (now >= evFin(ev)) return 'cd-fin';
+  if (dt <= 0) return 'cd-curso';
+  if (dt <= DAY) return 'cd-hoy';
+  if (dt <= 2 * DAY) return 'cd-pronto';
+  if (dt <= 7 * DAY) return 'cd-semana';
+  return 'cd-lejos';
+}
+function tipoEvento(ev){
+  const t = (ev.titulo + ' ' + (ev.descripcion || '')).toLowerCase();
+  if (/golf|torneo|tee|hoyo/.test(t)) return 'torneo';
+  if (/open house|visita|recorrido|tour|showroom/.test(t)) return 'visita';
+  if (/feria|expo|congreso|convenci|summit|foro/.test(t)) return 'feria';
+  if (/almuerzo|cena|desayuno|reuni|inversionista|coctel|cóctel/.test(t)) return 'reunion';
+  if (/webinar|charla|conferencia|lanzamiento|presentaci/.test(t)) return 'lanzamiento';
+  return 'general';
+}
+const upcoming = now => eventos.filter(ev => now < evFin(ev) + 3 * DAY).sort((a, b) => a.inicio - b.inicio);
+const nextEvent = now => upcoming(now).find(ev => now < evFin(ev)) || null;
+const evTasks = id => allMsgs().filter(m => m.tipo === 'tarea' && m.evento === id);
+
+/* --- normalización --- */
+function normEvent(r, extra = {}){
+  const toMs = v => { if (v === null || v === undefined || v === '') return null; const n = typeof v === 'number' ? v : Date.parse(v); return isNaN(n) ? null : n; };
+  const inicio = toMs(r.inicio);
+  if (inicio === null) return null;
+  return {
+    id: String(r.id || extra.id || 'e' + (++msgSeq)), titulo: String(r.titulo || 'Evento').slice(0, 140),
+    inicio, fin: toMs(r.fin), todoDia: !!(r.todo_el_dia ?? r.todoDia), zona: r.zona || null,
+    lugar: r.lugar ? String(r.lugar).slice(0, 200) : '', descripcion: String(r.descripcion || '').slice(0, 1000),
+    fuente: r.fuente || extra.fuente || 'manual', avisos: Array.isArray(r.avisos) ? r.avisos.slice() : [],
+    preparado: toMs(r.preparado),
+  };
+}
+function loadLiveEvents(list){
+  const next = list.map(x => normEvent(x)).filter(Boolean);
+  const sig = next.map(e => e.id + e.inicio + e.avisos.join('') + (e.preparado || '')).join('|');
+  evSource = server && server.calendario ? 'hermes-cal' : 'hermes';
+  if (sig === evSig) return;
+  evSig = sig; eventos = next;
+  renderEvents(true); drawEventScreens();
+}
+
+/* --- motor de avisos (simulación y claude.ai; con Hermes lo hace el servidor) --- */
+function startEventEngine(){
+  if (evEngineOn) return;
+  evEngineOn = true;
+  if (evSource === 'ejemplo' && !eventos.length) seedSampleEvents();
+  renderEvents(true); drawEventScreens();
+}
+function seedSampleEvents(){
+  const now = Date.now();
+  const at = (days, hh, mm, zona) => {             // una fecha a días vista, a una hora local fija
+    const d = new Date(now + days * DAY);
+    const ymd = fmtParts(d, zona, { year:'numeric', month:'2-digit', day:'2-digit' }).split('/').reverse().join('-');
+    const off = zona === 'America/Bogota' ? '-05:00' : '-04:00';
+    return Date.parse(`${ymd}T${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}:00${off}`);
+  };
+  const add = (r) => { const e = normEvent({ ...r, fuente:'ejemplo' }); if (e) eventos.push(e); };
+  // el torneo: el próximo 08:00 de Bogotá que caiga entre 24 y 48 horas (así el aviso es de 2 días)
+  const t0 = now + DAY, bog = new Date(t0 - 5 * H);
+  let golf = Date.UTC(bog.getUTCFullYear(), bog.getUTCMonth(), bog.getUTCDate(), 13, 0);   // 08:00 en Bogotá = 13:00 UTC
+  if (golf <= t0) golf += DAY;
+  add({ id:'ej-golf', titulo:'Torneo de golf Bogotá', inicio: golf, zona:'America/Bogota', lugar:'Bogotá, Colombia',
+        descripcion:'Torneo con inversionistas y aliados. Oportunidad para presentar Cap Cana y Cabeza de Toro (Coral Golf Resort).' });
+  add({ id:'ej-almuerzo', titulo:'Almuerzo con inversionistas', inicio: at(4, 13, 0, TZ_RD), zona:TZ_RD, lugar:'Cap Cana', descripcion:'Almuerzo privado con dos familias interesadas en segunda residencia.' });
+  add({ id:'ej-open', titulo:'Open house en Cap Cana', inicio: at(6, 10, 0, TZ_RD), zona:TZ_RD, lugar:'Cap Cana', descripcion:'Recorrido por villas seleccionadas.' });
+  add({ id:'ej-feria', titulo:'Feria inmobiliaria internacional', inicio: at(18, 9, 0, TZ_RD), zona:TZ_RD, lugar:'Miami, Estados Unidos', descripcion:'Stand compartido con aliados.' });
+}
+function eventsTick(now){
+  if (now - evLastTick < 1000) return;                 // una vez por segundo basta
+  evLastTick = now;
+  const t = Date.now();
+  if (Math.floor(t / 30000) !== Math.floor((t - 1000) / 30000)) { drawEventScreens(); if (evOpen) renderEvents(true); updateEvBadge(); }
+  if (live || !evEngineOn || evBusy || now - evLastFire < 20000) return;
+  for (const ev of upcoming(t)) {
+    const u = umbralDe(ev, t);
+    if (!u || ev.avisos.includes(u)) continue;
+    const idx = UMBRALES.indexOf(u);
+    UMBRALES.slice(0, idx + 1).forEach(x => { if (!ev.avisos.includes(x)) ev.avisos.push(x); });
+    evLastFire = now;
+    fireEvent(ev, u);
+    break;                                             // un aviso a la vez
+  }
+}
+function avisoTexto(ev, u){
+  const cuando = fechaTexto(ev) + (ev.lugar ? ' · ' + ev.lugar : '');
+  return {
+    '7d': `Falta una semana o menos para «${ev.titulo}» (${cuando}).`,
+    '2d': `Faltan 2 días para «${ev.titulo}» (${cuando}).`,
+    '1d': `Mañana es «${ev.titulo}» (${cuando}).`,
+    '3h': `En menos de 3 horas empieza «${ev.titulo}» (${cuando}).`,
+    ahora: `Ya empezó «${ev.titulo}».`,
+    despues: `Terminó «${ev.titulo}». Es buen momento para el seguimiento.`,
+    manual: `María Andrea pidió preparar «${ev.titulo}» (${cuando}).`,
+  }[u];
+}
+async function fireEvent(ev, u){
+  post({ de:'sistema', para:'todos', canal:'equipo', tipo:'evento', evento: ev.id, umbral: u, texto: avisoTexto(ev, u) });
+  renderEvents(true); drawEventScreens(); updateEvBadge();
+  const auto = evSource === 'ejemplo' ? ['2d', '1d', 'despues'] : AUTO_UMBRALES;   // en simulación, sin tanto ruido
+  if (auto.includes(u)) await prepareEvent(ev, u);
+}
+
+/* --- preparación: plan por tipo de evento y momento --- */
+const PREP = {
+  torneo: {
+    '7d': [['mark','Campaña de invitación al torneo para el segmento golf', true], ['viktor','Lista de clientes con perfil golf para invitar (sin datos sensibles en el chat)', false],
+           ['sergio','Confirmar sede, horario y logística del torneo', false], ['bety','Borrador de invitación al torneo', true]],
+    '2d': [['marcelo','Confirmar asistentes y programar recordatorios', false], ['viktor','Kit para invitados: fichas de Cap Cana y Cabeza de Toro (Coral Golf Resort)', false],
+           ['bety','Borrador de publicación para el día del torneo', true]],
+    '1d': [['marcelo','Recordatorio a los confirmados', true], ['sylvia','Revisar la lista final y el plan del día', false]],
+    despues: [['marcelo','Registrar contactos nuevos y programar su seguimiento', false], ['bety','Borrador de agradecimiento a los asistentes', true], ['mark','Resultados del torneo: contactos, interés y leads', false]],
+  },
+  visita: {
+    '7d': [['viktor','Seleccionar las propiedades del recorrido y la agenda', false], ['bety','Borrador de invitación al recorrido', true], ['sergio','Verificar datos de cada propiedad (con fuente y fecha)', false]],
+    '2d': [['marcelo','Confirmar asistentes y horarios', false], ['viktor','Fichas impresas y digitales de cada propiedad', false]],
+    '1d': [['marcelo','Recordatorio a los invitados', true], ['sylvia','Revisar la ruta y los tiempos del recorrido', false]],
+    despues: [['marcelo','Seguimiento a cada visitante', false], ['bety','Borrador de agradecimiento con las fichas vistas', true]],
+  },
+  reunion: {
+    '7d': [['sergio','Perfil del mercado relevante para los invitados', false], ['viktor','Opciones que encajan con su perfil y horizonte', false]],
+    '2d': [['viktor','Propuesta preliminar para revisión (precios por confirmar)', true], ['marcelo','Confirmar asistencia y detalles', false]],
+    '1d': [['sylvia','Resumen de la reunión y preguntas clave para María Andrea', false]],
+    despues: [['marcelo','Registrar acuerdos y próximos pasos', false], ['bety','Borrador de mensaje de agradecimiento', true]],
+  },
+  feria: {
+    '7d': [['mark','Plan de captación de contactos en la feria', false], ['bety','Borrador de publicaciones de la feria', true], ['sergio','Agenda de la feria y aliados presentes', false]],
+    '2d': [['viktor','Material del stand: fichas y presentación de proyectos', false], ['marcelo','Formulario para registrar contactos en el CRM', false]],
+    '1d': [['sylvia','Turnos del equipo y checklist del stand', false]],
+    despues: [['marcelo','Cargar y clasificar los contactos de la feria', false], ['mark','Resultados: contactos y leads por proyecto', false], ['bety','Borrador de agradecimiento a los contactos', true]],
+  },
+  lanzamiento: {
+    '7d': [['bety','Borrador de invitación y publicaciones del lanzamiento', true], ['mark','Audiencia y difusión del lanzamiento', false]],
+    '2d': [['viktor','Presentación del proyecto para el evento', false], ['marcelo','Confirmar inscritos', false]],
+    '1d': [['marcelo','Recordatorio a los inscritos', true]],
+    despues: [['mark','Resultados del lanzamiento', false], ['bety','Borrador de resumen para publicar', true]],
+  },
+  general: {
+    '7d': [['sylvia','Plan del evento y responsables', false], ['bety','Borrador de comunicación del evento', true]],
+    '2d': [['marcelo','Confirmar asistentes', false], ['sergio','Revisar datos y logística', false]],
+    '1d': [['sylvia','Checklist final del evento', false]],
+    despues: [['marcelo','Seguimiento a los contactos del evento', false], ['bety','Borrador de agradecimiento', true]],
+  },
+};
+function draftFor(texto, ev){
+  const cuando = fechaTexto(ev).split(' (')[0], lugar = ev.lugar ? ` en ${ev.lugar}` : '';
+  const t = texto.toLowerCase();
+  if (/agradec/.test(t)) return `Estimado(a) [nombre]:\n\nGracias por acompañarnos en «${ev.titulo}». Fue un gusto compartir con usted.\nSi desea conversar con calma sobre alguna de las opciones que conoció, con gusto coordinamos una reunión.\n\nCordialmente,\nMadreperla Realtors`;
+  if (/recordatorio/.test(t)) return `Estimado(a) [nombre]:\n\nLe recordamos con gusto «${ev.titulo}», el ${cuando}${lugar}.\nQuedamos atentos a cualquier detalle que necesite.\n\nCordialmente,\nMadreperla Realtors`;
+  if (/publicaci|resumen para publicar/.test(t)) return `«${ev.titulo}»${lugar}.\nUn espacio para conversar con calma sobre decisiones patrimoniales en República Dominicana: destinos, proyectos y criterio antes de invertir.\n¿Le gustaría una lectura de su caso? Escríbanos y conversamos.`;
+  if (/propuesta/.test(t)) return `Propuesta preliminar para «${ev.titulo}»:\n— Objetivo y perfil de los invitados.\n— Opciones sugeridas según su horizonte.\n— Precios y condiciones: por confirmar con una persona autorizada.`;
+  return `Estimado(a) [nombre]:\n\nNos complace invitarle a «${ev.titulo}», el ${cuando}${lugar}.\nSerá una ocasión para compartir y conversar, con calma, sobre oportunidades patrimoniales en República Dominicana.\n¿Le gustaría acompañarnos? Con gusto le reservamos un lugar.\n\nCordialmente,\nMadreperla Realtors`;
+}
+async function aiPlan(ev, u){
+  const equipo = AGENTS.map(a => `${a.id} = ${a.name} (${a.role}): ${robots[a.id].info.mision}`).join('\n');
+  const out = await sampler.json(`Eres Sylvia, coordinadora del equipo de agentes de Madreperla Realtors (bienes raíces de lujo en República Dominicana).
+Se acerca este evento:
+- Título: ${ev.titulo}
+- Fecha: ${fechaTexto(ev)}
+- Lugar: ${ev.lugar || 'sin lugar indicado'}
+- Descripción: ${(ev.descripcion || 'sin descripción').slice(0, 600)}
+- Momento: ${UMBRAL_LABEL[u] || u}
+Equipo:
+${equipo}
+Prepara de 3 a 5 tareas concretas y breves (máximo 90 caracteres cada una) para los agentes adecuados según este momento.
+Reglas: todo lo que vaya a clientes o al público (invitaciones, publicaciones, recordatorios, agradecimientos) es un borrador que necesita aprobación ("aprobacion": true). No decidas precios, condiciones legales ni contractuales. No inventes datos de clientes.
+Responde solo con JSON: {"resumen":"una frase para María Andrea","tareas":[{"para":"bety","texto":"…","aprobacion":true}]}
+Valores válidos de "para": ${AGENTS.map(a => a.id).join(', ')}.`, { modelTier:'default', cache:false });
+  const tareas = (Array.isArray(out?.tareas) ? out.tareas : []).filter(x => AGENTS.some(a => a.id === x.para) && typeof x.texto === 'string' && x.texto.trim())
+    .slice(0, 5).map(x => [x.para, x.texto.trim().slice(0, 120), !!x.aprobacion]);
+  if (!tareas.length) throw new Error('plan vacío');
+  return { resumen: typeof out.resumen === 'string' ? out.resumen.slice(0, 240) : '', tareas };
+}
+async function prepareEvent(ev, u){
+  if (live) return;
+  evBusy = true;
+  try {
+    const etapa = PREP[tipoEvento(ev)][u] ? u : (u === 'manual' ? (umbralDe(ev, Date.now()) === 'despues' ? 'despues' : (ev.inicio - Date.now() <= 2 * DAY ? '2d' : '7d')) : '7d');
+    let plan = null;
+    if (aiState === 'on') { try { plan = await aiPlan(ev, etapa); } catch { plan = null; } }
+    const tareas = plan ? plan.tareas : PREP[tipoEvento(ev)][etapa] || PREP.general[etapa];
+    ev.preparado = Date.now();
+    await say('sylvia', 'todos', plan && plan.resumen ? plan.resumen : `Preparo «${ev.titulo}» (${faltaTexto(ev, Date.now())}). Reparto las tareas del equipo.`);
+    const involved = [];
+    for (const [para, texto, aprob] of tareas) {
+      const txt = `${texto} · ${ev.titulo}`;
+      if (para === 'sylvia') {                           // lo que hace ella misma
+        const card = post({ de:'sylvia', para:'sylvia', canal:'equipo', tipo:'tarea', estado:'aceptada', texto: txt, evento: ev.id });
+        setTimeout(() => { if (!live) setTaskState(card, 'hecha'); }, 45000 + Math.random() * 30000);
+      } else {
+        assignFlow('sylvia', para, txt, true, ev.id).then(() => {});
+        await wait(2600);
+      }
+      if (!involved.includes(para)) involved.push(para);
+      if (aprob) setTimeout(() => {
+        if (live) return;
+        const detalle = draftFor(texto, ev);
+        simAddApproval({ de: para, clase:'borrador', titulo:`${texto.replace(/^Borrador de /i, '')}: ${ev.titulo}`, detalle });
+        const a = approvals[approvals.length - 1]; if (a) a.evento = ev.id;
+        renderEvents(true);
+      }, 9000 + Math.random() * 6000);
+    }
+    // quienes preparan pasan un rato por la Sala de Eventos
+    involved.filter(id => id !== 'sylvia' && !robots[id].presenting && robots[id].state !== 'reunion').slice(0, 4).forEach((id, i) => setTimeout(() => {
+      if (live) return;
+      const prev = { estado: robots[id].state, tarea: robots[id].task };
+      applyState({ id, estado:'trabajando', sala:'eventos', tarea:`Preparando: ${ev.titulo}` });
+      setTimeout(() => { if (!live && robots[id].room === 'eventos') applyState({ id, estado: prev.estado === 'error' ? 'trabajando' : prev.estado, tarea: prev.tarea || pick(SIM_TASKS[id]) }); }, 26000);
+    }, 1500 + i * 1800));
+    // a 2 días, Sylvia presenta un briefing en el Meeting Room
+    if (etapa === '2d' && !presActive) setTimeout(() => {
+      if (live || presActive) return;
+      const pr = normPres({ tipo:'documento', titulo:`Briefing: ${ev.titulo}`, secciones:[
+        { titulo:'Evento', texto:`${fechaTexto(ev)}${ev.lugar ? '\n' + ev.lugar : ''}${ev.descripcion ? '\n\n' + ev.descripcion : ''}` },
+        { titulo:'Tareas y responsables', texto: tareas.map(([p, t]) => `— ${who(p).name}: ${t}`).join('\n') },
+        { titulo:'Pendiente de tu aprobación', texto: tareas.some(x => x[2]) ? 'Los borradores para clientes están en el tablero de aprobaciones. Nada se envía sin tu visto bueno.' : 'Por ahora no hay borradores pendientes.' },
+      ]}, { de:'sylvia', ejemplo: evSource === 'ejemplo' });
+      startPresentation(pr);
+      say('sylvia', 'todos', `Les comparto el briefing de «${ev.titulo}».`, { tipo:'presentacion', ref: pr.id });
+    }, 16000);
+    renderEvents(true); drawEventScreens();
+  } finally { evBusy = false; }
+}
+
+/* --- tablero y calendario en 3D --- */
+function drawEventScreens(){
+  const now = Date.now();
+  if (EV_SCREEN) {
+    const { cv, tex } = EV_SCREEN, x = cv.getContext('2d'), w = cv.width, h = cv.height;
+    const g = x.createLinearGradient(0, 0, w, h); g.addColorStop(0, '#1B2A22'); g.addColorStop(1, '#071A1E');
+    x.fillStyle = g; x.fillRect(0, 0, w, h);
+    x.fillStyle = '#E0C27A'; x.fillRect(0, 0, 14, h);
+    const ev = nextEvent(now);
+    x.fillStyle = '#E0C27A'; x.font = '600 24px sans-serif'; x.fillText('PRÓXIMO EVENTO', 52, 58);
+    if (!ev) {
+      x.fillStyle = '#EFE9DD'; x.font = '600 48px sans-serif'; x.fillText('Sin eventos próximos', 52, 150);
+      x.fillStyle = '#8FA7A5'; x.font = '24px sans-serif'; x.fillText(evSource === 'ejemplo' ? 'Modo simulación' : 'Conecta un calendario en el panel Eventos', 52, 200);
+    } else {
+      x.fillStyle = '#EFE9DD'; x.font = '600 50px sans-serif';
+      const tl = wrapLines(x, ev.titulo, w - 110, 2); tl.forEach((l, i) => x.fillText(l, 52, 128 + i * 58));
+      let y = 128 + tl.length * 58;
+      x.fillStyle = '#8FA7A5'; x.font = '24px sans-serif';
+      x.fillText(fechaTexto(ev).split(' (')[0] + (ev.lugar ? ' · ' + ev.lugar : ''), 52, y); y += 70;
+      x.fillStyle = '#E0C27A'; x.font = '700 64px sans-serif'; x.fillText(faltaTexto(ev, now).replace(/^en /, ''), 52, y);
+      const ts = evTasks(ev.id), done = ts.filter(m => m.estado === 'hecha').length;
+      if (ts.length) {
+        y += 50; x.fillStyle = '#8FA7A5'; x.font = '22px sans-serif'; x.fillText(`Preparación ${done}/${ts.length}`, 52, y);
+        x.fillStyle = 'rgba(239,233,221,.12)'; x.fillRect(300, y - 16, 420, 14);
+        x.fillStyle = '#E0C27A'; x.fillRect(300, y - 16, 420 * (done / ts.length), 14);
+      }
+      const more = upcoming(now).filter(e => e !== ev && now < evFin(e)).slice(0, 2);
+      more.forEach((e, i) => { x.fillStyle = '#8FA7A5'; x.font = '21px sans-serif'; x.fillText(`${e.titulo.slice(0, 40)} · ${faltaTexto(e, now)}`, 52, h - 64 + i * 30); });
+    }
+    tex.needsUpdate = true;
+  }
+  if (EV_CAL) {
+    const { cv, tex } = EV_CAL, x = cv.getContext('2d'), w = cv.width, h = cv.height;
+    x.fillStyle = '#F2EDE3'; x.fillRect(0, 0, w, h);
+    const hoy = new Date(now);
+    const [yy, mm, dd] = fmtParts(now, TZ_RD, { year:'numeric', month:'2-digit', day:'2-digit' }).split('/').reverse().map(Number);
+    const mes = fmtParts(now, TZ_RD, { month:'long', year:'numeric' });
+    x.fillStyle = '#0B252A'; x.font = '600 30px sans-serif'; x.fillText(mes.charAt(0).toUpperCase() + mes.slice(1), 26, 46);
+    const first = new Date(Date.UTC(yy, mm - 1, 1)).getUTCDay(), days = new Date(Date.UTC(yy, mm, 0)).getUTCDate();
+    const startCol = (first + 6) % 7, cw = (w - 52) / 7, ch = 50;
+    x.font = '16px sans-serif'; x.fillStyle = '#6B7A78';
+    ['L','M','M','J','V','S','D'].forEach((d, i) => x.fillText(d, 26 + i * cw + cw/2 - 5, 80));
+    const marked = new Set(upcoming(now).map(e => fmtParts(e.inicio, TZ_RD, { year:'numeric', month:'2-digit', day:'2-digit' })));
+    for (let d = 1; d <= days; d++) {
+      const i = startCol + d - 1, col = i % 7, row = Math.floor(i / 7);
+      const cx = 26 + col * cw, cy = 96 + row * ch;
+      const key = `${String(d).padStart(2, '0')}/${String(mm).padStart(2, '0')}/${yy}`;
+      if (marked.has(key)) { x.fillStyle = '#E0C27A'; x.beginPath(); x.arc(cx + cw/2, cy + 20, 20, 0, Math.PI * 2); x.fill(); }
+      if (d === dd) { x.strokeStyle = '#0B252A'; x.lineWidth = 3; x.beginPath(); x.arc(cx + cw/2, cy + 20, 22, 0, Math.PI * 2); x.stroke(); }
+      x.fillStyle = '#0B252A'; x.font = (d === dd ? '600 ' : '') + '20px sans-serif';
+      x.fillText(String(d), cx + cw/2 - (d > 9 ? 11 : 6), cy + 27);
+    }
+    tex.needsUpdate = true;
+    void hoy;
+  }
+}
+
+/* --- panel --- */
+function updateEvBadge(){
+  const now = Date.now();
+  const n = upcoming(now).filter(ev => now < evFin(ev) && ev.inicio - now <= 7 * DAY).length;
+  evBadge.hidden = !n; evBadge.textContent = n;
+}
+function sourceLine(){
+  if (evSource === 'ejemplo') return 'Modo simulación: eventos de ejemplo.';
+  if (evSource === 'google') return `Google Calendar · <b>${esc(evCalName || 'calendario elegido')}</b>`;
+  if (evSource === 'hermes-cal') return 'Calendario conectado en tu computadora (servidor local).';
+  return 'Eventos del servidor local. Para conectar tu calendario, ver puente/HERMES.md.';
+}
+function renderEvents(force){
+  updateEvBadge();
+  if (!evOpen) return;
+  const now = Date.now();
+  const list = upcoming(now);
+  const focusId = document.activeElement && evPanel.contains(document.activeElement) ? document.activeElement.id : null;
+  const nx = nextEvent(now);
+  const exp = evExpanded || nx?.id;
+  const canEdit = !live || !!server;
+  evPanel.innerHTML = `
+    <div class="d-head">
+      <div class="d-avatar" aria-hidden="true" style="--c:#E0C27A"></div>
+      <div><h2>Eventos</h2><div class="sub">Avisos y preparación del equipo</div></div>
+      <button class="x" id="evClose" aria-label="Cerrar eventos">×</button>
+    </div>
+    <div class="ev-src">${sourceLine()}</div>
+    ${calConnectBlock()}
+    <div class="ev-list">
+      ${list.length ? list.map(ev => evItem(ev, now, ev.id === exp, ev === nx, canEdit)).join('') : '<div class="apr-empty">No hay eventos en los próximos días.</div>'}
+    </div>
+    ${canEdit && evSource !== 'google' ? `<form class="ev-form" id="evForm">
+      <span class="eyebrow">Agregar evento</span>
+      <label for="evT">Título</label><input id="evT" maxlength="140" required placeholder="Torneo de golf Bogotá">
+      <label for="evF">Fecha y hora (Santo Domingo)</label><input id="evF" type="datetime-local" required>
+      <label for="evL">Lugar</label><input id="evL" maxlength="200" placeholder="Bogotá, Colombia">
+      <div class="apr-err" id="evErr" hidden></div>
+      <div class="ev-row"><button class="apr-ok" type="submit">Agregar</button></div>
+    </form>` : evSource === 'google' ? `<div class="apr-note">Para agregar un evento, créalo en tu calendario «${esc(evCalName)}»${evCalTag() ? ' con #madreperla en el título o la descripción' : ''}. Aparece aquí en unos minutos.</div>` : ''}`;
+  if (focusId) { const el = document.getElementById(focusId); if (el) el.focus(); }
+}
+function evItem(ev, now, open, isNext, canEdit){
+  const ts = evTasks(ev.id);
+  const aps = approvals.filter(a => a.evento === ev.id && a.estado === 'pendiente').length;
+  const src = { ejemplo:'Ejemplo', calendario:'Calendario', google:'Google Calendar', manual:'Agregado a mano', hermes:'Desde Hermes' }[ev.fuente] || ev.fuente;
+  return `<article class="ev-item${isNext ? ' next' : ''}" style="--c:#E0C27A">
+    <button class="ev-head" data-exp="${esc(ev.id)}" aria-expanded="${open}">
+      <span class="ev-title">${esc(ev.titulo)}</span>
+      <span class="ev-cd ${cdClase(ev, now)}">${esc(faltaTexto(ev, now))}</span>
+      <span class="ev-when">${esc(fechaTexto(ev))}${ev.lugar ? ' · ' + esc(ev.lugar) : ''}</span>
+    </button>
+    ${open ? `
+      ${isNext ? `<div class="ev-big">${esc(faltaTexto(ev, now))}</div>` : ''}
+      ${ev.descripcion ? `<div class="ev-desc">${esc(ev.descripcion)}</div>` : ''}
+      <div class="ev-tags"><span class="tool">${esc(src)}</span><span class="tool">${esc({ torneo:'Torneo', visita:'Visita', feria:'Feria', reunion:'Reunión', lanzamiento:'Lanzamiento', general:'Evento' }[tipoEvento(ev)])}</span>${ev.preparado ? `<span class="tool">Preparado ${hhmm(ev.preparado)}</span>` : ''}</div>
+      <div class="d-sec"><div class="eyebrow">Plan de preparación <span>${ts.filter(m => m.estado === 'hecha').length}/${ts.length}</span></div>
+        ${ts.length ? `<ul class="ev-plan">${ts.map(m => { const w = who(m.para); return `<li style="--c2:${w.color}"><i></i><span><b>${esc(w.name)}</b> · ${esc(m.texto.replace(' · ' + ev.titulo, ''))}</span><span class="chip tk-${m.estado || 'pendiente'}">${TK_LABEL[m.estado || 'pendiente']}</span></li>`; }).join('')}</ul>`
+          : `<div class="d-small">${live ? 'Sylvia reparte las tareas cuando se acerca el evento, o cuando tocas "Preparar ahora".' : 'Todavía no hay tareas. Se reparten solas a una semana, a 2 días y un día antes, o con "Preparar ahora".'}</div>`}
+      </div>
+      ${aps ? `<button class="apr-more" data-goapr="1">${aps === 1 ? '1 borrador espera' : aps + ' borradores esperan'} tu aprobación</button>` : ''}
+      <div class="ev-row">
+        ${canEdit ? `<button class="apr-ok" data-prep="${esc(ev.id)}"${evBusy ? ' disabled' : ''}>Preparar ahora</button>` : ''}
+        ${canEdit && (ev.fuente === 'manual' || ev.fuente === 'hermes') ? `<button class="apr-back" data-del="${esc(ev.id)}">Quitar</button>` : ''}
+      </div>` : ''}
+  </article>`;
+}
+function openEvents(id){
+  if (selected) select(null);
+  if (aprOpen) closeApprovals();
+  evOpen = true; evPanel.hidden = false; rosterEl.hidden = true;
+  if (id) evExpanded = id;
+  evBtn.setAttribute('aria-expanded', 'true');
+  renderEvents(true); evPanel.scrollTop = 0;
+}
+function closeEvents(){
+  evOpen = false; evPanel.hidden = true;
+  evBtn.setAttribute('aria-expanded', 'false');
+  if (!selected && !aprOpen) rosterEl.hidden = false;
+}
+evBtn.addEventListener('click', () => evOpen ? closeEvents() : openEvents());
+avEv.addEventListener('click', () => openEvents());
+evPanel.addEventListener('click', async e => {
+  if (e.target.closest('#evClose')) return closeEvents();
+  const ex = e.target.closest('[data-exp]'); if (ex) { evExpanded = evExpanded === ex.dataset.exp ? '__none' : ex.dataset.exp; return renderEvents(true); }
+  if (e.target.closest('[data-goapr]')) { closeEvents(); return openApprovals(); }
+  const pb = e.target.closest('[data-prep]');
+  if (pb) {
+    const ev = eventos.find(x => x.id === pb.dataset.prep); if (!ev) return;
+    if (live) {
+      if (!server) return;
+      pb.disabled = true;
+      try { await api('api/evento/preparar', { id: ev.id }); poll(); toastText('Le pedí a Sylvia que prepare el evento.'); }
+      catch (err) { toastText(err.message); pb.disabled = false; }
+      return;
+    }
+    if (evBusy) return;
+    post({ de:'sistema', para:'todos', canal:'equipo', tipo:'evento', evento: ev.id, umbral:'manual', texto: avisoTexto(ev, 'manual') });
+    return prepareEvent(ev, 'manual');
+  }
+  const del = e.target.closest('[data-del]');
+  if (del) {
+    const id = del.dataset.del;
+    if (live) { if (!server) return; try { await api('api/evento/borrar', { id }); poll(); } catch (err) { toastText(err.message); } return; }
+    eventos = eventos.filter(x => x.id !== id); renderEvents(true); drawEventScreens();
+  }
+  const cs = e.target.closest('#calUse'); if (cs) return useCalendar();
+});
+evPanel.addEventListener('submit', async e => {
+  if (e.target.id !== 'evForm') return;
+  e.preventDefault();
+  const titulo = document.getElementById('evT').value.trim(), f = document.getElementById('evF').value, lugar = document.getElementById('evL').value.trim();
+  const err = document.getElementById('evErr');
+  const inicio = f ? Date.parse(f + ':00-04:00') : NaN;
+  if (!titulo || isNaN(inicio)) { err.hidden = false; err.textContent = 'Escribe el título y elige la fecha y la hora.'; return; }
+  if (live) {
+    if (!server) return;
+    try { await api('api/evento', { titulo, inicio: f, lugar }); poll(); toastText('Evento agregado.'); }
+    catch (x) { err.hidden = false; err.textContent = x.message; }
+    return;
+  }
+  const ev = normEvent({ id:'man-' + Date.now(), titulo, inicio, lugar, zona: TZ_RD, fuente:'manual' });
+  eventos.push(ev); evExpanded = ev.id;
+  renderEvents(true); drawEventScreens();
+});
+
+/* --- avisos flotantes --- */
+function toastText(texto, evento){ showToast({ texto, evento, umbral: evento ? 'manual' : null }); }
+function showToast(m){
+  const el = document.createElement('div'); el.className = 'toast';
+  el.innerHTML = `<span class="eyebrow">${esc(UMBRAL_LABEL[m.umbral] || 'Sala de Eventos')}</span><p>${esc(m.texto)}</p>${m.evento ? `<button type="button">Ver</button>` : '<span></span>'}`;
+  const b = el.querySelector('button'); if (b) b.addEventListener('click', () => { el.remove(); openEvents(m.evento); });
+  toastsEl.prepend(el);
+  while (toastsEl.children.length > 3) toastsEl.lastChild.remove();
+  setTimeout(() => el.remove(), 9000);
+}
+
+/* --- Google Calendar (solo en claude.ai, con el conector de tu cuenta) --- */
+let mcpCal = null, calList = null, calUnsub = null;
+const CAL_KEY = 'habitat-calendario';
+function calPref(){ try { return JSON.parse(localStorage.getItem(CAL_KEY) || 'null'); } catch { return null; } }
+function evCalTag(){ const p = calPref(); return !!(p && p.tag); }
+function calConnectBlock(){
+  if (!mcpCal || live) return '';
+  const p = calPref();
+  const opts = (calList || []).map(c => `<option value="${esc(c.id)}"${p && p.id === c.id && !p.tag ? ' selected' : ''}>${esc(c.nombre)}</option>`).join('');
+  return `<div class="ev-conn">
+    <span>${evSource === 'google' ? 'Calendario conectado. Puedes cambiarlo:' : 'Conecta tu Google Calendar. Elige el calendario de eventos de Madreperla (así no aparecen eventos personales), o usa solo los eventos marcados con <b>#madreperla</b>.'}</span>
+    <label class="sr" for="calSel">Calendario</label>
+    <select id="calSel">
+      ${calList ? '' : '<option value="">Cargando calendarios…</option>'}
+      ${opts}
+      <option value="__tag"${p && p.tag ? ' selected' : ''}>Calendario principal: solo eventos con #madreperla</option>
+    </select>
+    ${evCalError ? `<div class="apr-err" role="alert">${esc(evCalError)}</div>` : ''}
+    <div class="ev-row"><button class="apr-ok" id="calUse" type="button">${evSource === 'google' ? 'Cambiar' : 'Usar este calendario'}</button></div>
+  </div>`;
+}
+function calErrorText(e){
+  const c = e && e.code;
+  if (c === 'needs_reauth') return 'Vuelve a conectar Google Calendar en claude.ai → Configuración → Conectores.';
+  if (c === 'server_not_connected' || c === 'server_not_found') return 'Agrega Google Calendar en claude.ai → Configuración → Conectores.';
+  if (c === 'selection_required') return 'Tienes más de un Google Calendar conectado: elige uno cuando claude.ai te lo pregunte.';
+  if (c === 'not_in_manifest') return 'No le diste permiso a esta página para leer tu calendario.';
+  if (c === 'blocked_by_policy' || c === 'approval_required') return 'Tu organización no permite que esta página lea el calendario.';
+  if (c === 'tool_error') return 'Google Calendar respondió con un error: ' + (e.message || '').slice(0, 120);
+  return 'No pude leer el calendario ahora. Lo intento de nuevo en unos minutos.';
+}
+async function initCalendar(){
+  try { mcpCal = window.claude?.use ? await window.claude.use('mcp') : null; } catch { mcpCal = null; }
+  if (!mcpCal || live) return;
+  const p = calPref();
+  if (p) startCalendarWatch(p);
+  renderEvents(true);
+}
+async function loadCalendarList(){
+  if (!mcpCal || calList) return;
+  try {
+    const r = await mcpCal.callTool('Google Calendar', 'list_calendars', { pageSize: 50 });
+    const items = r.payload?.items || r.payload?.calendars || [];
+    calList = items.map(c => ({ id: String(c.id || ''), nombre: String(c.summaryOverride || c.summary || c.id || 'Calendario') })).filter(c => c.id);
+    evCalError = '';
+  } catch (e) { calList = []; evCalError = calErrorText(e); }
+  renderEvents(true);
+}
+function useCalendar(){
+  const v = document.getElementById('calSel')?.value;
+  if (!v) return;
+  const pref = v === '__tag' ? { tag:true, id:'primary', nombre:'Principal · #madreperla' } : { tag:false, id:v, nombre:(calList || []).find(c => c.id === v)?.nombre || v };
+  try { localStorage.setItem(CAL_KEY, JSON.stringify(pref)); } catch {}
+  startCalendarWatch(pref);
+}
+function startCalendarWatch(pref){
+  if (calUnsub) { calUnsub(); calUnsub = null; }
+  evCalName = pref.nombre || '';
+  const hora = Math.floor(Date.now() / H) * H;             // entrada estable durante una hora
+  const input = { calendarId: pref.id || 'primary', startTime: new Date(hora - 3 * DAY).toISOString(), endTime: new Date(hora + 45 * DAY).toISOString(), orderBy:'startTime', pageSize: 100 };
+  if (pref.tag) input.fullText = 'madreperla';
+  calUnsub = mcpCal.watchTool('Google Calendar', 'list_events', input, ev => {
+    if (ev.type === 'error') {
+      evCalError = calErrorText(ev.error);
+      if (['needs_reauth','server_not_connected','not_in_manifest','blocked_by_policy','approval_required','selection_required'].includes(ev.error?.code)) {
+        eventos = eventos.filter(x => x.fuente !== 'google');   // retirar lo que ya no se puede leer
+        drawEventScreens();
+      }
+      return renderEvents(true);
+    }
+    evCalError = '';
+    const pl = ev.result?.payload || {};
+    const tzCal = pl.timeZone || TZ_RD;
+    const prev = new Map(eventos.filter(x => x.fuente === 'google').map(x => [x.id, x]));
+    const next = (Array.isArray(pl.events) ? pl.events : []).filter(x => x && x.status !== 'cancelled' && (!x.eventType || x.eventType === 'DEFAULT' || x.eventType === 'FROM_GMAIL'))
+      .filter(x => !pref.tag || /#madreperla/i.test(`${x.summary || ''} ${x.description || ''}`))
+      .map(x => {
+        const allDay = !x.start?.dateTime;
+        const zona = x.start?.timeZone || tzCal;
+        const ini = allDay ? Date.parse(`${x.start?.date}T00:00:00${zona === 'America/Bogota' ? '-05:00' : '-04:00'}`) : Date.parse(x.start?.dateTime);
+        const fin = allDay ? (x.end?.date ? Date.parse(`${x.end.date}T00:00:00${zona === 'America/Bogota' ? '-05:00' : '-04:00'}`) : null) : Date.parse(x.end?.dateTime);
+        const e = normEvent({ id:'g-' + x.id, titulo: (x.summary || 'Evento').replace(/#madreperla/ig, '').trim(), inicio: ini, fin: isNaN(fin) ? null : fin, todo_el_dia: allDay, zona,
+          lugar: x.location || '', descripcion: String(x.description || '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/#madreperla/ig, '').replace(/\s+\n/g, '\n').trim(), fuente:'google' });
+        if (e && prev.has(e.id)) { e.avisos = prev.get(e.id).avisos; e.preparado = prev.get(e.id).preparado; }
+        return e;
+      }).filter(Boolean);
+    eventos = eventos.filter(x => x.fuente === 'manual').concat(next);
+    evSource = 'google';
+    renderEvents(true); drawEventScreens();
+  }, { refetchInterval: 10 * 60 * 1000 });
+  renderEvents(true);
+}
+evPanel.addEventListener('focusin', e => { if (e.target.id === 'calSel') loadCalendarList(); });
+evPanel.addEventListener('pointerdown', e => { if (e.target.id === 'calSel') loadCalendarList(); });
+
 /* ───────── Interacción ───────── */
 
 const ray = new THREE.Raycaster(), ptr = new THREE.Vector2();
@@ -2472,6 +3148,7 @@ canvas.addEventListener('pointerup', e => {
   const hits = ray.intersectObjects(Object.values(robots).flatMap(r => r.hitboxes), false);
   if (hits.length) return select(hits[0].object.userData.agent);
   if (APR_SCREEN && ray.intersectObject(APR_SCREEN.mesh, false).length) return openApprovals();
+  if ((EV_SCREEN && ray.intersectObject(EV_SCREEN.mesh, false).length) || (EV_CAL && ray.intersectObject(EV_CAL.mesh, false).length)) return openEvents();
   if (PRES_SCREEN && ray.intersectObject(PRES_SCREEN.mesh, false).length) { const last = presActive || presentations[presentations.length - 1]; if (last) return openViewer(last.id); }
   if (selected) return select(null);               // primer toque cierra la ficha
   const fh = ray.intersectObject(floor, false);
@@ -2485,7 +3162,7 @@ window.addEventListener('keydown', e => {
     return;
   }
   if (e.key !== 'Escape') return;
-  if (chatOpen) closeChat(); else if (aprOpen) closeApprovals(); else select(null);
+  if (chatOpen) closeChat(); else if (evOpen) closeEvents(); else if (aprOpen) closeApprovals(); else select(null);
 });
 
 /* etiquetas de sala */
@@ -2543,6 +3220,7 @@ function avatarWorld(now){
     meRoom = room;
     avMeet.hidden = room !== 'meeting';
     avApr.hidden = room !== 'meeting';
+    avEv.hidden = room !== 'eventos';
     const host = room && Object.values(robots).find(rb => rb.room === room && rb.a.home === room && !rb.path.length);
     if (host && (!lastGreet[host.a.id] || now - lastGreet[host.a.id] > 60000)) {
       lastGreet[host.a.id] = now;
@@ -2735,6 +3413,7 @@ function tick(){
   avatarWorld(now);
   updateDayNight(dt);
   presTick(dt, now);
+  eventsTick(now);
   roomTags.forEach(({ r, el }) => project(r.labelPos, el, 0));
 
   if (intro.t < 1) {
@@ -2753,6 +3432,8 @@ renderRoster();
 renderApprovals(true);
 drawAprScreen();
 drawPresScreen();
+drawEventScreens();
+initCalendar();
 detectServer().then(poll);
 tick();
 document.getElementById('loading').classList.add('done');
