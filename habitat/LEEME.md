@@ -4,14 +4,18 @@ Laboratorio 3D donde viven los seis agentes de IA. Cada robot tiene su color y s
 
 | Bot (Hermes) | Usuario en Hermes | Color | Sala | Función |
 |---|---|---|---|---|
-| Sylvia  | `@sylvia` | Coral | Meeting Room | Coordina a los demás agentes |
-| Viktor  | `@viktor` | Cian | Meeting Room | Asesor inmobiliario, ventas |
+| Sylvia  | `@sylvia` | Coral | Meeting Room (centro) | Coordina a los demás agentes |
+| Viktor  | `@viktor` | Cian | Sala de Ventas | Asesor inmobiliario, ventas |
 | Sergio  | `@ageente-de-investigacion-madreperla` | Verde | Librería | Investigación y verificación de fuentes |
 | Bety    | `@contenido-madreperla` | Magenta | Design Room | Calendario y contenido (solo borradores) |
 | Mark    | `@mark` | Ámbar | Analítica | Marketing y captación de leads |
 | Marcelo | `@marcelo` | Violeta | Archivo | CRM y seguimiento de clientes |
 
-El **Code Lab** queda libre para un futuro agente.
+El **Code Lab** queda libre para un futuro agente. El **Meeting Room** está en el centro del laboratorio.
+
+**Tu avatar (María Andrea):** toca el piso para caminar. Cerca de un bot aparece *Hablar con…*, y dentro del Meeting Room, *Convocar reunión*. *Seguirme* hace que la cámara te acompañe.
+
+**Conectar Hermes:** ver `puente/HERMES.md`.
 
 ## Cómo funciona
 
@@ -28,7 +32,7 @@ Cada agente solo tiene que actualizar su línea en `estado.json` (copia `estado.
 
 - `id`: el usuario de Hermes del bot (`@sylvia`, `@contenido-madreperla`…) o su nombre corto (`sylvia`, `sergio`, `bety`, `mark`, `marcelo`, `viktor`).
 - `estado`: `trabajando`, `pensando`, `reunion`, `inactivo` o `error` (este último hace parpadear al robot en rojo: necesita ayuda).
-- `sala` (opcional): `code`, `design`, `analitica`, `libreria`, `archivo` o `meeting`. Si no se pone, el robot va a su propia sala (o al Meeting Room si está en reunión).
+- `sala` (opcional): `code`, `design`, `analitica`, `libreria`, `archivo`, `ventas` o `meeting`. Si no se pone, el robot va a su propia sala (o al Meeting Room si está en reunión).
 - `tarea`: texto corto que aparece en la burbuja del robot.
 
 ### Datos para la ficha del agente (todos opcionales)
