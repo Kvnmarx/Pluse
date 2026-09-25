@@ -74,6 +74,9 @@
   .tag .bubble{max-width:200px;font:12px/1.35 var(--body);background:var(--ivory);color:#0B252A;padding:6px 9px;border-radius:10px;text-align:center;opacity:0;transform:translateY(4px);transition:opacity .25s, transform .25s}
   .tag.talk .bubble{opacity:1;transform:none}
   .room{position:absolute;left:0;top:0;transform:translate(-50%,-50%);font:600 12px/1 var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--c);text-shadow:0 0 14px rgba(0,0,0,.9);white-space:nowrap;opacity:.95}
+  .tag,.room{transition:opacity .25s}
+  .room.tenue{opacity:.38}
+  body.lejos .tag .name i, body.lejos .room small{display:none}
   .room small{display:block;margin-top:4px;font:10px/1 var(--mono);letter-spacing:.08em;color:var(--muted);text-transform:none;text-align:center}
 
   /* Ficha del agente */
@@ -4391,9 +4394,41 @@ function project(v, el, dy = 0){
   tmp.copy(v); tmp.y += dy; tmp.project(camera);
   const vis = tmp.z < 1 && Math.abs(tmp.x) < 1.2 && Math.abs(tmp.y) < 1.2;
   if (el._vis !== vis) { el._vis = vis; el.style.display = vis ? '' : 'none'; }     // solo si cambia
-  if (!vis) return;
-  const tr = `translate(${Math.round((tmp.x*.5+.5)*innerWidth)}px, ${Math.round((-tmp.y*.5+.5)*innerHeight)}px) translate(-50%,-100%)`;
+  el._px = Math.round((tmp.x*.5+.5)*innerWidth); el._py = Math.round((-tmp.y*.5+.5)*innerHeight);
+}
+function ponerEn(el, x, y){
+  const tr = `translate(${x}px, ${y}px) translate(-50%,-100%)`;
   if (el._tr !== tr) { el._tr = tr; el.style.transform = tr; }
+}
+/* Etiquetas sin encimarse: los nombres de los bots se apilan si chocan (primero el que
+   tienes seleccionado y tu avatar), y el nombre de una sala tapado se atenúa.
+   De lejos se ocultan el estado y los subtítulos para que se lea mejor. */
+let medidasAt = 0;
+function ordenarEtiquetas(now){
+  const lejos = camera.position.distanceTo(controls.target) > 55;
+  if (document.body.classList.contains('lejos') !== lejos) { document.body.classList.toggle('lejos', lejos); medidasAt = 0; }
+  const tags = MOVERS.map(rb => rb.tag).filter(el => el._vis), salas = roomTags.map(t => t.el).filter(el => el._vis);
+  if (now - medidasAt > 800) {
+    medidasAt = now;
+    tags.forEach(el => { const n = el.querySelector('.name'); el._w = n.offsetWidth; el._h = n.offsetHeight; });
+    salas.forEach(el => { el._w = el.offsetWidth; el._h = el.offsetHeight; });
+  }
+  const pri = el => el.dataset.id === selected ? 3 : el.classList.contains('me') ? 2 : 1;
+  tags.sort((a, b) => pri(b) - pri(a) || b._py - a._py);
+  const puestos = [], choca = (x0, y0, x1, y1) => puestos.some(r => x0 < r[2] && x1 > r[0] && y0 < r[3] && y1 > r[1]);
+  for (const el of tags) {
+    const w = (el._w || 80) + 4, h = el._h || 20;
+    let y = el._py, n = 0;
+    while (n < 6 && choca(el._px - w/2, y - h, el._px + w/2, y)) { y -= h + 3; n++; }
+    puestos.push([el._px - w/2, y - h, el._px + w/2, y]);
+    ponerEn(el, el._px, y);
+  }
+  for (const el of salas) {
+    const w = el._w || 100, h = el._h || 24, tapa = choca(el._px - w/2, el._py - h, el._px + w/2, el._py);
+    if (el._tenue !== tapa) { el._tenue = tapa; el.classList.toggle('tenue', tapa); }
+    if (!tapa) puestos.push([el._px - w/2, el._py - h, el._px + w/2, el._py]);
+    ponerEn(el, el._px, el._py);
+  }
 }
 
 function tick(){
@@ -4486,6 +4521,7 @@ function tick(){
   eventsTick(now);
   vidaTick(dt, now);
   roomTags.forEach(({ r, el }) => project(r.labelPos, el, 0));
+  ordenarEtiquetas(now);
 
   if (intro.t < 1) {
     intro.t = Math.min(1, intro.t + dt/2.6);
