@@ -95,6 +95,15 @@ Reporta tu trabajo al Hábitat de Madreperla con la terminal:
   · El script muestra el id del evento, por ejemplo her-1790000000000.
 - Si trabajas para un evento, agrega --evento ID a --tarea-para, --aprobacion y
   --presentar. El id viene en el aviso del evento o en la tarea que te asignaron.
+- Si crees que algo importante necesita al equipo reunido, convoca una junta en el
+  Meeting Room (todos van, y tú la abres en el chat del equipo):
+    --convocar "Tema de la junta" [--minutos 10]
+  Úsalo con criterio: una junta cada 30 minutos como máximo.
+- Metas de la semana (tablero del Meeting Room):
+    --meta "Leads calificados" --objetivo 20 --sumar 1
+- Logros (pared de logros de la oficina de María Andrea; el equipo lo celebra):
+    --logro "Visita agendada en Cap Cana"
+- Para ir a la oficina de María Andrea: --sala oficina
 
 Textos cortos y profesionales. Nunca incluyas datos sensibles de clientes
 (cédulas, cuentas, montos, teléfonos), tampoco en los eventos. Nada se envía
@@ -317,6 +326,9 @@ Si más adelante prefieres que Mark envíe los correos aprobados por su cuenta, 
 | Apruebas un correo | Queda listo en la carpeta `correos` para que lo envíes desde tu cuenta, y Mark recibe la confirmación |
 | Tocas *Pedir a Sergio que busque leads* | Sergio busca en internet, registra los leads con su fuente y le pasa los mejores a Mark para los correos |
 | Convocas una reunión | Todos van al Meeting Room por 10 minutos y Sylvia abre la reunión |
+| Un bot convoca una junta (`--convocar`) | Todos van al Meeting Room, arriba aparece quién la convocó y el bot la abre en **# Equipo** |
+| Tocas *Cierre del día* en el chat | Sylvia pide a cada bot un resumen de lo que hizo y lo que queda pendiente |
+| Te acercas a un bot y tocas *Encargar tarea* | La tarea le llega a ese bot en privado |
 | Le pides a un bot que presente | Prepara su presentación y la muestra con `--presentar`: camina al atril y aparece en la pantalla grande |
 | Anotas un evento en tu calendario de Madreperla | Aparece en la Sala de Eventos en unos 10 minutos |
 | Agregas un evento con el botón *Eventos* | Aparece al momento. Si ya está cerca, llega el aviso enseguida |

@@ -309,6 +309,20 @@ def recibir_privado(cuerpo):
                  'no_contactar': len(priv['no_contactar'])}
 
 
+inventario_cache = {'t': 0, 'datos': None}
+
+
+def recibir_inventario(cuerpo):
+    """Proyectos de la hoja para la maqueta de la Sala de Ventas (sin las columnas internas)."""
+    if time.time() - inventario_cache['t'] > 600 or inventario_cache['datos'] is None:
+        try:
+            filas = C.datos_inventario(C.config())
+        except Exception as e:
+            return 502, {'error': f'No pude leer la hoja de inventario: {e}'}
+        inventario_cache.update(t=time.time(), datos=[{k: v for k, v in f.items() if '(interna' not in k} for f in filas])
+    return 200, {'proyectos': inventario_cache['datos']}
+
+
 def abrir_archivo(ruta):
     if sys.platform == 'darwin':
         subprocess.Popen(['open', ruta])
@@ -362,10 +376,16 @@ def vigilante():
         time.sleep(2)
         try:
             pendientes = []
+            juntas = []
 
             def revisar(data):
                 cambio = False
                 ahora_s = time.time()
+                j = data.get('junta')
+                if isinstance(j, dict) and not j.get('aviso') and j.get('de') in cfg['bots']:
+                    j['aviso'] = True                  # quien convocó abre la junta en el chat del equipo
+                    juntas.append(dict(j))
+                    cambio = True
                 for ag in data['agentes']:
                     if ag.get('_reunion_hasta') and ag['_reunion_hasta'] < ahora_s:
                         antes = ag.pop('_antes_reunion', {}) or {}
@@ -391,6 +411,11 @@ def vigilante():
                     data = R.leer()
                     if revisar(data):
                         R.guardar(data)
+            for j in juntas:
+                en_hilo(preguntar, j['de'],
+                        f'Convocaste una junta en el Meeting Room del Hábitat: «{j["tema"]}». Ábrela con el equipo: '
+                        'explica en 3 o 4 frases por qué es importante y qué propones. Si hace falta una decisión de '
+                        'María Andrea, dilo claro.', 'equipo', 'todos')
             for m in pendientes:
                 ahora_s = time.time()
                 reenvios[:] = [x for x in reenvios if ahora_s - x < 600]
@@ -919,7 +944,7 @@ class Manejador(SimpleHTTPRequestHandler):
         rutas = {'/api/mensaje': recibir_mensaje, '/api/aprobacion': recibir_aprobacion, '/api/reunion': recibir_reunion,
                  '/api/evento': recibir_evento, '/api/evento/preparar': recibir_preparar,
                  '/api/evento/borrar': recibir_borrar_evento, '/api/privado': recibir_privado,
-                 '/api/correo/abrir': recibir_abrir_correo}
+                 '/api/correo/abrir': recibir_abrir_correo, '/api/inventario': recibir_inventario}
         fn = rutas.get(urlparse(self.path).path)
         if not fn:
             return self._json(404, {'error': 'No encontrado.'})

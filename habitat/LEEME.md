@@ -169,6 +169,20 @@ Los leads y los correos completos quedan en `puente/privado.json`, solo en tu co
 
 Para configurarlo (hoja, perfil de lead, firma e instrucciones para Sergio y Mark), ve a `puente/HERMES.md` › *Leads y correos*.
 
+## La vida del hábitat
+
+- **Tu oficina de fundadora**, con vista al mar, es donde empieza tu avatar. Ahí está la **pared de logros**. El botón *Mi oficina* te lleva de vuelta.
+- **Saludo:** al abrir el hábitat, el equipo se voltea a saludarte y aparece el resumen del día.
+- **Metas de la semana:** pantalla este del Meeting Room. Los bots las actualizan con `reportar.py --meta`; si no hay metas cargadas, se calculan solas.
+- **Ruta del lead:** una luz viaja entre salas cuando un lead avanza (Sergio lo encuentra, Mark le escribe, Viktor agenda, Marcelo lo sigue).
+- **Logros:** cuando un bot registra uno (`--logro`) o apruebas una propuesta, el equipo lo celebra y queda en la pared.
+- **Juntas:** cualquier bot puede convocar una junta con `--convocar "tema"`. Arriba aparece quién la convocó, con el botón *Ir a la junta*.
+- **Encargar tarea:** acércate a un bot y toca *Encargar tarea*.
+- **Cierre del día:** botón en el chat del equipo. En la simulación llega solo a las 6 p. m.
+- **Maqueta de República Dominicana** en la Sala de Ventas: toca una zona para ver sus proyectos del inventario.
+- **Ánimo de los robots:** ojos contentos al terminar algo, concentrados al trabajar, preocupados si esperan tu aprobación.
+- **Tu atuendo:** saco de noche después de las 7:30 p. m., y la corona brilla los días de evento.
+
 ## Nota sobre Pluse
 
 Pluse guarda páginas para funcionar sin conexión. Si publicas el hábitat en la misma dirección que Pluse (`…github.io/pluse/habitat/`), ese guardado puede mezclar ambas páginas. Lo más limpio es moverlo a su propio repositorio (por ejemplo `habitat`).

@@ -15,6 +15,9 @@ Ejemplos:
   python3 reportar.py --bot @contenido-madreperla --presentar "Calendario de octubre" --formato slides --archivo calendario.md
   python3 reportar.py --bot @mark --tokens-entrada 1200 --tokens-salida 300
   python3 reportar.py --bot @marcelo --estado inactivo --subir
+  python3 reportar.py --bot @mark --convocar "Subió el costo por lead en Bávaro" --minutos 10
+  python3 reportar.py --bot @mark --meta "Leads calificados" --objetivo 20 --sumar 1
+  python3 reportar.py --bot @viktor --logro "Visita agendada en Cap Cana"
 
 Sala de Eventos:
   python3 reportar.py --bot @sylvia --evento-nuevo "Torneo de golf Bogotá" --fecha 2026-09-26T08:00 --zona America/Bogota --lugar "Club El Rincón"
@@ -67,7 +70,7 @@ AQUI = os.path.dirname(os.path.abspath(__file__))
 ESTADO = os.path.join(os.path.dirname(AQUI), 'estado.json')
 BLOQUEO = ESTADO + '.lock'
 ESTADOS = ['trabajando', 'pensando', 'reunion', 'inactivo', 'error']
-SALAS = ['code', 'design', 'analitica', 'libreria', 'archivo', 'ventas', 'meeting', 'eventos']
+SALAS = ['code', 'design', 'analitica', 'libreria', 'archivo', 'ventas', 'meeting', 'eventos', 'oficina']
 CLASES = ['borrador', 'propuesta', 'consulta', 'correo']
 MAX_MENSAJES = 200
 MAX_APROBACIONES = 60
@@ -583,6 +586,13 @@ def main():
     ap.add_argument('--idioma', choices=['es', 'en'], default='es', help='Idioma del correo: es (español) o en (inglés)')
     ap.add_argument('--correo-para', help='Prepara un correo para aprobar: "Nombre <correo@dominio.com>"')
     ap.add_argument('--asunto', help='Asunto del correo')
+    ap.add_argument('--convocar', help='Convoca una junta en el Meeting Room sobre un tema importante')
+    ap.add_argument('--minutos', type=int, default=10, help='Duración de la junta (5 a 30 minutos)')
+    ap.add_argument('--meta', help='Meta de la semana (tablero del Meeting Room): nombre, por ejemplo "Leads calificados"')
+    ap.add_argument('--objetivo', type=int, help='Número a alcanzar en la semana (con --meta)')
+    ap.add_argument('--valor', type=int, help='Avance actual (con --meta)')
+    ap.add_argument('--sumar', type=int, help='Suma al avance actual (con --meta)')
+    ap.add_argument('--logro', help='Agrega un logro a la pared de logros (venta cerrada, campaña aprobada…)')
     ap.add_argument('--subir', action='store_true', help='Además, sube estado.json a GitHub')
     ap.add_argument('--sin-subir', action='store_true', help=argparse.SUPPRESS)   # compatibilidad
     a = ap.parse_args()
@@ -759,6 +769,41 @@ def main():
             elif a.aprobacion:
                 agregar_aprobacion(data, bot, a.aprobacion, a.detalle, a.clase, t, evento_id)
                 ag.setdefault('historial', []).insert(0, {'hora': t.strftime('%H:%M'), 'texto': 'Pidió aprobación: ' + a.aprobacion})
+
+            if a.convocar:
+                previa = data.get('junta') if isinstance(data.get('junta'), dict) else {}
+                if previa.get('de') == bot and t.timestamp() - previa.get('ts', 0) < 1800:
+                    raise ValueError('ya convocaste una junta hace menos de 30 minutos. Usa el chat del equipo.')
+                minutos = max(5, min(30, a.minutos))
+                hasta = t.timestamp() + minutos * 60
+                for otro in data['agentes']:
+                    if otro.get('estado') != 'reunion':
+                        otro['_antes_reunion'] = {'estado': otro.get('estado'), 'tarea': otro.get('tarea', '')}
+                    otro.update({'estado': 'reunion', 'tarea': a.convocar[:200], '_reunion_hasta': hasta})
+                    otro.pop('sala', None)
+                data['junta'] = {'id': nuevo_id(t, bot), 'de': bot, 'tema': a.convocar[:200], 'hora': t.isoformat(),
+                                 'ts': t.timestamp(), 'hasta': hasta, 'aviso': False}
+                agregar_mensaje(data, bot, f'Convoco una junta en el Meeting Room: {a.convocar[:200]}.', t=t, tipo='mensaje')
+                ag.setdefault('historial', []).insert(0, {'hora': t.strftime('%H:%M'), 'texto': 'Convocó una junta: ' + a.convocar[:80]})
+            if a.meta:
+                semana = t.strftime('%G-W%V')
+                metas = [m for m in data.get('metas', []) if m.get('semana') == semana]
+                m = next((x for x in metas if x.get('nombre', '').lower() == a.meta.strip().lower()), None)
+                if m is None:
+                    m = {'nombre': a.meta.strip()[:60], 'objetivo': 0, 'valor': 0, 'semana': semana}
+                    metas.append(m)
+                if a.objetivo is not None:
+                    m['objetivo'] = max(0, a.objetivo)
+                if a.valor is not None:
+                    m['valor'] = max(0, a.valor)
+                if a.sumar:
+                    m['valor'] = max(0, m.get('valor', 0) + a.sumar)
+                m['actualizado'] = t.isoformat()
+                data['metas'] = metas[-8:]
+            if a.logro:
+                data.setdefault('logros', []).append({'texto': a.logro.strip()[:140], 'de': bot, 'hora': t.isoformat()})
+                data['logros'] = data['logros'][-20:]
+                ag.setdefault('historial', []).insert(0, {'hora': t.strftime('%H:%M'), 'texto': 'Logro: ' + a.logro[:80]})
 
             ag['historial'] = ag.get('historial', [])[:MAX_HISTORIAL]
             ag['ultima_actividad'] = t.isoformat()

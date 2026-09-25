@@ -606,7 +606,7 @@ def filas_inventario(crudo):
     return out
 
 
-def leer_inventario(cfg=None):
+def datos_inventario(cfg=None):
     cfg = cfg if cfg is not None else config()
     url = (cfg.get('inventario') or '').strip()
     if not url.startswith('https://'):
@@ -618,6 +618,11 @@ def leer_inventario(cfg=None):
     datos = filas_inventario(crudo)
     if not datos:
         raise ValueError('la hoja no tiene proyectos debajo del encabezado.')
+    return datos
+
+
+def leer_inventario(cfg=None):
+    datos = datos_inventario(cfg)
     lineas = [f'Inventario de proyectos · {len(datos)} filas · leído {dt.datetime.now():%Y-%m-%d %H:%M}',
               'Es la fuente más actualizada: si algo no coincide con la página web, vale lo de aquí.',
               'Valores «desde» y fechas estimadas: menciónalos solo como referencia, sujetos a confirmación.']
