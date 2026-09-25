@@ -9,7 +9,8 @@
   "inventario": "PEGA-AQUI-EL-ENLACE-DE-LA-HOJA-INVENTARIO-DE-PROYECTOS",
   "sitio": ["https://madreperlarealtors.com/", "https://madreperlarealtors.com/en/"],
   "leads": {
-    "paises": ["Colombia", "Estados Unidos", "España"],
+    "paises": ["Latinoamérica", "Estados Unidos", "Canadá", "Europa"],
+    "primer_contacto": ["Estados Unidos"],
     "perfil": "Inversionistas patrimoniales de 40 a 65 años que ya tienen capital y buscan una decisión sólida: médicos, empresarios, profesionales y ejecutivos; familias que planean su retiro o una segunda residencia; asesores financieros y patrimoniales que podrían ser aliados.",
     "por_dia": 10
   },
@@ -17,9 +18,11 @@
     "remitente": "María Andrea López <administracion@madreperlarealtors.com>",
     "firma_nombre": "María Andrea López",
     "firma_cargo": "Fundadora · Madreperla Realtors",
+    "firma_cargo_en": "Founder · Madreperla Realtors",
     "telefono": "",
     "sitio": "https://madreperlarealtors.com",
     "ciudad": "Punta Cana, República Dominicana",
+    "ciudad_en": "Punta Cana, Dominican Republic",
     "direccion": "",
     "envio": "borrador"
   },

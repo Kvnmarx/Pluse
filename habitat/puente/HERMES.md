@@ -206,21 +206,30 @@ El enlace de la hoja ya viene guardado en tu copia del hábitat (en `puente/bots
 
 En `"correo"` de `bots.json` puedes ajustar la firma, el teléfono, el remitente y la dirección física de la oficina (`"direccion"`). En `"leads"` puedes cambiar el perfil de lead compatible, los países prioritarios y cuántos correos a prospectos se preparan por día (`"por_dia"`, 10 por defecto).
 
-### 2. Antes de escribir a personas que no te conocen
+### 2. A quién se le puede escribir el primer correo
 
-Escribir por primera vez a alguien que encontraste en internet tiene reglas distintas en cada país:
+Escribir por primera vez a alguien que encontraste en internet tiene reglas distintas en cada país. En muchos (Canadá, la Unión Europea, Colombia o Perú, por ejemplo) suele hacer falta el permiso previo de la persona. En otros, como Estados Unidos, la regla general lo permite si el correo trae una forma de darse de baja, una dirección física y el aviso de que es una comunicación comercial.
 
-- En Estados Unidos se permite si el correo trae una forma de darse de baja y una dirección física.
-- En España y el resto de la Unión Europea, o en Canadá, suele hacer falta el consentimiento previo de la persona.
+El hábitat funciona así:
 
-**Confírmalo con tu aliado legal antes de empezar.** Para facilitarlo, el hábitat:
+- **Mercado** (`"leads"` › `"paises"`): toda Latinoamérica, Estados Unidos, Canadá y Europa.
+- **Primer correo sin permiso** (`"leads"` › `"primer_contacto"`): solo los países de esta lista. Viene con **Estados Unidos**. Sergio empieza la búsqueda por ahí.
+- **Los demás países:** Sergio registra a la persona solo si se lo pides, y Mark no le escribe. El primer contacto va por otros canales (tu LinkedIn, un evento, un referido). Si la persona responde o da su permiso, Mark la anota con `--con-permiso` y ya puede escribirle.
+- **Quien te contactó** (por el sitio, WhatsApp, redes, un evento o un referido) ya puede recibir correos.
+
+**Confirma con tu aliado legal** la lista de `"primer_contacto"` antes de agregar otros países. Si te confirma más países, agrégalos a la lista, por ejemplo: `"primer_contacto": ["Estados Unidos", "México"]`.
+
+Cada correo de primer contacto lleva al pie:
+
+- La dirección física de la oficina: complétala en `"correo"` › `"direccion"` de `bots.json`. Sin ella, Mark no puede preparar estos correos.
+- El aviso «Comunicación comercial de Madreperla Realtors».
+- La frase para darse de baja.
+
+Además, el hábitat:
 
 - Guarda de dónde salió cada contacto.
-- Incluye en cada correo la frase para darse de baja.
 - Respeta la lista de *no contactar*: no deja preparar ni aprobar un correo para alguien que está en ella.
-- Limita los correos a prospectos por día.
-
-Completa `"direccion"` en `bots.json` si vas a escribir a Estados Unidos.
+- Limita los correos de primer contacto por día (`"por_dia"`, 10).
 
 ### 3. Instrucción para Sergio
 
@@ -232,13 +241,15 @@ Búsqueda de leads para Madreperla:
   python3 RUTA/puente/reportar.py --bot @ageente-de-investigacion-madreperla --perfil
   python3 RUTA/puente/reportar.py --bot @ageente-de-investigacion-madreperla --inventario
   python3 RUTA/puente/reportar.py --bot @ageente-de-investigacion-madreperla --leads
-- Busca en internet personas que encajen con el perfil y los países prioritarios: directorios
-  profesionales, páginas de clínicas y empresas, asociaciones, eventos, prensa y publicaciones públicas.
+- Busca en internet personas que encajen con el perfil. Empieza por los países que --perfil marca
+  con "EMPIEZA POR": ahí Mark puede escribir el primer correo. Busca en los demás países solo si
+  María Andrea lo pide. Fuentes: directorios profesionales, páginas de clínicas y empresas,
+  asociaciones, eventos, prensa y publicaciones públicas.
 - Usa solo información pública y profesional. Anota el correo que la persona o su empresa publicó;
   no adivines ni armes correos. Nunca guardes cédulas, pasaportes, cuentas, ingresos, patrimonio ni
   datos de salud o de familia.
 - Registra a cada persona con la página exacta donde la encontraste y por qué encaja:
-  python3 RUTA/puente/reportar.py --bot @ageente-de-investigacion-madreperla --lead "Nombre" --cargo "Profesión o cargo" --email correo@dominio.com --pais "País" --fuente https://… --motivo "Por qué encaja" --puntaje 1-5
+  python3 RUTA/puente/reportar.py --bot @ageente-de-investigacion-madreperla --lead "Nombre" --cargo "Profesión o cargo" --email correo@dominio.com --pais "País en español" --fuente https://… --motivo "Por qué encaja" --puntaje 1-5
 - Máximo 10 personas por búsqueda, sin repetir a nadie que ya esté en --leads.
 - Al terminar, pásale a Mark las de puntaje 4 o 5:
   python3 RUTA/puente/reportar.py --bot @ageente-de-investigacion-madreperla --tarea-para mark --mensaje "Correos de primer contacto para: Nombre 1, Nombre 2"
@@ -265,6 +276,12 @@ Leads y correos de Madreperla:
 - Primer contacto con un prospecto que encontró Sergio: máximo 150 palabras. Preséntate como
   Madreperla, di con respeto por qué le escribes (su perfil, sin detalles personales), ofrece una
   conversación sin compromiso y no incluyas precios. Un solo seguimiento, 7 días después, si no responde.
+  Solo se puede si su país está en la lista de primer contacto; si no, el hábitat no te deja
+  prepararlo: queda para LinkedIn, un evento o un referido.
+- Escribe en el idioma de la persona. Para un correo en inglés agrega --idioma en (la firma y el pie
+  salen en inglés).
+- Si un prospecto responde o da su permiso, anótalo:
+  python3 RUTA/puente/reportar.py --bot @mark --lead "Nombre" --email correo@dominio.com --con-permiso
 - Guarda el texto en un archivo y envíalo a aprobación:
   python3 RUTA/puente/reportar.py --bot @mark --correo-para "Nombre <correo@dominio.com>" --asunto "Asunto" --archivo correo.txt
   Formato del texto: línea en blanco = párrafo nuevo · "## " = subtítulo · "- " = lista ·
@@ -339,6 +356,8 @@ Además:
 | "No conozco la zona horaria…" | Usa un nombre como `America/Bogota`, `America/Santo_Domingo` o `America/New_York` |
 | "No pude leerlo: falta \"inventario\"…" | Pega el enlace de la hoja en `"inventario"` de `puente/bots.json` |
 | "Google devolvió una página, no la hoja" | La hoja no está compartida con *Cualquier persona con el enlace*. Revisa el paso 1 de *Leads y correos* |
+| "… donde hace falta su permiso antes del primer correo" | Esa persona está en un país fuera de `"primer_contacto"`. Contáctala por otro canal; si da su permiso, Mark la anota con `--con-permiso` |
+| "falta la dirección física de la oficina" | Completa `"correo"` › `"direccion"` en `bots.json` |
 | "ya se llegó al límite de 10 correos a prospectos por hoy" | Es el límite diario de primeros contactos. Súbelo en `"leads"` › `"por_dia"` de `bots.json` si lo necesitas |
 | "esa persona pidió no recibir correos de Madreperla" | Está en la lista de *no contactar*. No hay que escribirle |
 | El correo aprobado no se abre con *Abrir en Mail* | Ábrelo a mano: está en la carpeta `correos` del hábitat (doble clic) |

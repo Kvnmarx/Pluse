@@ -37,8 +37,14 @@ Leads y correos (Mark):
   python3 reportar.py --bot @mark --leads             muestra los leads registrados
   python3 reportar.py --bot @mark --perfil            muestra el perfil de lead compatible y las reglas
   python3 reportar.py --bot @mark --lead "Ana Pérez" --email ana@correo.com --pais Colombia --interes "Villa en Cap Cana" --origen "Formulario del sitio" --puntaje 4
-  python3 reportar.py --bot @ageente-de-investigacion-madreperla --lead "Dr. Luis Gómez" --cargo "Cirujano, socio de clínica" --email contacto@clinica.com --pais Colombia --fuente https://clinica.com/equipo --motivo "Publicó sobre retiro en el Caribe" --puntaje 4
+  python3 reportar.py --bot @ageente-de-investigacion-madreperla --lead "Dr. Luis Gómez" --cargo "Cirujano, socio de clínica" --email contacto@clinica.com --pais "Estados Unidos" --fuente https://clinica.com/equipo --motivo "Publicó sobre retiro en el Caribe" --puntaje 4
+  python3 reportar.py --bot @mark --lead "Dr. Luis Gómez" --email contacto@clinica.com --con-permiso   si respondió o dio su permiso
+  python3 reportar.py --bot @mark --correo-para "contacto@clinica.com" --asunto "A conversation about the Caribbean" --idioma en --archivo correo.txt
   python3 reportar.py --bot @mark --no-contactar ana@correo.com   si alguien pide no recibir más correos
+
+  Primer correo a un prospecto encontrado en internet: solo si su país está en
+  bots.json › leads › primer_contacto (o si dio su permiso). Lleva al pie la dirección
+  física de la oficina y el aviso de comunicación comercial.
   python3 reportar.py --bot @mark --correo-para "Ana Pérez <ana@correo.com>" --asunto "Villas frente al mar en Cap Cana" --archivo correo.txt
 
   El texto del correo es simple: línea en blanco = párrafo nuevo, '## ' = subtítulo,
@@ -573,6 +579,8 @@ def main():
     ap.add_argument('--motivo', help='Por qué es compatible con Madreperla')
     ap.add_argument('--perfil', action='store_true', help='Muestra el perfil de lead compatible y las reglas de búsqueda')
     ap.add_argument('--no-contactar', help='Correo de alguien que pidió no recibir más correos')
+    ap.add_argument('--con-permiso', action='store_true', help='El lead dio su permiso para recibir correos (respondió, llenó un formulario…)')
+    ap.add_argument('--idioma', choices=['es', 'en'], default='es', help='Idioma del correo: es (español) o en (inglés)')
     ap.add_argument('--correo-para', help='Prepara un correo para aprobar: "Nombre <correo@dominio.com>"')
     ap.add_argument('--asunto', help='Asunto del correo')
     ap.add_argument('--subir', action='store_true', help='Además, sube estado.json a GitHub')
@@ -610,8 +618,8 @@ def main():
         cc = C.conf_correo()
         asunto = a.asunto.strip()[:160]
         resumen = C.resumen_de(cuerpo)
-        correo = {'para': email_dest, 'nombre': nombre_dest, 'asunto': asunto, 'texto': cuerpo[:20000],
-                  'texto_plano': C.texto_plano(cuerpo, cc), 'html': C.armar_html(asunto, cuerpo, cc, resumen),
+        correo = {'para': email_dest, 'nombre': nombre_dest, 'asunto': asunto, 'texto': cuerpo[:20000], 'idioma': a.idioma,
+                  'texto_plano': C.texto_plano(cuerpo, cc, a.idioma), 'html': C.armar_html(asunto, cuerpo, cc, resumen, a.idioma),
                   'hora': t.isoformat(), 'de': bot}
     try:                                             # se valida antes de tocar los archivos
         if a.lead and a.email:
@@ -713,7 +721,7 @@ def main():
                     lead, lead_nuevo = C.guardar_lead(priv, t, bot, a.lead, a.email, pais=a.pais, interes=a.interes,
                                                       origen=a.origen, presupuesto=a.presupuesto, nota=a.nota,
                                                       etapa=a.etapa, puntaje=a.puntaje, cargo=a.cargo,
-                                                      fuente=a.fuente, motivo=a.motivo)
+                                                      fuente=a.fuente, motivo=a.motivo, permiso=a.con_permiso)
                     ag.setdefault('historial', []).insert(0, {'hora': t.strftime('%H:%M'),
                                                               'texto': ('Registró un lead' if lead_nuevo else 'Actualizó un lead')
                                                               + (f' ({lead["puntaje"]}/5)' if lead.get('puntaje') else '')})
@@ -723,12 +731,24 @@ def main():
                     lead_c = C.buscar_lead(priv, correo['para'])
                     if lead_c:
                         correo['lead'] = lead_c['id']
-                        if lead_c.get('tipo') == 'prospecto':      # primer contacto con alguien que no nos escribió
-                            correo['prospecto'] = True
+                        if lead_c.get('tipo') == 'prospecto' and not lead_c.get('permiso'):   # primer contacto en frío
+                            if not C.puede_escribir(lead_c):
+                                donde = lead_c.get('pais') or 'un país sin anotar'
+                                raise ValueError(f'{lead_c.get("nombre", "esta persona")} está en {donde}, donde hace falta su permiso '
+                                                 'antes del primer correo. Queda como prospecto: el primer contacto va por LinkedIn, '
+                                                 'un evento o un referido. Si da su permiso, anótalo con --lead y --con-permiso.')
+                            cc2 = C.conf_correo()
+                            if not cc2['direccion'].strip():
+                                raise ValueError('falta la dirección física de la oficina en bots.json › correo › direccion. '
+                                                 'Los correos de primer contacto la llevan al pie.')
                             tope = C.conf_leads()['por_dia']
                             if C.correos_a_prospectos_hoy(priv, t) >= tope:
                                 raise ValueError(f'ya se llegó al límite de {tope} {"correo" if tope == 1 else "correos"} a '
                                                  'prospectos por hoy (bots.json › leads › por_dia). Deja los demás para mañana.')
+                            correo['prospecto'] = True                 # lleva el aviso de comunicación comercial
+                            correo['texto_plano'] = C.texto_plano(correo['texto'], cc2, correo['idioma'], True)
+                            correo['html'] = C.armar_html(correo['asunto'], correo['texto'], cc2,
+                                                          C.resumen_de(correo['texto']), correo['idioma'], True)
                     ap_c = agregar_aprobacion(data, bot, a.aprobacion or f'Correo: {correo["asunto"]}',
                                               correo_resumen(correo), 'correo', t, evento_id,
                                               correo={'asunto': correo['asunto']})

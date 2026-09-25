@@ -124,7 +124,8 @@ def instrucciones(bot, canal):
         'Si trabajas en algo de un evento de la Sala de Eventos, agrega --evento ID en reportar.py. '
         'Los correos a clientes se preparan con reportar.py --correo-para y --asunto (quedan en Aprobaciones con '
         'la identidad de Madreperla); nunca los envíes por otra vía. '
-        'Para buscar leads, revisa reportar.py --perfil y registra a cada persona con --lead, --fuente y --motivo. '
+        'Para buscar leads, revisa reportar.py --perfil (dice por qué países empezar) y registra a cada persona con '
+        '--lead, --pais, --fuente y --motivo. '
         f'Equipo: {equipo}.'
     )
 
@@ -302,7 +303,9 @@ def recibir_privado(cuerpo):
     correos = {k: {'para': v.get('para'), 'nombre': v.get('nombre', ''), 'asunto': v.get('asunto'),
                    'html': v.get('html', ''), 'listo': bool(v.get('archivo') and os.path.exists(v['archivo']))}
                for k, v in priv['correos'].items() if k in ids}
-    return 200, {'leads': priv['leads'][-200:], 'correos': correos, 'envio': C.conf_correo(cfg)['envio'],
+    cfg_leads = C.config()                       # con los valores por defecto (países de primer contacto)
+    leads = [dict(x, escribir=C.puede_escribir(x, cfg_leads)) for x in priv['leads'][-200:]]
+    return 200, {'leads': leads, 'correos': correos, 'envio': C.conf_correo(cfg)['envio'],
                  'no_contactar': len(priv['no_contactar'])}
 
 

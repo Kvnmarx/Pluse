@@ -169,6 +169,8 @@
   .lead-search{display:grid;gap:6px;border:1px dashed var(--line);border-radius:12px;padding:10px 12px}
   .lead-search p{margin:0;font-size:12.5px;line-height:1.45;color:var(--muted)}
   .lead-tipo{font:10.5px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--champagne)}
+  .lead-perm{font-size:12px;line-height:1.45;padding:6px 8px;border-radius:8px;background:rgba(239,233,221,.05)}
+  .lead-perm.si{color:var(--ok)} .lead-perm.no{color:var(--warn)}
   .lead-src{font:11.5px/1.4 var(--mono);color:var(--champagne);text-decoration:none;overflow-wrap:anywhere} .lead-src:hover{text-decoration:underline}
   .st-pendiente{color:var(--champagne)} .st-aprobada{color:var(--ok)} .st-devuelta{color:var(--warn)}
   .tag .name .flag{display:none}
@@ -2419,9 +2421,10 @@ async function openInMail(id){
 }
 
 const leadSearch = { busy:false, msg:'', err:'' };
-const PEDIDO_LEADS = '@Sergio, busca en internet personas compatibles con el perfil de Madreperla. Primero revisa el perfil '
-  + 'y el inventario (reportar.py --perfil y --inventario) y los leads que ya tenemos (--leads). Registra a cada persona con '
-  + 'reportar.py --lead, --fuente (la página donde la encontraste) y --motivo. Solo datos públicos y profesionales, sin datos '
+const PEDIDO_LEADS = '@Sergio, busca en internet personas compatibles con el perfil de Madreperla, empezando por los países '
+  + 'donde se puede escribir el primer correo sin permiso previo (te los indica reportar.py --perfil). Primero revisa el perfil, '
+  + 'el inventario (--inventario) y los leads que ya tenemos (--leads). Registra a cada persona con reportar.py --lead, --pais, '
+  + '--fuente (la página donde la encontraste) y --motivo. Solo datos públicos y profesionales, sin datos '
   + 'sensibles, y un máximo de 10 por hoy. Al terminar, pásale a Mark las de puntaje 4 o 5 con reportar.py --tarea-para mark '
   + 'para que prepare los correos, y me cuentas en el chat del equipo. Ningún correo sale sin mi aprobación.';
 function leadSearchHTML(){
@@ -2451,6 +2454,9 @@ function leadsHTML(){
       ${l.cargo ? `<div class="lead-line">${esc(l.cargo)}</div>` : ''}
       ${l.interes ? `<div class="lead-line">${esc(l.interes)}</div>` : ''}
       ${l.motivo ? `<div class="lead-line">Por qué encaja: ${esc(l.motivo)}</div>` : ''}
+      ${l.tipo === 'prospecto' ? (l.escribir === false
+        ? '<div class="lead-perm no">En su país hace falta su permiso antes del primer correo. Primer contacto: LinkedIn, un evento o un referido.</div>'
+        : l.escribir ? `<div class="lead-perm si">${l.permiso ? 'Dio su permiso: se le puede escribir.' : 'Se le puede escribir el primer correo.'}</div>` : '') : ''}
       <div class="lead-top"><span class="lead-mail">${esc(l.origen || '')}</span>${l.puntaje ? `<span class="lead-dots" aria-label="Puntaje ${l.puntaje} de 5">${'●'.repeat(l.puntaje)}${'○'.repeat(5 - l.puntaje)}</span>` : ''}</div>
       ${fuente(l.fuente)}
       ${l.nota ? `<div class="lead-line">${esc(l.nota)}</div>` : ''}
@@ -2477,31 +2483,35 @@ async function simBuscarLeads(){
   leadSearch.busy = true; leadSearch.msg = 'Sergio empezó a buscar. Mira la Librería y el chat del equipo.'; renderApprovals(true);
   post({ de:'tu', para:'todos', texto:'@Sergio, busca en internet personas compatibles con el perfil de Madreperla y pásale las mejores a Mark.' });
   applyState({ id:'sergio', estado:'trabajando', tarea:'Buscando inversionistas compatibles en internet' });
-  await say('sergio', 'todos', 'Con gusto. Reviso el perfil y el inventario, y busco médicos, empresarios y ejecutivos en Colombia, Estados Unidos y España.');
+  await say('sergio', 'todos', 'Con gusto. Reviso el perfil y el inventario, y empiezo por Estados Unidos, donde Mark puede escribir el primer correo.');
   await wait(16000);
   if (live) { leadSearch.busy = false; return; }
   if (!SIM_LEADS.some(l => l.id === 'sl4')) SIM_LEADS.push(
-    { id:'sl4', nombre:'Prospecto de ejemplo D', cargo:'Cirujano plástico, socio de una clínica', correo:'contacto@clinica-ejemplo.test', pais:'Colombia',
+    { id:'sl4', nombre:'Prospecto de ejemplo D', cargo:'Cirujano plástico, socio de una clínica', correo:'contacto@clinica-ejemplo.test', pais:'Miami, Estados Unidos',
       interes:'Segunda residencia frente al mar', motivo:'Habló en una entrevista pública sobre pasar temporadas en el Caribe.', fuente:'https://clinica-ejemplo.test/equipo',
-      origen:'Investigación de Sergio', etapa:'calificado', puntaje:5, tipo:'prospecto', actualizado:new Date().toISOString() },
-    { id:'sl5', nombre:'Prospecto de ejemplo E', cargo:'Directora financiera de una empresa familiar', correo:'oficina@empresa-ejemplo.test', pais:'Estados Unidos',
+      origen:'Investigación de Sergio', etapa:'calificado', puntaje:5, tipo:'prospecto', escribir:true, actualizado:new Date().toISOString() },
+    { id:'sl5', nombre:'Prospecto de ejemplo E', cargo:'Directora financiera de una empresa familiar', correo:'oficina@empresa-ejemplo.test', pais:'Houston, Estados Unidos',
       interes:'Diversificación con propiedades para alquiler', motivo:'Participa en foros de inversión inmobiliaria internacional.', fuente:'https://empresa-ejemplo.test/directorio',
-      origen:'Investigación de Sergio', etapa:'nuevo', puntaje:4, tipo:'prospecto', actualizado:new Date().toISOString() });
+      origen:'Investigación de Sergio', etapa:'nuevo', puntaje:4, tipo:'prospecto', escribir:true, actualizado:new Date().toISOString() },
+    { id:'sl6', nombre:'Prospecto de ejemplo F', cargo:'Empresario del sector hotelero', correo:'direccion@hotel-ejemplo.test', pais:'Madrid, España',
+      interes:'Villa en Cap Cana', motivo:'Invierte en hoteles boutique y viaja con frecuencia al Caribe.', fuente:'https://hotel-ejemplo.test/equipo',
+      origen:'Investigación de Sergio', etapa:'nuevo', puntaje:4, tipo:'prospecto', escribir:false, actualizado:new Date().toISOString() });
   renderApprovals(true);
-  await assignFlow('sergio', 'mark', 'Correos de primer contacto para 2 prospectos (puntaje 4 y 5)');
+  await say('sergio', 'todos', 'Registré 3 prospectos. Dos están en Estados Unidos. La tercera persona está en España: ahí hace falta su permiso, así que conviene contactarla por LinkedIn o en un evento.');
+  await assignFlow('sergio', 'mark', 'Correos de primer contacto para los 2 prospectos de Estados Unidos (puntaje 4 y 5)');
   applyState({ id:'sergio', estado:'trabajando', tarea:pick(SIM_TASKS.sergio) });
   applyState({ id:'mark', estado:'trabajando', tarea:'Redactando correos de primer contacto' });
   await wait(14000);
   if (live) { leadSearch.busy = false; return; }
   simAddApproval({ de:'mark', clase:'correo', titulo:'Correo: Una conversación sobre el Caribe',
     detalle:'Correo de primer contacto con la identidad de Madreperla, listo para revisar.',
-    correo:{ para:'contacto@clinica-ejemplo.test', nombre:'Prospecto de ejemplo D', asunto:'Una conversación sobre el Caribe', texto: SIM_MAIL_PROSPECTO } });
+    correo:{ para:'contacto@clinica-ejemplo.test', nombre:'Prospecto de ejemplo D', asunto:'Una conversación sobre el Caribe', texto: SIM_MAIL_PROSPECTO, comercial:true } });
   await say('mark', 'todos', 'María Andrea, te dejé en Aprobaciones el primer correo. Queda a la espera de tu visto bueno.');
-  leadSearch.busy = false; leadSearch.msg = 'Listo: 2 prospectos nuevos y un correo esperando tu aprobación.'; renderApprovals(true);
+  leadSearch.busy = false; leadSearch.msg = 'Listo: 3 prospectos nuevos (2 en Estados Unidos) y un correo esperando tu aprobación.'; renderApprovals(true);
 }
 
 /* el mismo diseño que arma puente/correos.py (para la simulación) */
-function mailHTML(asunto, texto){
+function mailHTML(asunto, texto, comercial){
   const M = { marfil:'#F6F1E7', arena:'#E9DFCC', pet:'#0E3B43', graf:'#2B2B2B', champ:'#B9A27A', gris:'#6E6A63' };
   const serif = "'Cormorant Garamond', Georgia, 'Times New Roman', serif", sans = "'Helvetica Neue', Helvetica, Arial, sans-serif";
   const inl = t => esc(t).replace(/\*\*(.+?)\*\*/g, `<strong style="color:${M.graf};font-weight:600">$1</strong>`);
@@ -2524,7 +2534,7 @@ function mailHTML(asunto, texto){
 <tr><td style="height:3px;background:${M.champ};font-size:0">&nbsp;</td></tr>
 <tr><td style="padding:40px 32px 12px"><h1 style="margin:0 0 26px;font-family:${serif};font-size:28px;line-height:1.22;font-weight:500;color:${M.pet}">${esc(asunto)}</h1>${out.join('')}</td></tr>
 <tr><td style="padding:8px 32px 40px"><div style="border-left:2px solid ${M.champ};padding:2px 0 2px 16px"><div style="font-family:${serif};font-size:20px;color:${M.pet}">María Andrea López</div><div style="margin-top:4px;font-family:${sans};font-size:12px;color:${M.gris}">Fundadora · Madreperla Realtors</div></div></td></tr>
-<tr><td style="background:${M.pet};padding:22px 32px;text-align:center;font-family:${sans};font-size:11px;line-height:1.7;color:#C9D3D1">madreperlarealtors.com · Punta Cana, República Dominicana<br><span style="color:#9FB1AE">Si prefiere no recibir más comunicaciones nuestras, responda a este correo y lo retiraremos de la lista.</span></td></tr>
+<tr><td style="background:${M.pet};padding:22px 32px;text-align:center;font-family:${sans};font-size:11px;line-height:1.7;color:#C9D3D1">madreperlarealtors.com · Punta Cana, República Dominicana<br><span style="color:#9FB1AE">${comercial ? 'Comunicación comercial de Madreperla Realtors.<br>' : ''}Si prefiere no recibir más comunicaciones nuestras, responda a este correo y lo retiraremos de la lista.</span></td></tr>
 </table></td></tr></table></body></html>`;
 }
 const SIM_LEADS = [
@@ -2579,7 +2589,7 @@ const SIM_APPROVALS = [
 let simAprIdx = 0, simAprTimer = null;
 function simAddApproval(src){
   const s = src || SIM_APPROVALS[simAprIdx++ % SIM_APPROVALS.length];
-  const correo = s.correo ? { ...s.correo, html: s.correo.html || mailHTML(s.correo.asunto, s.correo.texto || SIM_MAIL) } : undefined;
+  const correo = s.correo ? { ...s.correo, html: s.correo.html || mailHTML(s.correo.asunto, s.correo.texto || SIM_MAIL, s.correo.comercial) } : undefined;
   approvals.push({ id:'s' + (++msgSeq), de:s.de, titulo:s.titulo, detalle:s.detalle, clase:s.clase, estado:'pendiente', comentario:'', t:Date.now(), td:null, correo });
   renderApprovals(true);
 }

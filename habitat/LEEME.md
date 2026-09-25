@@ -163,6 +163,7 @@ Sergio busca en internet personas compatibles con el perfil de Madreperla y las 
 - Si lo **devuelves**, tu comentario le llega a Mark y te trae una versión nueva.
 - La pestaña **Leads** muestra cada lead con su tipo (prospecto o interesado), su país, por qué encaja, dónde se encontró, su puntaje de 1 a 5 y su etapa.
 - Quien pide no recibir más correos queda en la lista de *no contactar*, y nadie vuelve a escribirle.
+- El primer correo a alguien que no te conoce solo sale para los países de `"primer_contacto"` (por ahora, Estados Unidos). En los demás, el contacto va por LinkedIn, eventos o referidos hasta que la persona dé su permiso.
 
 Los leads y los correos completos quedan en `puente/privado.json`, solo en tu computadora: no se suben a GitHub ni aparecen en `estado.json`. En `estado.json` solo queda el asunto de cada correo y los conteos de leads (`leads_resumen`).
 

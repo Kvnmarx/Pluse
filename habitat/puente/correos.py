@@ -35,14 +35,19 @@ CORREO_BASE = {
     'remitente': 'María Andrea López <administracion@madreperlarealtors.com>',
     'firma_nombre': 'María Andrea López',
     'firma_cargo': 'Fundadora · Madreperla Realtors',
+    'firma_cargo_en': 'Founder · Madreperla Realtors',
     'telefono': '',
     'sitio': 'https://madreperlarealtors.com',
     'ciudad': 'Punta Cana, República Dominicana',
+    'ciudad_en': 'Punta Cana, Dominican Republic',
     'direccion': '',            # dirección física de la oficina (algunos países la piden en correos comerciales)
     'envio': 'borrador',        # borrador: tú lo envías desde Mail · bot: el bot lo envía tras tu aprobación
 }
 LEADS_BASE = {
-    'paises': ['Colombia', 'Estados Unidos', 'España'],
+    'paises': ['Latinoamérica', 'Estados Unidos', 'Canadá', 'Europa'],
+    # países donde Mark puede escribir por primera vez sin permiso previo de la persona.
+    # Es un punto de partida: confírmalo con tu aliado legal antes de agregar otros.
+    'primer_contacto': ['Estados Unidos'],
     'perfil': ('Inversionistas patrimoniales de 40 a 65 años que ya tienen capital y buscan una decisión sólida: '
                'médicos, empresarios, profesionales y ejecutivos; familias que planean su retiro o una segunda '
                'residencia; asesores financieros y patrimoniales que podrían ser aliados.'),
@@ -84,7 +89,87 @@ def conf_leads(cfg=None):
         c['perfil'] = extra['perfil'].strip()
     if isinstance(extra.get('por_dia'), int) and extra['por_dia'] >= 0:
         c['por_dia'] = extra['por_dia']
+    if isinstance(extra.get('primer_contacto'), list):
+        c['primer_contacto'] = [str(x) for x in extra['primer_contacto'] if str(x).strip()][:40]
     return c
+
+
+REGIONES = {
+    'Latinoamérica': ['México', 'Guatemala', 'Belice', 'Honduras', 'El Salvador', 'Nicaragua', 'Costa Rica', 'Panamá',
+                      'Cuba', 'República Dominicana', 'Puerto Rico', 'Colombia', 'Venezuela', 'Ecuador', 'Perú',
+                      'Bolivia', 'Chile', 'Argentina', 'Uruguay', 'Paraguay', 'Brasil'],
+    'Europa': ['España', 'Portugal', 'Francia', 'Italia', 'Alemania', 'Reino Unido', 'Irlanda', 'Países Bajos',
+               'Bélgica', 'Luxemburgo', 'Suiza', 'Austria', 'Suecia', 'Noruega', 'Dinamarca', 'Finlandia', 'Islandia',
+               'Polonia', 'República Checa', 'Hungría', 'Grecia', 'Rumanía', 'Bulgaria', 'Croacia', 'Eslovenia',
+               'Eslovaquia', 'Estonia', 'Letonia', 'Lituania', 'Malta', 'Chipre', 'Mónaco', 'Andorra'],
+}
+ALIAS_PAIS = {
+    'Estados Unidos': ['eeuu', 'ee uu', 'usa', 'u s a', 'us', 'united states', 'estados unidos de america', 'florida',
+                       'miami', 'nueva york', 'new york', 'texas', 'california', 'nueva jersey', 'new jersey'],
+    'Canadá': ['canada'], 'México': ['mexico'], 'Brasil': ['brazil'], 'Perú': ['peru'], 'Panamá': ['panama'],
+    'República Dominicana': ['rd', 'rep dominicana', 'dominican republic'], 'España': ['spain'],
+    'Reino Unido': ['uk', 'united kingdom', 'inglaterra', 'england', 'escocia', 'gales', 'londres', 'london'],
+    'Países Bajos': ['holanda', 'netherlands'], 'Alemania': ['germany'], 'Francia': ['france'], 'Italia': ['italy'],
+    'Suiza': ['switzerland'], 'Bélgica': ['belgium'], 'Irlanda': ['ireland'], 'Suecia': ['sweden'],
+    'Portugal': ['portugal'],
+}
+
+
+SINONIMOS_REGION = {'latam': 'Latinoamérica', 'latinoamerica': 'Latinoamérica', 'america latina': 'Latinoamérica',
+                    'europa': 'Europa', 'europe': 'Europa'}
+
+
+def _clave(v):
+    return ' '.join(re.sub(r'[^a-z ]+', ' ', _norm(v)).split())
+
+
+def _region(x):
+    k = _clave(x)
+    return next((r for r in REGIONES if _clave(r) == k), None) or SINONIMOS_REGION.get(k)
+
+
+def _mapa_paises():
+    m = {}
+    for lista in REGIONES.values():
+        for pais in lista:
+            m[_clave(pais)] = pais
+    for pais, alias in ALIAS_PAIS.items():
+        m[_clave(pais)] = pais
+        for a in alias:
+            m[_clave(a)] = pais
+    return m
+
+
+def pais_de(texto):
+    """'Miami, Florida (EE. UU.)' → 'Estados Unidos'. None si no se reconoce."""
+    mapa = _mapa_paises()
+    partes = [texto or ''] + re.split(r'[,;/()·|-]+', texto or '')
+    for parte in partes:
+        k = _clave(parte)
+        if k and k in mapa:
+            return mapa[k]
+    return None
+
+
+def expandir(lista):
+    """['Latinoamérica', 'Estados Unidos'] → conjunto de países (las regiones se abren en sus países)."""
+    out = set()
+    for x in lista or []:
+        region = _region(x)
+        if region:
+            out.update(REGIONES[region])
+        elif pais_de(x):
+            out.add(pais_de(x))
+    return out
+
+
+def puede_escribir(lead, cfg=None):
+    """¿Se le puede escribir un primer correo? Sí si nos contactó, si dio su permiso o si su país está
+    en 'primer_contacto'. A un prospecto sin país reconocido no se le escribe."""
+    if not lead or lead.get('tipo') != 'prospecto' or lead.get('permiso'):
+        return True
+    pais = pais_de(lead.get('pais'))
+    return bool(pais) and pais in expandir(conf_leads(cfg)['primer_contacto'])
 
 
 def conf_correo(cfg=None):
@@ -208,6 +293,8 @@ def guardar_lead(p, t, de, nombre, correo=None, **datos):
             lead[k] = str(datos[k]).strip()[:600]
     if nuevo or datos.get('fuente'):          # encontrado en internet = prospecto; vino a nosotros = interesado
         lead['tipo'] = 'prospecto' if lead.get('fuente') else 'interesado'
+    if datos.get('permiso'):                  # respondió, llenó un formulario o aceptó recibir información
+        lead['permiso'] = t.isoformat()
     if datos.get('etapa'):
         lead['etapa'] = datos['etapa']
     if datos.get('puntaje') is not None:
@@ -242,15 +329,20 @@ def texto_leads(p):
 def texto_perfil(cfg=None):
     """Criterios para buscar leads compatibles: lo lee Sergio antes de investigar."""
     L = conf_leads(cfg)
+    libres = ', '.join(sorted(expandir(L['primer_contacto']))) or 'ninguno todavía'
     return '\n'.join([
         'PERFIL DE LEAD COMPATIBLE CON MADREPERLA',
         f'Perfil: {L["perfil"]}',
-        f'Países prioritarios: {", ".join(L["paises"]) or "sin preferencia"}.',
+        f'Mercado: {", ".join(L["paises"]) or "sin preferencia"}.',
+        f'EMPIEZA POR: {libres}. Ahí Mark puede escribir el primer correo sin permiso previo de la persona.',
+        'En los demás países hace falta ese permiso: busca ahí solo si María Andrea lo pide. Esos contactos van por',
+        'otros canales (LinkedIn de María Andrea, eventos, referidos) hasta que den su permiso.',
+        'Escribe --pais con el nombre del país en español (por ejemplo: Estados Unidos, México, España).',
         'Zonas y proyectos: los del inventario (reportar.py --inventario).',
         '',
         'Puntaje de 1 a 5 (un punto por cada señal):',
         '- Encaja con el perfil (edad aproximada, profesión o cargo).',
-        '- Vive o trabaja en un país prioritario.',
+        '- Vive o trabaja en uno de los países del mercado.',
         '- Muestra interés público en invertir, segunda residencia, retiro, el Caribe, golf o náutica.',
         '- Tiene capacidad patrimonial visible (cargo directivo, empresa propia, profesión de alto ingreso).',
         '- Tiene un correo profesional publicado por la propia persona o su empresa.',
@@ -265,6 +357,23 @@ def texto_perfil(cfg=None):
 
 
 # ─────────────────────────── correo con la identidad de Madreperla ───────────────────────────
+
+TEXTOS = {
+    'es': {'baja': 'Si prefiere no recibir más comunicaciones nuestras, responda a este correo y lo retiraremos de la lista.',
+           'comercial': 'Comunicación comercial de Madreperla Realtors.'},
+    'en': {'baja': 'If you prefer not to receive further messages from us, simply reply to this email and we will remove you from our list.',
+           'comercial': 'Commercial communication from Madreperla Realtors.'},
+}
+
+
+def _pie(c, idioma):
+    """Firma y datos de contacto según el idioma del correo."""
+    en = idioma == 'en'
+    cargo = c['firma_cargo_en'] if en else c['firma_cargo']
+    lugar = c['direccion'] or (c['ciudad_en'] if en else c['ciudad'])
+    contacto = [x for x in (c['telefono'], c['sitio'].replace('https://', ''), lugar) if x]
+    return cargo, contacto
+
 
 def _en_linea(t):
     """Escapa y aplica **negrita**. Los enlaces sueltos quedan como texto (nada de rastreo)."""
@@ -313,7 +422,9 @@ def bloques(texto):
     return out
 
 
-def texto_plano(texto, c):
+def texto_plano(texto, c, idioma='es', comercial=False):
+    T = TEXTOS['en' if idioma == 'en' else 'es']
+    cargo, contacto = _pie(c, idioma)
     lineas = []
     for tipo, v in bloques(texto):
         if tipo == 'h':
@@ -324,16 +435,17 @@ def texto_plano(texto, c):
             lineas += [f'{v[0]}: {v[1]}', '']
         else:
             lineas += [re.sub(r'\*\*', '', v), '']
-    lineas += [c['firma_nombre'], c['firma_cargo']]
-    lineas += [x for x in (c['telefono'], c['sitio'].replace('https://', ''), c['direccion'] or c['ciudad']) if x]
-    lineas += ['', 'Si prefiere no recibir más comunicaciones nuestras, responda a este correo y lo retiraremos de la lista.']
+    lineas += [c['firma_nombre'], cargo] + contacto
+    lineas += [''] + ([T['comercial']] if comercial else []) + [T['baja']]
     return '\n'.join(lineas)
 
 
-def armar_html(asunto, texto, c=None, resumen=''):
+def armar_html(asunto, texto, c=None, resumen='', idioma='es', comercial=False):
     """Correo HTML de una columna (600 px), con tablas y estilos en línea para que se vea bien
     en Gmail, Outlook y Apple Mail. Sin imágenes externas ni píxeles de rastreo."""
     c = c or conf_correo()
+    T = TEXTOS['en' if idioma == 'en' else 'es']
+    cargo, lugar = _pie(c, idioma)
     partes = []
     for tipo, v in bloques(texto):
         if tipo == 'h':
@@ -356,10 +468,11 @@ def armar_html(asunto, texto, c=None, resumen=''):
         else:
             partes.append(f'<p style="margin:0 0 16px;font-family:{SANS};font-size:15px;line-height:1.7;'
                           f'color:{GRAFITO}">{_en_linea(v)}</p>')
-    contacto = ' · '.join(html.escape(x) for x in (c['telefono'], c['sitio'].replace('https://', ''), c['direccion'] or c['ciudad']) if x)
+    contacto = ' · '.join(html.escape(x) for x in lugar)
+    aviso = f'{html.escape(T["comercial"])}<br>' if comercial else ''
     oculto = html.escape(resumen or '')
     return f'''<!DOCTYPE html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="{'en' if idioma == 'en' else 'es'}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="light only"><title>{html.escape(asunto)}</title>
 <style>@media (max-width:480px){{.pad{{padding-left:24px!important;padding-right:24px!important}}.h1{{font-size:25px!important}}.logo{{font-size:24px!important;letter-spacing:.22em!important}}}}</style></head>
 <body style="margin:0;padding:0;background:{ARENA}">
@@ -380,12 +493,12 @@ def armar_html(asunto, texto, c=None, resumen=''):
   <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
     <td style="border-left:2px solid {CHAMPAGNE};padding:2px 0 2px 16px">
       <div style="font-family:{SERIF};font-size:20px;color:{PETROLEO}">{html.escape(c['firma_nombre'])}</div>
-      <div style="margin-top:4px;font-family:{SANS};font-size:12px;letter-spacing:.06em;color:{GRIS}">{html.escape(c['firma_cargo'])}</div>
+      <div style="margin-top:4px;font-family:{SANS};font-size:12px;letter-spacing:.06em;color:{GRIS}">{html.escape(cargo)}</div>
     </td></tr></table>
 </td></tr>
 <tr><td class="pad" style="background:{PETROLEO};padding:22px 44px;text-align:center;font-family:{SANS};font-size:11px;line-height:1.7;color:#C9D3D1">
   {contacto}<br>
-  <span style="color:#9FB1AE">Si prefiere no recibir más comunicaciones nuestras, responda a este correo y lo retiraremos de la lista.</span>
+  <span style="color:#9FB1AE">{aviso}{html.escape(T['baja'])}</span>
 </td></tr>
 </table>
 </td></tr></table>
