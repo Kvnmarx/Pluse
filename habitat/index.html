@@ -151,6 +151,21 @@
   .apr-note{font:11.5px/1.45 var(--mono);color:var(--muted)}
   .apr-dec{font-size:12.5px;line-height:1.45;color:var(--muted)} .apr-dec b{color:var(--ivory);font-weight:500}
   .apr-empty{font:13px/1.5 var(--body);color:var(--muted);text-align:center;padding:22px 8px}
+  .mail-meta{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:12.5px;line-height:1.4;overflow-wrap:anywhere}
+  .mail-meta span{font:11px/1.5 var(--mono);color:var(--muted)}
+  .mail-wrap{position:relative;height:440px;overflow:hidden;border:1px solid var(--line);border-radius:8px;background:#E9DFCC}
+  .mail-frame{position:absolute;top:0;left:0;width:600px;height:calc(440px / var(--k,.52));border:0;transform:scale(var(--k,.52));transform-origin:0 0;display:block}
+  .mail-links{display:flex;gap:14px;flex-wrap:wrap}
+  .mail-view{position:fixed;inset:0;z-index:8;display:grid;place-items:center;padding:16px;background:rgba(2,9,11,.78);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+  .mail-box{width:min(680px,100%);height:min(900px,100%);display:grid;grid-template-rows:auto 1fr;gap:10px}
+  .mail-box header{display:flex;justify-content:space-between;align-items:center;gap:10px;color:var(--ivory);font:500 14px/1.3 var(--body)}
+  .mail-box iframe{width:100%;height:100%;border:0;border-radius:10px;background:#E9DFCC}
+  .lead-item{border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:grid;gap:5px}
+  .lead-top{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+  .lead-name{font:600 13.5px/1.3 var(--body)} .lead-mail{font:11.5px/1.4 var(--mono);color:var(--muted);overflow-wrap:anywhere}
+  .lead-line{font-size:12.5px;line-height:1.45;opacity:.88}
+  .lead-dots{font:12px var(--mono);letter-spacing:2px;color:var(--champagne)}
+  .lead-sum{display:flex;gap:14px;flex-wrap:wrap;font:11.5px var(--mono);color:var(--muted)} .lead-sum b{color:var(--ivory);font-weight:500}
   .st-pendiente{color:var(--champagne)} .st-aprobada{color:var(--ok)} .st-devuelta{color:var(--warn)}
   .tag .name .flag{display:none}
   .tag.wait .name .flag{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--champagne);box-shadow:0 0 8px var(--champagne)}
@@ -392,6 +407,12 @@
 
 <aside class="ui detail" id="detail" hidden aria-label="Ficha del agente"></aside>
 <aside class="ui detail apr" id="aprPanel" hidden aria-label="Aprobaciones"></aside>
+<div class="mail-view" id="mailView" hidden role="dialog" aria-modal="true" aria-labelledby="mvTitle">
+  <div class="mail-box">
+    <header><span id="mvTitle">Vista previa del correo</span><button class="x" id="mvClose" aria-label="Cerrar vista previa">×</button></header>
+    <iframe id="mvFrame" sandbox="" title="Vista previa del correo en tamaño real"></iframe>
+  </div>
+</div>
 <aside class="ui detail evp" id="evPanel" hidden aria-label="Eventos"></aside>
 <div class="ui toasts" id="toasts" aria-live="polite"></div>
 
@@ -1504,6 +1525,8 @@ async function poll(){
     data.agentes.forEach(ag => applyState(ag, false));
     if (Array.isArray(data.mensajes)) loadLiveMessages(data.mensajes);
     if (Array.isArray(data.aprobaciones)) loadLiveApprovals(data.aprobaciones);
+    leadsResumen = data.leads_resumen && typeof data.leads_resumen === 'object' ? data.leads_resumen : null;
+    if (aprOpen) loadPrivado();
     if (Array.isArray(data.presentaciones)) loadLivePresentations(data.presentaciones);
     if (Array.isArray(data.eventos)) loadLiveEvents(data.eventos);
     if (Array.isArray(data.escribiendo)) {
@@ -2069,7 +2092,7 @@ chForm.addEventListener('submit', async e => {
 /* ───────── Aprobaciones ─────────
    Los bots piden tu visto bueno (reportar.py --aprobacion). Tú apruebas o
    devuelves con un comentario, y la decisión les llega por el servidor.     */
-const CLASE_LABEL = { borrador:'Borrador', propuesta:'Propuesta', consulta:'Consulta' };
+const CLASE_LABEL = { borrador:'Borrador', propuesta:'Propuesta', consulta:'Consulta', correo:'Correo' };
 const AP_LABEL = { pendiente:'Pendiente', aprobada:'Aprobada', devuelta:'Devuelta' };
 var approvals = [];
 let aprOpen = false, aprTab = 'pendientes', aprSig = '';
@@ -2086,6 +2109,7 @@ function loadLiveApprovals(list){
     estado: AP_LABEL[a.estado] ? a.estado : 'pendiente', comentario: String(a.comentario || ''),
     t: Date.parse(a.hora) || Date.now(), td: Date.parse(a.decidido) || null,
     evento: a.evento ? String(a.evento) : undefined,
+    asunto: a.correo?.asunto ? String(a.correo.asunto) : '', listo: !!a.listo,
   }));
   renderApprovals();
 }
@@ -2114,7 +2138,7 @@ function renderApprovals(force){
   aprBadge.hidden = !pend.length; aprBadge.textContent = pend.length;
   avApr.textContent = pend.length ? `Ver aprobaciones (${pend.length})` : 'Ver aprobaciones';
   for (const rb of Object.values(robots)) rb.tag.classList.toggle('wait', pend.some(a => a.de === rb.a.id));
-  const sig = approvals.map(a => a.id + a.estado).join('|');
+  const sig = approvals.map(a => a.id + a.estado + (a.listo ? 'l' : '')).join('|');
   if (sig !== aprSig) { aprSig = sig; drawAprScreen(); renderRoster(); }
   else if (!force) return;
   if (!aprOpen) return;
@@ -2133,10 +2157,12 @@ function renderApprovals(force){
     <div class="apr-tabs" role="tablist">
       <button class="apr-tab${aprTab === 'pendientes' ? ' on' : ''}" data-tab="pendientes" role="tab" aria-selected="${aprTab === 'pendientes'}">Pendientes (${pend.length})</button>
       <button class="apr-tab${aprTab === 'resueltas' ? ' on' : ''}" data-tab="resueltas" role="tab" aria-selected="${aprTab === 'resueltas'}">Resueltas</button>
+      <button class="apr-tab${aprTab === 'leads' ? ' on' : ''}" data-tab="leads" role="tab" aria-selected="${aprTab === 'leads'}">Leads (${leadsList().length})</button>
     </div>
     <div class="apr-list">
-      ${list.length ? list.map(a => aprItem(a, canDecide)).join('') : `<div class="apr-empty">${aprTab === 'pendientes' ? 'No hay nada pendiente. Todo está al día.' : 'Todavía no has resuelto ninguna solicitud.'}</div>`}
+      ${aprTab === 'leads' ? leadsHTML() : list.length ? list.map(a => aprItem(a, canDecide)).join('') : `<div class="apr-empty">${aprTab === 'pendientes' ? 'No hay nada pendiente. Todo está al día.' : 'Todavía no has resuelto ninguna solicitud.'}</div>`}
     </div>`;
+  aprPanel.querySelectorAll('.mail-wrap').forEach(w => w.style.setProperty('--k', Math.min(1, w.clientWidth / 600).toFixed(4)));
   if (focusId) { const el = aprPanel.querySelector(`textarea[data-apr="${focusId}"]`); if (el) { el.focus(); el.selectionStart = el.selectionEnd = el.value.length; } }
 }
 
@@ -2144,13 +2170,16 @@ function aprItem(a, canDecide){
   const rb = robots[a.de], col = rb?.a.color || '#CDBB93', name = rb?.a.name || a.de;
   const ui = aprUI[a.id] || {};
   const long = a.detalle.length > 260;
-  const body = a.detalle ? `<div class="apr-body${ui.open || !long ? ' open' : ''}">${esc(a.detalle)}</div>${long ? `<button class="apr-more" data-more="${a.id}">${ui.open ? 'Ver menos' : 'Ver completo'}</button>` : ''}` : '';
+  let body = a.detalle ? `<div class="apr-body${ui.open || !long ? ' open' : ''}">${esc(a.detalle)}</div>${long ? `<button class="apr-more" data-more="${a.id}">${ui.open ? 'Ver menos' : 'Ver completo'}</button>` : ''}` : '';
+  if (a.clase === 'correo') body = mailBlock(a, a.estado !== 'pendiente');
   if (a.estado !== 'pendiente') {
     return `<article class="apr-item" style="--c:${col}">
       <div class="apr-top"><span class="apr-who">${esc(name)}<small>${CLASE_LABEL[a.clase]} · ${hhmm(a.t)}</small></span><span class="chip st-${a.estado}">${AP_LABEL[a.estado]}</span></div>
       <div class="apr-title">${esc(a.titulo)}</div>
       ${body}
       <div class="apr-dec">${a.estado === 'aprobada' ? 'Aprobada' : 'Devuelta'}${a.td ? ' a las ' + hhmm(a.td) : ''}${a.comentario ? ` · <b>${esc(a.comentario)}</b>` : ''}</div>
+      ${a.clase === 'correo' && a.estado === 'aprobada' ? mailReady(a) : ''}
+      ${ui.err ? `<div class="apr-err" role="alert">${esc(ui.err)}</div>` : ''}
     </article>`;
   }
   return `<article class="apr-item" style="--c:${col}">
@@ -2161,7 +2190,7 @@ function aprItem(a, canDecide){
     <textarea id="c-${a.id}" data-apr="${a.id}" placeholder="Comentario (obligatorio para devolver)" maxlength="1500"${canDecide ? '' : ' disabled'}>${esc(ui.comment || '')}</textarea>
     ${ui.err ? `<div class="apr-err" role="alert">${esc(ui.err)}</div>` : ''}
     <div class="apr-actions">
-      <button class="apr-ok${ui.confirm ? ' confirm' : ''}" data-ok="${a.id}"${canDecide && !ui.busy ? '' : ' disabled'}>${ui.confirm ? 'Confirmar aprobación' : 'Aprobar'}</button>
+      <button class="apr-ok${ui.confirm ? ' confirm' : ''}" data-ok="${a.id}"${canDecide && !ui.busy ? '' : ' disabled'}>${ui.confirm ? 'Confirmar aprobación' : a.clase === 'correo' ? 'Aprobar correo' : 'Aprobar'}</button>
       <button class="apr-back" data-back="${a.id}"${canDecide && !ui.busy ? '' : ' disabled'}>Devolver</button>
     </div>
   </article>`;
@@ -2173,6 +2202,7 @@ function openApprovals(){
   aprOpen = true; aprPanel.hidden = false; rosterEl.hidden = true;
   aprBtn.setAttribute('aria-expanded', 'true');
   renderApprovals(true); aprPanel.scrollTop = 0;
+  loadPrivado(true);
 }
 function closeApprovals(){
   aprOpen = false; aprPanel.hidden = true;
@@ -2190,6 +2220,8 @@ aprPanel.addEventListener('click', e => {
   if (e.target.closest('#aprClose')) return closeApprovals();
   const tab = e.target.closest('[data-tab]'); if (tab) { aprTab = tab.dataset.tab; return renderApprovals(true); }
   const more = e.target.closest('[data-more]'); if (more) { const u = (aprUI[more.dataset.more] ||= {}); u.open = !u.open; return renderApprovals(true); }
+  const big = e.target.closest('[data-mail]'); if (big) return openMail(big.dataset.mail);
+  const opn = e.target.closest('[data-openmail]'); if (opn) return openInMail(opn.dataset.openmail);
   const ok = e.target.closest('[data-ok]'); if (ok) return decide(ok.dataset.ok, 'aprobada');
   const back = e.target.closest('[data-back]'); if (back) return decide(back.dataset.back, 'devuelta');
 });
@@ -2209,7 +2241,7 @@ async function decide(id, decision){
   if (live) {
     if (!server) return;
     ui.busy = true; renderApprovals(true);
-    try { await api('api/aprobacion', { id: a.srcId, decision, comentario }); delete aprUI[id]; poll(); }
+    try { await api('api/aprobacion', { id: a.srcId, decision, comentario }); delete aprUI[id]; await poll(); if (a.clase === 'correo') await loadPrivado(true); }
     catch (err) { ui.err = err.message; }
     ui.busy = false; renderApprovals(true);
     return;
@@ -2220,8 +2252,134 @@ async function decide(id, decision){
   simApprovalReply(a);
 }
 
+/* ───────── Correos y leads ─────────
+   Mark prepara correos con reportar.py --correo-para; el servidor guarda el
+   destinatario y el HTML en puente/privado.json (nunca en estado.json) y la
+   página los pide con la llave de la sesión. Al aprobar, el correo queda como
+   archivo .eml en la carpeta «correos», listo para enviarlo desde tu cuenta. */
+var privado = { leads:[], correos:{}, envio:'borrador' }, leadsResumen = null;
+let privSig = '', privAt = 0, privSeq = 0;
+const mailView = document.getElementById('mailView'), mvFrame = document.getElementById('mvFrame'), mvTitle = document.getElementById('mvTitle');
+const ETAPA_LABEL = { nuevo:'Nuevo', calificado:'Calificado', 'correo-listo':'Correo listo', contactado:'Contactado', respondio:'Respondió', descartado:'Descartado' };
+
+async function loadPrivado(force){
+  if (!live || !server || (!force && Date.now() - privAt < 8000)) return;
+  privAt = Date.now();
+  const seq = ++privSeq;                         // una respuesta vieja no pisa a una nueva
+  try {
+    const j = await api('api/privado', {});
+    if (seq !== privSeq) return;
+    privado = { leads: Array.isArray(j.leads) ? j.leads : [], correos: j.correos && typeof j.correos === 'object' ? j.correos : {}, envio: j.envio || 'borrador' };
+    const sig = JSON.stringify([privado.leads.map(l => [l.id, l.etapa, l.actualizado]), Object.entries(privado.correos).map(([k, v]) => [k, v.listo])]);
+    if (sig !== privSig) { privSig = sig; renderApprovals(true); }
+  } catch {}
+}
+const correoDe = a => live ? privado.correos[a.srcId] : a.correo;
+const leadsList = () => live ? privado.leads : SIM_LEADS;
+
+function mailBlock(a, compact){
+  const c = correoDe(a);
+  if (!c) return `<div class="apr-body open">${esc(a.detalle)}</div>
+    <div class="apr-note">${live && !server ? 'La vista previa y el destinatario solo se ven con el servidor local de tu computadora.' : 'Cargando la vista previa…'}</div>`;
+  return `<div class="mail-meta"><span>Para</span><div>${esc(c.nombre ? `${c.nombre} <${c.para}>` : c.para)}</div><span>Asunto</span><div>${esc(c.asunto)}</div></div>
+ ${compact ? '' : `<div class="mail-wrap"><iframe class="mail-frame" sandbox="" loading="lazy" title="Vista previa: ${esc(c.asunto)}" srcdoc="${esc(c.html)}"></iframe></div>`}
+    <div class="mail-links"><button class="apr-more" data-mail="${a.id}">Ver en tamaño real</button></div>`;
+}
+function mailReady(a){
+  if (!live) return `<div class="apr-note">En el hábitat conectado, el correo aprobado queda en la carpeta «correos», listo para enviarlo desde su cuenta.</div>`;
+  const c = correoDe(a);
+  if (privado.envio === 'bot') return `<div class="apr-note">${esc(robots[a.de]?.a.name || 'El bot')} lo enviará tal como lo aprobó.</div>`;
+  if (!c?.listo || !server) return `<div class="apr-note">El correo quedó en la carpeta «correos» del hábitat.</div>`;
+  return `<div class="apr-actions"><button class="apr-ok" data-openmail="${a.id}">Abrir en Mail para enviar</button></div>
+    <div class="apr-note">Se abre en su programa de correo. En Apple Mail: menú Mensaje › Volver a enviar. En Outlook se abre listo para enviar.</div>`;
+}
+function openMail(id){
+  const a = approvals.find(x => x.id === id), c = a && correoDe(a);
+  if (!c) return;
+  mvTitle.textContent = c.asunto; mvFrame.srcdoc = c.html;
+  mailView.hidden = false; document.getElementById('mvClose').focus();
+}
+function closeMail(){ mailView.hidden = true; mvFrame.srcdoc = ''; }
+document.getElementById('mvClose').addEventListener('click', closeMail);
+mailView.addEventListener('click', e => { if (e.target === mailView) closeMail(); });
+addEventListener('keydown', e => { if (e.key === 'Escape' && !mailView.hidden) { e.stopPropagation(); closeMail(); } }, true);
+async function openInMail(id){
+  const a = approvals.find(x => x.id === id); if (!a || !server) return;
+  const ui = (aprUI[id] ||= {});
+  try { await api('api/correo/abrir', { id: a.srcId }); ui.err = ''; }
+  catch (err) { ui.err = err.message; }
+  renderApprovals(true);
+}
+
+function leadsHTML(){
+  const L = leadsList();
+  if (live && !server) return `<div class="apr-empty">Los leads se guardan solo en su computadora. Ábralos con el servidor local.${leadsResumen ? `<br>Registrados: ${leadsResumen.total || 0}` : ''}</div>`;
+  if (!L.length) return `<div class="apr-empty">Todavía no hay leads. Mark los registra con reportar.py --lead.</div>`;
+  const activos = L.filter(l => l.etapa !== 'descartado');
+  const sum = `<div class="lead-sum"><span><b>${activos.length}</b> activos</span><span><b>${activos.filter(l => (l.puntaje || 0) >= 4).length}</b> con puntaje alto</span><span><b>${L.filter(l => l.etapa === 'correo-listo').length}</b> con correo listo</span></div>`;
+  const orden = [...L].sort((x, y) => (y.puntaje || 0) - (x.puntaje || 0) || String(y.actualizado || '').localeCompare(String(x.actualizado || '')));
+  return sum + (live ? '' : '<div class="note">Modo simulación: leads de ejemplo, no son personas reales.</div>') + orden.map(l => `
+    <article class="lead-item">
+      <div class="lead-top"><span class="lead-name">${esc(l.nombre || 'Sin nombre')}</span><span class="chip">${esc(ETAPA_LABEL[l.etapa] || 'Nuevo')}</span></div>
+      <div class="lead-mail">${esc(l.correo || 'sin correo')}${l.pais ? ' · ' + esc(l.pais) : ''}</div>
+      ${l.interes ? `<div class="lead-line">${esc(l.interes)}</div>` : ''}
+      <div class="lead-top"><span class="lead-mail">${esc(l.origen || '')}</span>${l.puntaje ? `<span class="lead-dots" aria-label="Puntaje ${l.puntaje} de 5">${'●'.repeat(l.puntaje)}${'○'.repeat(5 - l.puntaje)}</span>` : ''}</div>
+      ${l.nota ? `<div class="lead-line">${esc(l.nota)}</div>` : ''}
+    </article>`).join('');
+}
+
+/* el mismo diseño que arma puente/correos.py (para la simulación) */
+function mailHTML(asunto, texto){
+  const M = { marfil:'#F6F1E7', arena:'#E9DFCC', pet:'#0E3B43', graf:'#2B2B2B', champ:'#B9A27A', gris:'#6E6A63' };
+  const serif = "'Cormorant Garamond', Georgia, 'Times New Roman', serif", sans = "'Helvetica Neue', Helvetica, Arial, sans-serif";
+  const inl = t => esc(t).replace(/\*\*(.+?)\*\*/g, `<strong style="color:${M.graf};font-weight:600">$1</strong>`);
+  const out = []; let par = [], lis = [];
+  const flushP = () => { if (par.length) out.push(`<p style="margin:0 0 16px;font-family:${sans};font-size:15px;line-height:1.7;color:${M.graf}">${inl(par.join(' '))}</p>`); par = []; };
+  const flushL = () => { if (lis.length) out.push(`<table role="presentation" style="margin:0 0 16px">${lis.map(x => `<tr><td valign="top" style="width:18px;padding:0 0 8px;color:${M.champ}">—</td><td style="padding:0 0 8px;font-family:${sans};font-size:15px;line-height:1.65;color:${M.graf}">${inl(x)}</td></tr>`).join('')}</table>`); lis = []; };
+  for (const raw of texto.split('\n')) {
+    const l = raw.trim(), b = l.match(/^\[([^\]]{1,60})\]\((https:\/\/[^\s)]+)\)$/);
+    if (!l) { flushP(); flushL(); }
+    else if (/^#{1,2} /.test(l)) { flushP(); flushL(); out.push(`<h2 style="margin:28px 0 10px;font-family:${serif};font-size:23px;font-weight:500;color:${M.pet}">${inl(l.replace(/^#+\s*/, ''))}</h2>`); }
+    else if (/^[-•*] /.test(l)) { flushP(); lis.push(l.slice(2)); }
+    else if (b) { flushP(); flushL(); out.push(`<table role="presentation" style="margin:26px 0 22px"><tr><td style="background:${M.pet};border-radius:2px"><a href="${esc(b[2])}" style="display:inline-block;padding:14px 30px;font-family:${sans};font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:${M.marfil};text-decoration:none">${esc(b[1])}</a></td></tr></table>`); }
+    else { flushL(); par.push(l); }
+  }
+  flushP(); flushL();
+  return `<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;background:${M.arena}"><table role="presentation" width="100%" style="background:${M.arena}"><tr><td align="center" style="padding:32px 12px">
+<table role="presentation" width="600" style="width:100%;max-width:600px;background:${M.marfil}">
+<tr><td style="background:${M.pet};padding:34px 24px 30px;text-align:center"><div style="font-family:${serif};font-size:30px;letter-spacing:.32em;color:${M.marfil}">MADREPERLA</div><div style="margin-top:8px;font-family:${sans};font-size:10px;letter-spacing:.5em;color:${M.champ}">REALTORS</div></td></tr>
+<tr><td style="height:3px;background:${M.champ};font-size:0">&nbsp;</td></tr>
+<tr><td style="padding:40px 32px 12px"><h1 style="margin:0 0 26px;font-family:${serif};font-size:28px;line-height:1.22;font-weight:500;color:${M.pet}">${esc(asunto)}</h1>${out.join('')}</td></tr>
+<tr><td style="padding:8px 32px 40px"><div style="border-left:2px solid ${M.champ};padding:2px 0 2px 16px"><div style="font-family:${serif};font-size:20px;color:${M.pet}">María Andrea López</div><div style="margin-top:4px;font-family:${sans};font-size:12px;color:${M.gris}">Fundadora · Madreperla Realtors</div></div></td></tr>
+<tr><td style="background:${M.pet};padding:22px 32px;text-align:center;font-family:${sans};font-size:11px;line-height:1.7;color:#C9D3D1">madreperlarealtors.com · Punta Cana, República Dominicana<br><span style="color:#9FB1AE">Si prefiere no recibir más comunicaciones nuestras, responda a este correo y lo retiraremos de la lista.</span></td></tr>
+</table></td></tr></table></body></html>`;
+}
+const SIM_LEADS = [
+  { id:'sl1', nombre:'Inversionista de ejemplo A', correo:'ejemplo.a@correo.test', pais:'Colombia', interes:'Villa en Cap Cana para segunda residencia', origen:'Formulario del sitio', etapa:'correo-listo', puntaje:5 },
+  { id:'sl2', nombre:'Inversionista de ejemplo B', correo:'ejemplo.b@correo.test', pais:'Estados Unidos', interes:'Apartamento en Cabeza de Toro para alquiler turístico', origen:'Evento: torneo de golf', etapa:'calificado', puntaje:4 },
+  { id:'sl3', nombre:'Familia de ejemplo C', correo:'ejemplo.c@correo.test', pais:'España', interes:'Retiro en Las Terrenas', origen:'Referido', etapa:'nuevo', puntaje:3, nota:'Prefiere conversar por videollamada.' },
+];
+const SIM_MAIL = `Estimado inversionista:
+
+Gracias por su interés en Madreperla Realtors. A partir de lo que nos compartió, hemos preparado una selección curada de villas en Cap Cana que responden a su búsqueda de privacidad, cercanía al mar y una inversión con horizonte de largo plazo.
+
+## Por qué Cap Cana
+- Playa Juanillo y la marina internacional, a pocos minutos.
+- El campo de golf **Punta Espada** y un entorno residencial privado.
+- Proyectos que pueden acogerse a los beneficios de la Ley CONFOTUR.
+
+Antes de recomendarle una propiedad, nos gustaría entender su perfil, su objetivo y su horizonte. Así cada opción será coherente con su patrimonio.
+
+[Agendar una conversación](https://madreperlarealtors.com/en/contacto/)
+
+Quedo atenta a sus comentarios.`;
+
 /* solicitudes de ejemplo (modo simulación) */
 const SIM_APPROVALS = [
+  { de:'mark', clase:'correo', titulo:'Correo: Una selección de villas en Cap Cana',
+    detalle:'Correo con la identidad de Madreperla, listo para revisar.',
+    correo:{ para:'ejemplo.a@correo.test', nombre:'Inversionista de ejemplo A', asunto:'Una selección de villas en Cap Cana' } },
   { de:'bety', clase:'borrador', titulo:'Carrusel de LinkedIn: vivir en Cap Cana',
     detalle:'Diapositiva 1: Cap Cana, donde el Caribe se vive con calma.\nDiapositiva 2: Playa Juanillo, la marina internacional y el campo de golf Punta Espada.\nDiapositiva 3: Una decisión patrimonial se toma con información, no con prisa.\nCierre: ¿Le gustaría conocer las opciones disponibles? Escríbanos y conversamos.' },
   { de:'viktor', clase:'propuesta', titulo:'Propuesta de visita a villas en Cap Cana',
@@ -2238,7 +2396,8 @@ const SIM_APPROVALS = [
 let simAprIdx = 0, simAprTimer = null;
 function simAddApproval(src){
   const s = src || SIM_APPROVALS[simAprIdx++ % SIM_APPROVALS.length];
-  approvals.push({ id:'s' + (++msgSeq), de:s.de, titulo:s.titulo, detalle:s.detalle, clase:s.clase, estado:'pendiente', comentario:'', t:Date.now(), td:null });
+  const correo = s.correo ? { ...s.correo, html: s.correo.html || mailHTML(s.correo.asunto, SIM_MAIL) } : undefined;
+  approvals.push({ id:'s' + (++msgSeq), de:s.de, titulo:s.titulo, detalle:s.detalle, clase:s.clase, estado:'pendiente', comentario:'', t:Date.now(), td:null, correo });
   renderApprovals(true);
 }
 function startSimApprovals(){
@@ -2259,7 +2418,7 @@ async function simApprovalReply(a){
     applyState({ id:a.de, estado:'trabajando', tarea:`Ajustando: ${a.titulo}` });
     setTimeout(() => {
       if (live) return;
-      simAddApproval({ de:a.de, clase:a.clase, titulo:`${a.titulo} (versión 2)`,
+      simAddApproval({ de:a.de, clase:a.clase, titulo:`${a.titulo} (versión 2)`, correo:a.correo,
         detalle:`${a.detalle}\n\nAjustado según tu comentario: «${a.comentario}».` });
     }, 30000);
   }

@@ -4,3 +4,7 @@ habitat/estado.json.tmp
 habitat/puente/bots.json
 habitat/estado.json
 habitat/puente/__pycache__/
+# leads, correos de clientes y correos aprobados: solo en esta computadora
+habitat/puente/privado.json
+habitat/puente/privado.json.tmp
+habitat/correos/

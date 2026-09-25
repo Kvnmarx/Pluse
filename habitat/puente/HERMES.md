@@ -189,6 +189,58 @@ python3 RUTA/puente/reportar.py --bot @sylvia --tarea-para @contenido-madreperla
 
 Cuando Sylvia reparte las tareas de un evento, el hábitat le recuerda a cada bot que use `--evento` en sus aprobaciones y presentaciones.
 
+## Leads y correos (Mark)
+
+Mark lee la página de Madreperla y la hoja **Inventario de proyectos**, registra los leads y prepara correos con la identidad de Madreperla. **Ningún correo sale sin que lo apruebes.**
+
+### 1. Conectar la hoja de inventario
+
+1. Abre la hoja *Inventario de proyectos* en Google Sheets.
+2. Toca **Compartir** › *Acceso general* › **Cualquier persona con el enlace** › *Lector*. Copia el enlace.
+   (Otra opción: *Archivo › Compartir › Publicar en la web* › la pestaña del inventario › *Valores separados por comas (.csv)*.)
+3. Pega el enlace en `puente/bots.json`, en `"inventario": "…"`. Cierra y vuelve a abrir el hábitat.
+
+Quien tenga el enlace podrá ver la hoja. Si el inventario tiene datos internos (comisiones, notas privadas), deja esas columnas en otra pestaña y comparte solo la del inventario público.
+
+En `"correo"` de `bots.json` puedes ajustar la firma, el teléfono y el remitente de los correos.
+
+### 2. Instrucción para Mark
+
+Copia esto en las instrucciones de Mark (cambia `RUTA` por la carpeta del hábitat):
+
+```
+Leads y correos de Madreperla:
+- Para conocer la oferta, lee la página y el inventario (el inventario es la fuente más actualizada):
+  python3 RUTA/puente/reportar.py --bot @mark --sitio
+  python3 RUTA/puente/reportar.py --bot @mark --inventario
+- Registra solo personas que mostraron interés en Madreperla: escribieron por el sitio, WhatsApp o redes,
+  dejaron sus datos en un evento o llegaron referidas. No compres listas ni tomes correos de desconocidos
+  de internet. No guardes cédulas, pasaportes, cuentas bancarias ni datos financieros.
+  python3 RUTA/puente/reportar.py --bot @mark --lead "Nombre" --email correo@dominio.com --pais "País" --interes "Qué busca" --origen "Cómo llegó" --puntaje 1-5
+- Para ver los leads: python3 RUTA/puente/reportar.py --bot @mark --leads
+- Para cada lead calificado, redacta un correo en español formal (de "usted"), elegante y sereno, sin
+  exclamaciones, sin urgencia y sin promesas de rentabilidad. Usa solo proyectos y datos del inventario
+  o de la página. Precios, condiciones y plazos: "por confirmar con nuestro equipo".
+  Guarda el texto en un archivo y envíalo a aprobación:
+  python3 RUTA/puente/reportar.py --bot @mark --correo-para "Nombre <correo@dominio.com>" --asunto "Asunto" --archivo correo.txt
+  Formato del texto: línea en blanco = párrafo nuevo · "## " = subtítulo · "- " = lista ·
+  **negrita** · una línea "[Agendar una conversación](https://madreperlarealtors.com/en/contacto/)" = botón.
+  No escribas la firma: el hábitat la agrega.
+- Nunca envíes un correo tú. Espera la aprobación de María Andrea en el hábitat.
+  Si lo devuelve, ajústalo según su comentario y vuelve a enviarlo a aprobación.
+```
+
+### 3. Qué ves en el hábitat
+
+- En **Aprobaciones** aparece el correo con el destinatario, el asunto y la vista previa tal como lo verá el cliente. *Ver en tamaño real* lo abre en grande.
+- Si lo **devuelves**, tu comentario le llega a Mark y te trae una versión nueva.
+- Si lo **apruebas**, el correo queda como archivo en la carpeta `correos` del hábitat. Toca **Abrir en Mail para enviar**:
+  - En **Outlook** se abre listo para enviar.
+  - En **Apple Mail** se abre el mensaje; ve al menú *Mensaje › Volver a enviar*, revisa y envía.
+- En la pestaña **Leads** ves cada lead con su país, su interés, su origen, su puntaje y su etapa.
+
+Si más adelante prefieres que Mark envíe los correos aprobados por su cuenta, cambia `"envio": "borrador"` por `"envio": "bot"` en `bots.json`. Mark tiene que tener acceso al correo en Hermes, y solo puede enviar la versión exacta que aprobaste.
+
 ## Qué pasa con cada acción
 
 | Tú haces en el hábitat | Qué pasa |
@@ -196,6 +248,7 @@ Cuando Sylvia reparte las tareas de un evento, el hábitat le recuerda a cada bo
 | Escribes en privado a un bot | Le llega a ese bot y su respuesta aparece en el chat |
 | Escribes en **# Equipo** | Le llega a Sylvia, o al bot que menciones con @ |
 | Apruebas o devuelves una solicitud | El bot recibe tu decisión y tu comentario, y te confirma qué hará |
+| Apruebas un correo | Queda listo en la carpeta `correos` para que lo envíes desde tu cuenta, y Mark recibe la confirmación |
 | Convocas una reunión | Todos van al Meeting Room por 10 minutos y Sylvia abre la reunión |
 | Le pides a un bot que presente | Prepara su presentación y la muestra con `--presentar`: camina al atril y aparece en la pantalla grande |
 | Anotas un evento en tu calendario de Madreperla | Aparece en la Sala de Eventos en unos 10 minutos |
@@ -213,6 +266,7 @@ Además:
 
 - El hábitat solo se abre desde tu computadora (`127.0.0.1`). Otras páginas web no pueden enviarle mensajes a tus bots.
 - Las claves y la dirección secreta de tu calendario quedan en `puente/bots.json`. Ese archivo no se sube a GitHub y la página no lo muestra.
+- Los leads y los correos completos (destinatario, texto) quedan en `puente/privado.json` y los correos aprobados en la carpeta `correos`. Ninguno de los dos se sube a GitHub ni se ve fuera de tu computadora. En `estado.json` solo queda el asunto del correo.
 - `estado.json` tiene las conversaciones del día y los eventos. No se sube a GitHub, salvo que un bot use `reportar.py --subir` (solo hace falta si publicas el hábitat con GitHub Pages). En ese caso también se suben el título, el lugar y la descripción de los eventos, así que no anotes datos sensibles de clientes en ellos.
 - Cualquiera puede enviarte una invitación y hacer que aparezca en tu calendario principal. Por eso lo más seguro es el **calendario aparte**, donde solo tú agregas eventos. La etiqueta ayuda, pero alguien podría enviarte una invitación con `#madreperla` en el título. En todos los casos, a Sylvia le llegan solo el título, la fecha y el lugar (nunca la descripción del calendario), marcados como información y no como órdenes, y nada sale hacia clientes sin tu aprobación.
 
@@ -233,4 +287,7 @@ Además:
 | "No le pedí a Sylvia que preparara «…» para no saturar al equipo" | Ya preparó 6 eventos en la última hora. Pídeselo más tarde con *Preparar ahora* |
 | "Este evento viene de tu calendario…" | Bórralo en Google Calendar. Sale de la sala en unos minutos |
 | "No conozco la zona horaria…" | Usa un nombre como `America/Bogota`, `America/Santo_Domingo` o `America/New_York` |
+| "No pude leerlo: falta \"inventario\"…" | Pega el enlace de la hoja en `"inventario"` de `puente/bots.json` |
+| "Google devolvió una página, no la hoja" | La hoja no está compartida con *Cualquier persona con el enlace*. Revisa el paso 1 de *Leads y correos* |
+| El correo aprobado no se abre con *Abrir en Mail* | Ábrelo a mano: está en la carpeta `correos` del hábitat (doble clic) |
 | Una tarea de un evento quedó en el chat, pero el bot no respondió | Se llegó al límite de 6 reenvíos en 10 minutos (la terminal dice "Límite de reenvíos alcanzado"). Pasa si se preparan varios eventos a la vez. Vuelve a pedírsela en unos minutos |

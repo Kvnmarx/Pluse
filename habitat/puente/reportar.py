@@ -31,9 +31,24 @@ Sala de Eventos:
 Por defecto todo queda en esta computadora. Con --subir, además se sube a
 GitHub (solo hace falta si publicas el hábitat con GitHub Pages).
 
+Leads y correos (Mark):
+  python3 reportar.py --bot @mark --inventario        muestra la hoja «Inventario de proyectos»
+  python3 reportar.py --bot @mark --sitio             muestra el texto de madreperlarealtors.com
+  python3 reportar.py --bot @mark --leads             muestra los leads registrados
+  python3 reportar.py --bot @mark --lead "Ana Pérez" --email ana@correo.com --pais Colombia --interes "Villa en Cap Cana" --origen "Formulario del sitio" --puntaje 4
+  python3 reportar.py --bot @mark --correo-para "Ana Pérez <ana@correo.com>" --asunto "Villas frente al mar en Cap Cana" --archivo correo.txt
+
+  El texto del correo es simple: línea en blanco = párrafo nuevo, '## ' = subtítulo,
+  '- ' = lista, '**texto**' = negrita, y una línea '[Agendar una conversación](https://…)'
+  se convierte en botón. El hábitat le da la identidad de Madreperla y te lo deja en
+  Aprobaciones con la vista previa. Nadie lo envía hasta que lo apruebes.
+  Los leads y los correos se guardan en puente/privado.json: nunca se suben a GitHub.
+
 No escribas datos sensibles de clientes (cédulas, cuentas, montos, teléfonos).
 """
 import argparse, datetime as dt, json, os, re, subprocess, sys, time
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import correos as C   # noqa: E402
 try:
     from zoneinfo import ZoneInfo
 except ImportError:                        # Python sin zoneinfo: se usan desfases fijos
@@ -44,7 +59,7 @@ ESTADO = os.path.join(os.path.dirname(AQUI), 'estado.json')
 BLOQUEO = ESTADO + '.lock'
 ESTADOS = ['trabajando', 'pensando', 'reunion', 'inactivo', 'error']
 SALAS = ['code', 'design', 'analitica', 'libreria', 'archivo', 'ventas', 'meeting', 'eventos']
-CLASES = ['borrador', 'propuesta', 'consulta']
+CLASES = ['borrador', 'propuesta', 'consulta', 'correo']
 MAX_MENSAJES = 200
 MAX_APROBACIONES = 60
 MAX_PRESENTACIONES = 30
@@ -176,14 +191,19 @@ def agregar_mensaje(data, de, texto, para='todos', tipo='mensaje', t=None, **ext
     return m
 
 
-def agregar_aprobacion(data, de, titulo, detalle='', clase='borrador', t=None, evento=None):
+def agregar_aprobacion(data, de, titulo, detalle='', clase='borrador', t=None, evento=None, **extra):
     t = t or ahora()
     a = {'id': nuevo_id(t, de), 'de': de, 'titulo': titulo, 'detalle': detalle, 'clase': clase,
-         'estado': 'pendiente', 'hora': t.isoformat()}
+         'estado': 'pendiente', 'hora': t.isoformat(), **extra}
     if evento:
         a['evento'] = evento
     data.setdefault('aprobaciones', []).append(a)
     return a
+
+
+def correo_resumen(correo):
+    """Lo que queda en estado.json de un correo: sin destinatario ni texto completo."""
+    return 'Correo con la identidad de Madreperla, listo para revisar. La vista previa se abre desde el servidor local.'
 
 
 def leer_presentacion(formato, texto):
@@ -533,6 +553,20 @@ def main():
     ap.add_argument('--lugar', help='Lugar del evento (opcional)')
     ap.add_argument('--descripcion', default='', help='Descripción del evento (opcional)')
     ap.add_argument('--evento', help='Id del evento al que pertenecen la tarea, la aprobación o la presentación')
+    ap.add_argument('--inventario', action='store_true', help='Muestra la hoja «Inventario de proyectos»')
+    ap.add_argument('--sitio', action='store_true', help='Muestra el texto de la página web de Madreperla')
+    ap.add_argument('--leads', action='store_true', help='Muestra los leads registrados')
+    ap.add_argument('--lead', help='Registra o actualiza un lead: nombre')
+    ap.add_argument('--email', help='Correo del lead')
+    ap.add_argument('--pais', help='País o ciudad del lead')
+    ap.add_argument('--interes', help='Qué le interesa (zona, tipo de propiedad, proyecto)')
+    ap.add_argument('--origen', help='Cómo llegó: formulario, evento, referido, redes…')
+    ap.add_argument('--presupuesto', help='Rango aproximado, si lo dijo (sin datos financieros)')
+    ap.add_argument('--etapa', choices=C.ETAPAS, help='Etapa del lead')
+    ap.add_argument('--puntaje', type=int, choices=range(1, 6), help='Qué tan buen prospecto es, de 1 a 5')
+    ap.add_argument('--nota', help='Nota corta sobre el lead')
+    ap.add_argument('--correo-para', help='Prepara un correo para aprobar: "Nombre <correo@dominio.com>"')
+    ap.add_argument('--asunto', help='Asunto del correo')
     ap.add_argument('--subir', action='store_true', help='Además, sube estado.json a GitHub')
     ap.add_argument('--sin-subir', action='store_true', help=argparse.SUPPRESS)   # compatibilidad
     a = ap.parse_args()
@@ -540,6 +574,40 @@ def main():
     bot = handle(a.bot)
     t = ahora()
     contenido = None
+    if a.inventario or a.sitio or a.leads:          # solo lectura: no toca estado.json
+        try:
+            if a.inventario:
+                print(C.leer_inventario())
+            if a.sitio:
+                print(C.leer_sitio())
+            if a.leads:
+                print(C.texto_leads(C.leer_privado()))
+        except Exception as e:
+            sys.exit(f'No pude leerlo: {e}')
+        if not (a.lead or a.correo_para or a.estado or a.tarea or a.mensaje or a.aprobacion or a.presentar):
+            return
+    correo = None
+    if a.correo_para:
+        try:
+            nombre_dest, email_dest = C.destinatario(a.correo_para)
+            if not (a.asunto or '').strip():
+                raise ValueError('falta --asunto.')
+            cuerpo = open(a.archivo, encoding='utf-8').read() if a.archivo else (a.contenido or a.detalle or '')
+            if not cuerpo.strip():
+                raise ValueError('falta el texto del correo (--archivo, --contenido o --detalle).')
+        except (OSError, ValueError) as e:
+            sys.exit(f'No pude preparar el correo: {e}')
+        cc = C.conf_correo()
+        asunto = a.asunto.strip()[:160]
+        resumen = C.resumen_de(cuerpo)
+        correo = {'para': email_dest, 'nombre': nombre_dest, 'asunto': asunto, 'texto': cuerpo[:20000],
+                  'texto_plano': C.texto_plano(cuerpo, cc), 'html': C.armar_html(asunto, cuerpo, cc, resumen),
+                  'hora': t.isoformat(), 'de': bot}
+    if a.lead and a.email:
+        try:
+            C.destinatario(a.email)
+        except ValueError as e:
+            sys.exit(f'No pude registrar el lead: {e}')
     if a.presentar:
         try:
             crudo = open(a.archivo, encoding='utf-8').read() if a.archivo else (a.contenido or '')
@@ -616,7 +684,27 @@ def main():
                 for x in data.get('presentaciones', []):
                     x['activa'] = False
 
-            if a.aprobacion:
+            if a.lead or correo:
+                priv = C.leer_privado()
+                if a.lead:
+                    lead, lead_nuevo = C.guardar_lead(priv, t, bot, a.lead, a.email, pais=a.pais, interes=a.interes,
+                                                      origen=a.origen, presupuesto=a.presupuesto, nota=a.nota,
+                                                      etapa=a.etapa, puntaje=a.puntaje)
+                    ag.setdefault('historial', []).insert(0, {'hora': t.strftime('%H:%M'),
+                                                              'texto': ('Registró un lead' if lead_nuevo else 'Actualizó un lead')
+                                                              + (f' ({lead["puntaje"]}/5)' if lead.get('puntaje') else '')})
+                if correo:
+                    lead_c = C.buscar_lead(priv, correo['para'])
+                    if lead_c:
+                        correo['lead'] = lead_c['id']
+                    ap_c = agregar_aprobacion(data, bot, a.aprobacion or f'Correo: {correo["asunto"]}',
+                                              correo_resumen(correo), 'correo', t, evento_id,
+                                              correo={'asunto': correo['asunto']})
+                    priv['correos'][ap_c['id']] = correo
+                    ag.setdefault('historial', []).insert(0, {'hora': t.strftime('%H:%M'), 'texto': 'Preparó un correo: ' + correo['asunto']})
+                data['leads_resumen'] = C.resumen_leads(priv)
+                C.guardar_privado(priv)
+            elif a.aprobacion:
                 agregar_aprobacion(data, bot, a.aprobacion, a.detalle, a.clase, t, evento_id)
                 ag.setdefault('historial', []).insert(0, {'hora': t.strftime('%H:%M'), 'texto': 'Pidió aprobación: ' + a.aprobacion})
 
@@ -629,6 +717,9 @@ def main():
     if a.subir:
         subir(bot)
     print(f'Listo: {bot} reportado.')
+    if correo:
+        print(f'Correo para aprobar: «{correo["asunto"]}». María Andrea lo verá en Aprobaciones con la vista previa. '
+              'No lo envíes: espera su aprobación.')
     if evento_nuevo:
         estado = 'Evento creado' if evento_creado else 'Ese evento ya existía'
         print(f'{estado}: {evento_nuevo["id"]} · «{evento_nuevo["titulo"]}» ({fecha_legible(evento_nuevo, t)}).')

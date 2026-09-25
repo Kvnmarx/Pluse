@@ -6,6 +6,17 @@
   "espera_segundos": 600,
   "calendario": { "ics": [], "dias": 30, "cada_minutos": 10, "etiqueta": null },
   "eventos_automaticos": ["7d", "2d", "1d", "despues"],
+  "inventario": "PEGA-AQUI-EL-ENLACE-DE-LA-HOJA-INVENTARIO-DE-PROYECTOS",
+  "sitio": ["https://madreperlarealtors.com/", "https://madreperlarealtors.com/en/"],
+  "correo": {
+    "remitente": "María Andrea López <administracion@madreperlarealtors.com>",
+    "firma_nombre": "María Andrea López",
+    "firma_cargo": "Fundadora · Madreperla Realtors",
+    "telefono": "",
+    "sitio": "https://madreperlarealtors.com",
+    "ciudad": "Punta Cana, República Dominicana",
+    "envio": "borrador"
+  },
   "bots": {
     "@sylvia":                              { "perfil": "sylvia",                              "clave": "PEGA-AQUI-LA-CLAVE-DE-SYLVIA" },
     "@viktor":                              { "perfil": "viktor",                              "clave": "PEGA-AQUI-LA-CLAVE-DE-VIKTOR" },

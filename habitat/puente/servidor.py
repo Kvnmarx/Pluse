@@ -25,6 +25,8 @@ from urllib.parse import urlparse, unquote
 AQUI = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, AQUI)
 import reportar as R   # noqa: E402  (mismo archivo de estado, mismo bloqueo)
+import correos as C    # noqa: E402  (leads y correos: puente/privado.json)
+import subprocess      # noqa: E402
 
 RAIZ = os.path.dirname(AQUI)
 CONFIG = os.path.join(AQUI, 'bots.json')
@@ -120,6 +122,8 @@ def instrucciones(bot, canal):
         'Nunca envíes ni publiques nada hacia clientes sin una aprobación explícita de María Andrea, '
         'y no decidas temas legales, contractuales ni precios finales. '
         'Si trabajas en algo de un evento de la Sala de Eventos, agrega --evento ID en reportar.py. '
+        'Los correos a clientes se preparan con reportar.py --correo-para y --asunto (quedan en Aprobaciones con '
+        'la identidad de Madreperla); nunca los envíes por otra vía. '
         f'Equipo: {equipo}.'
     )
 
@@ -241,10 +245,26 @@ def recibir_aprobacion(cuerpo):
     if decision == 'devuelta' and not comentario:
         return 400, {'error': 'Para devolver, escribe qué hay que ajustar.'}
 
+    cc = C.conf_correo(cfg)
+
     def decidir(data, t):
         item = next((a for a in data.get('aprobaciones', []) if a.get('id') == aid), None)
         if not item or item.get('estado') != 'pendiente':
             return None
+        if item.get('clase') == 'correo':
+            priv = C.leer_privado()
+            correo = priv['correos'].get(aid)
+            if not correo:
+                raise RuntimeError('No encontré el correo completo en puente/privado.json.')
+            correo['estado'] = decision
+            if decision == 'aprobada':
+                correo['archivo'] = C.guardar_eml(aid, correo, t, cc)
+                item['listo'] = True
+                lead = C.buscar_lead(priv, correo.get('lead') or correo['para'])
+                if lead and lead.get('etapa') in (None, 'nuevo', 'calificado'):
+                    lead['etapa'] = 'correo-listo'
+                data['leads_resumen'] = C.resumen_leads(priv)
+            C.guardar_privado(priv)
         item.update({'estado': decision, 'comentario': comentario, 'decidido': t.isoformat()})
         return dict(item)
     item = con_estado(decidir)
@@ -257,9 +277,53 @@ def recibir_aprobacion(cuerpo):
         texto = f'María Andrea devolvió «{item["titulo"]}» para ajustes.'
     if comentario:
         texto += f' Comentario: {comentario}'
+    if item.get('clase') == 'correo' and decision == 'aprobada':
+        if cc['envio'] == 'bot':
+            texto += (' Puedes enviarlo tal cual quedó aprobado (mismo destinatario, asunto y texto), sin cambios, '
+                      'y luego marca el lead como contactado con reportar.py --lead … --etapa contactado.')
+        else:
+            texto += (' El correo quedó listo en la carpeta «correos» del hábitat para que María Andrea lo envíe desde '
+                      'su cuenta. No lo envíes tú.')
+    elif item.get('clase') == 'correo':
+        texto += ' Ajusta el correo y vuelve a enviarlo a aprobación con reportar.py --correo-para.'
     texto += ' Continúa según corresponda y confírmale brevemente qué harás.'
     en_hilo(preguntar, bot, texto, bot, 'tu')
     return 200, {'ok': True}
+
+
+def recibir_privado(cuerpo):
+    """Leads y correos para la página (solo en esta computadora, con la llave de la sesión)."""
+    priv = C.leer_privado()
+    with R.Bloqueo():
+        ids = {a.get('id'): a.get('estado') for a in R.leer().get('aprobaciones', [])}
+    correos = {k: {'para': v.get('para'), 'nombre': v.get('nombre', ''), 'asunto': v.get('asunto'),
+                   'html': v.get('html', ''), 'listo': bool(v.get('archivo') and os.path.exists(v['archivo']))}
+               for k, v in priv['correos'].items() if k in ids}
+    return 200, {'leads': priv['leads'][-200:], 'correos': correos, 'envio': C.conf_correo(cfg)['envio']}
+
+
+def abrir_archivo(ruta):
+    if sys.platform == 'darwin':
+        subprocess.Popen(['open', ruta])
+    elif os.name == 'nt':
+        os.startfile(ruta)                  # noqa: S606 (archivo propio en la carpeta correos)
+    else:
+        subprocess.Popen(['xdg-open', ruta])
+
+
+def recibir_abrir_correo(cuerpo):
+    aid = str(cuerpo.get('id', ''))
+    correo = C.leer_privado()['correos'].get(aid)
+    ruta = (correo or {}).get('archivo')
+    if not ruta or not os.path.exists(ruta):
+        return 404, {'error': 'Ese correo todavía no está aprobado o ya no está en la carpeta «correos».'}
+    if os.path.dirname(os.path.abspath(ruta)) != os.path.abspath(C.CARPETA_CORREOS):
+        return 403, {'error': 'Archivo fuera de la carpeta de correos.'}
+    try:
+        abrir_archivo(ruta)
+    except OSError as e:
+        return 500, {'error': f'No pude abrirlo: {e}'}
+    return 200, {'ok': True, 'archivo': os.path.basename(ruta)}
 
 
 def recibir_reunion(cuerpo):
@@ -847,7 +911,8 @@ class Manejador(SimpleHTTPRequestHandler):
             return self._json(400, {'error': 'Formato no válido.'})
         rutas = {'/api/mensaje': recibir_mensaje, '/api/aprobacion': recibir_aprobacion, '/api/reunion': recibir_reunion,
                  '/api/evento': recibir_evento, '/api/evento/preparar': recibir_preparar,
-                 '/api/evento/borrar': recibir_borrar_evento}
+                 '/api/evento/borrar': recibir_borrar_evento, '/api/privado': recibir_privado,
+                 '/api/correo/abrir': recibir_abrir_correo}
         fn = rutas.get(urlparse(self.path).path)
         if not fn:
             return self._json(404, {'error': 'No encontrado.'})
