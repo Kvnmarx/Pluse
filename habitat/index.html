@@ -166,6 +166,10 @@
   .lead-line{font-size:12.5px;line-height:1.45;opacity:.88}
   .lead-dots{font:12px var(--mono);letter-spacing:2px;color:var(--champagne)}
   .lead-sum{display:flex;gap:14px;flex-wrap:wrap;font:11.5px var(--mono);color:var(--muted)} .lead-sum b{color:var(--ivory);font-weight:500}
+  .lead-search{display:grid;gap:6px;border:1px dashed var(--line);border-radius:12px;padding:10px 12px}
+  .lead-search p{margin:0;font-size:12.5px;line-height:1.45;color:var(--muted)}
+  .lead-tipo{font:10.5px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--champagne)}
+  .lead-src{font:11.5px/1.4 var(--mono);color:var(--champagne);text-decoration:none;overflow-wrap:anywhere} .lead-src:hover{text-decoration:underline}
   .st-pendiente{color:var(--champagne)} .st-aprobada{color:var(--ok)} .st-devuelta{color:var(--warn)}
   .tag .name .flag{display:none}
   .tag.wait .name .flag{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--champagne);box-shadow:0 0 8px var(--champagne)}
@@ -515,9 +519,37 @@ const SIM_TASKS = {
 
 const canvas = document.getElementById('scene');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias:true });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+/* Calidad adaptable: si la computadora no alcanza unos 42 cuadros por segundo,
+   baja la resolución por pasos (y al final el brillo) para que todo se mueva fluido. */
+const DPR = window.devicePixelRatio || 1;
+const NIVELES = [ { pr: Math.min(DPR, 2), sombra: 2 }, { pr: Math.min(DPR, 1.5), sombra: 2 }, { pr: Math.min(DPR, 1.25), sombra: 3 },
+                  { pr: Math.min(DPR, 1), sombra: 3, sinBrillo: true }, { pr: Math.min(DPR, 1) * .8, sombra: 4, sinBrillo: true } ]
+  .filter((n, i, L) => i === 0 || n.pr !== L[i-1].pr || !!n.sinBrillo !== !!L[i-1].sinBrillo);   // sin pasos repetidos
+let nivel = DPR > 1.5 ? 1 : 0, techo = 0;        // pantallas Retina empiezan en 1,5×; techo = lo mejor permitido
+const perf = { ema: 16.7, lento: 0, rapido: 0, espera: 4 };
+renderer.setPixelRatio(NIVELES[nivel].pr);
+function aplicarNivel(){
+  const N = NIVELES[nivel];
+  renderer.setPixelRatio(N.pr);
+  if (bloom) bloom.enabled = !N.sinBrillo;
+  sombraCada = N.sombra;
+  resize();
+}
+function medirCuadro(raw){
+  if (document.hidden) return;
+  if (perf.espera > 0) { perf.espera -= Math.min(raw, .25); return; }           // los primeros segundos no cuentan
+  perf.ema += (Math.min(raw * 1000, 100) - perf.ema) * .05;
+  if (perf.ema > 24) { perf.lento += raw; perf.rapido = 0; }
+  else if (perf.ema < 13) { perf.rapido += raw; perf.lento = 0; }
+  else { perf.lento = 0; perf.rapido = 0; }
+  if (perf.lento > 2 && nivel < NIVELES.length - 1) { nivel++; techo = nivel; perf.lento = 0; perf.espera = 1.5; aplicarNivel(); }
+  else if (perf.rapido > 10 && nivel > techo) { nivel--; perf.rapido = 0; perf.espera = 1.5; aplicarNivel(); }
+}
+document.addEventListener('visibilitychange', () => { perf.espera = 1.5; });
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.autoUpdate = false;           // se actualizan cada pocos cuadros (ver sombraCada)
+let sombraCada = 2;
 renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 0.92;
@@ -1201,6 +1233,68 @@ avatar.stateEl.textContent = 'tú';
 }
 const MOVERS = [...Object.values(robots), avatar];
 
+/* Cada robot tiene su propio ritmo: velocidad, tiempo de reacción y pequeñas
+   rutinas en su sala. Así nunca se mueven todos en el mismo instante.        */
+const PASO = 2.6;                                 // velocidad base al caminar (m/s)
+const RITMO = { sylvia:.7, viktor:.9, sergio:1.15, bety:.95, mark:.85, marcelo:1.25 };   // quién reacciona más rápido
+const ROJO = new THREE.Color('#FF4D4D');
+MOVERS.forEach(rb => {
+  rb.speed = rb.isMe ? PASO * 1.08 : PASO * (0.86 + Math.random() * 0.22);
+  rb.v = 0; rb.pending = null; rb.reactAt = 0; rb.idle = null; rb.pauseUntil = 0;
+  rb.nextIdle = performance.now() + 8000 + Math.random() * 16000;
+  rb.glance = { at: performance.now() + 2000 + Math.random() * 8000, until: 0, yaw: 0 };
+  rb.colorC = new THREE.Color(rb.a.color); rb.lblShown = '';
+  rb.typeSpeed = 7.5 + Math.random() * 3;
+});
+/* rincones de cada sala para darse una vuelta mientras trabajan:
+   ruta = puntos (lado, fondo) que esquivan los muebles; mira = hacia dónde se queda mirando */
+const RINCONES = {
+  libreria:  [ { ruta:[[-5.4, 3.3]], mira:[-5.4, 4.5] }, { ruta:[[6.0, 1.2]], mira:[7.05, 1.2] },
+               { ruta:[[-2.2, 2.2], [-2.2, 0.3]], mira:[0, 0.4] } ],
+  design:    [ { ruta:[[5.6, 0.8]], mira:[5.6, 1.8] }, { ruta:[[-2.6, 3.3]], mira:[-2.6, 4.2] } ],
+  analitica: [ { ruta:[[-2.8, -1.0], [-4.2, 1.2]], mira:[0, 1.2] }, { ruta:[[2.9, -1.0], [3.6, 3.4]], mira:[3.6, 4.25] } ],
+  archivo:   [ { ruta:[[-4.5, 1.2]], mira:[-4.5, 2.2] }, { ruta:[[4.5, 1.2]], mira:[4.5, 2.2] }, { ruta:[[-5.0, -0.8]], mira:[-6.4, -0.8] } ],
+  ventas:    [ { ruta:[[-2.4, 2.6], [-1.6, 3.5]], mira:[-1.6, 4.4] }, { ruta:[[-2.2, -0.9], [3.0, -0.9], [4.1, 1.6]], mira:[5.4, 2.2] } ],
+  meeting:   [ { ruta:[[-10.4, 0.8]], mira:[-11.9, 0.8], plano:true }, { ruta:[[-9.4, -2.6]], mira:[0, 0], plano:true } ],
+};
+/* un cambio de estado no mueve al robot al instante: cada uno reacciona a su tiempo */
+function queueRoute(rb, dest, estado, rapido){
+  if (rb.pending && rb.pending.dest === dest && rb.pending.estado === estado) return;
+  const lider = estado === 'reunion' && rb.a.id === 'sylvia';      // Sylvia sale primero a las reuniones
+  const base = rapido ? .15 : lider ? .2 : .6, extra = rapido ? 1.4 : lider ? .6 : 2.6;
+  rb.pending = { dest, estado };
+  rb.reactAt = performance.now() + (base + Math.random() * extra) * (RITMO[rb.a.id] || 1) * 1000;
+}
+/* vida propia: mirar alrededor, pausas y paseos cortos dentro de su sala */
+function idleTick(rb, now){
+  if (rb.isMe || reduceMotion) return;
+  if (now > rb.glance.at) {
+    rb.glance.yaw = (Math.random() - .5) * 1.4;
+    rb.glance.until = now + 1100 + Math.random() * 1700;
+    rb.glance.at = now + 5000 + Math.random() * 12000;
+  }
+  const I = rb.idle;
+  if (I) {
+    if (rb.path.length) return;
+    if (I.fase === 'ida') { I.fase = 'quieto'; I.hasta = now + 2500 + Math.random() * 3500; rb.look = I.mira; rb.pauseUntil = I.hasta; }
+    else if (I.fase === 'quieto' && now > I.hasta) { I.fase = 'vuelta'; rb.look = null; rb.path = I.vuelta; }
+    else if (I.fase === 'vuelta') { rb.look = I.lookBack; rb.idle = null; }
+    return;
+  }
+  if (now < rb.nextIdle) return;
+  rb.nextIdle = now + 15000 + Math.random() * 25000;
+  const enCasa = rb.at && rb.at === rb.a.home && rb.room === rb.a.home;
+  const libre = enCasa && !rb.path.length && !rb.pending && !rb.presenting && (rb.state === 'trabajando' || rb.state === 'pensando')
+    && !(presActive && rb.at === 'meeting') && nearId !== rb.a.id && selected !== rb.a.id;
+  const opciones = RINCONES[rb.at];
+  if (!libre || !opciones || Math.random() < .3) { rb.pauseUntil = now + 1500 + Math.random() * 3000; return; }   // solo una pausa
+  const r = ROOMS[rb.at], o = pick(opciones);
+  const pt = ([lx, lb]) => o.plano ? new THREE.Vector3(r.x + lx, 0, r.z + lb) : toWorld(r, lx, lb);
+  const ida = o.ruta.map(pt), casa = spotFor(rb.a.id, rb.at, rb.state);
+  rb.idle = { fase:'ida', mira: pt(o.mira), vuelta: [...ida.slice(0, -1).reverse(), casa.pos], lookBack: casa.look };
+  rb.look = null; rb.path = ida;
+}
+
 /* marcador donde vas a caminar */
 const marker = new THREE.Mesh(new THREE.RingGeometry(0.35, 0.5, 40), new THREE.MeshBasicMaterial({ color:'#E6D3A8', transparent:true, opacity:0, depthWrite:false, side:THREE.DoubleSide }));
 marker.rotation.x = -Math.PI/2; marker.position.y = 0.08; scene.add(marker);
@@ -1246,6 +1340,7 @@ function corridorPoint(){
   return p;
 }
 function routeTo(rb, roomKey, state){
+  rb.idle = null; rb.pending = null;
   const t = roomKey ? spotFor(rb.a.id, roomKey, state) : { pos: corridorPoint(), look: null };
   rb.path = planPath(rb.at, rb.g.position, roomKey, t.pos);
   rb.look = t.look; rb.at = roomKey;
@@ -1293,7 +1388,7 @@ function applyState(ag, silent){
   const changed = estado !== rb.state || dest !== rb.room || (ag.tarea || '') !== rb.task;
   const moved = dest !== rb.room || (estado === 'reunion') !== (rb.state === 'reunion');
   rb.state = estado; rb.task = ag.tarea || ''; rb.room = dest;
-  if (!rb.presenting && (moved || !rb.path.length && dest !== rb.at)) routeTo(rb, dest, estado);
+  if (!rb.presenting && (moved || !rb.path.length && !rb.pending && !rb.idle && dest !== rb.at)) queueRoute(rb, dest, estado, silent);
   if (changed && !silent) {
     rb.talkUntil = performance.now() + 6000;
     log(rb, dest);
@@ -1302,8 +1397,14 @@ function applyState(ag, silent){
     rb.info.historial.unshift({ t: Date.now(), texto: `${STATE_LABEL[rb.state]}${rb.task ? ' · ' + rb.task : ''}` });
     rb.info.historial.length = Math.min(rb.info.historial.length, 8);
   }
-  renderRoster();
+  rosterSoon();
   if (selected === rb.a.id) renderDetail();
+}
+let rosterQueued = false;                        // varios cambios juntos: una sola actualización de la lista
+function rosterSoon(){
+  if (rosterQueued) return;
+  rosterQueued = true;
+  setTimeout(() => { rosterQueued = false; renderRoster(); }, 0);
 }
 
 const feedEl = document.getElementById('feed');
@@ -1536,7 +1637,10 @@ async function poll(){
     }
     const when = data.actualizado ? new Date(data.actualizado) : new Date();
     updatedEl.textContent = 'Actualizado ' + when.toLocaleString('es-DO', { hour:'2-digit', minute:'2-digit', day:'2-digit', month:'short', hour12:false });
-    if (first) setInterval(poll, server ? 3000 : REFRESCO_MS);
+    if (first) {
+      setInterval(poll, server ? 3000 : REFRESCO_MS);
+      document.addEventListener('visibilitychange', () => { if (!document.hidden) poll(); });
+    }
   } catch (err) {
     if (live) { modeEl.className = 'mode lost'; modeText.textContent = 'Sin conexión'; }
     else startSim();
@@ -1587,13 +1691,15 @@ function simAssign(a, estado, tarea, extra = {}){
   }
   applyState({ id:a.id, estado, tarea, avance: estado === 'trabajando' ? 5 : undefined, ...extra });
 }
-let meetingUntil = 0;
+let meetingUntil = 0, nextMeeting = performance.now() + 120000 + Math.random() * 120000;
 function simStep(){
+  if (document.hidden) return;                     // pestaña oculta: la simulación espera
   simTokens();
   if (selected && !detailEl.querySelector('.tip:not([hidden])')) renderDetail();
   const now = performance.now();
-  if (now > meetingUntil && Math.random() < .12) {
+  if (now > nextMeeting && now > meetingUntil) {   // una reunión cada 4 a 7 minutos
     meetingUntil = now + 60000;
+    nextMeeting = meetingUntil + 240000 + Math.random() * 180000;
     const tema = pick(['Revisión semanal de leads','Planificación de contenido de octubre','Prioridades del CRM','Lanzamiento de nuevo proyecto']);
     AGENTS.forEach(a => { if (a.id === 'sylvia' || Math.random() < .7) applyState({ id:a.id, estado:'reunion', tarea:tema }); });
     setTimeout(() => simPresent(), 8000);
@@ -1943,7 +2049,7 @@ function startChatter(){
     post({ de:'sistema', para:'todos', tipo:'sistema', texto:'Conversación de ejemplo · modo simulación' });
     setTimeout(() => runScene(SCENES[2]), 1500);
   }
-  chatterTimer = setInterval(() => { if (Math.random() < .7) runScene(pick(SCENES)); }, 16000);
+  chatterTimer = setInterval(() => { if (!document.hidden && Math.random() < .7) runScene(pick(SCENES)); }, 16000);
 }
 
 /* ---------- mensajes en vivo ---------- */
@@ -2221,6 +2327,7 @@ aprPanel.addEventListener('click', e => {
   const tab = e.target.closest('[data-tab]'); if (tab) { aprTab = tab.dataset.tab; return renderApprovals(true); }
   const more = e.target.closest('[data-more]'); if (more) { const u = (aprUI[more.dataset.more] ||= {}); u.open = !u.open; return renderApprovals(true); }
   const big = e.target.closest('[data-mail]'); if (big) return openMail(big.dataset.mail);
+  if (e.target.closest('[data-buscar]')) return pedirBusqueda();
   const opn = e.target.closest('[data-openmail]'); if (opn) return openInMail(opn.dataset.openmail);
   const ok = e.target.closest('[data-ok]'); if (ok) return decide(ok.dataset.ok, 'aprobada');
   const back = e.target.closest('[data-back]'); if (back) return decide(back.dataset.back, 'devuelta');
@@ -2269,7 +2376,7 @@ async function loadPrivado(force){
   try {
     const j = await api('api/privado', {});
     if (seq !== privSeq) return;
-    privado = { leads: Array.isArray(j.leads) ? j.leads : [], correos: j.correos && typeof j.correos === 'object' ? j.correos : {}, envio: j.envio || 'borrador' };
+    privado = { leads: Array.isArray(j.leads) ? j.leads : [], correos: j.correos && typeof j.correos === 'object' ? j.correos : {}, envio: j.envio || 'borrador', noContactar: j.no_contactar || 0 };
     const sig = JSON.stringify([privado.leads.map(l => [l.id, l.etapa, l.actualizado]), Object.entries(privado.correos).map(([k, v]) => [k, v.listo])]);
     if (sig !== privSig) { privSig = sig; renderApprovals(true); }
   } catch {}
@@ -2311,21 +2418,86 @@ async function openInMail(id){
   renderApprovals(true);
 }
 
+const leadSearch = { busy:false, msg:'', err:'' };
+const PEDIDO_LEADS = '@Sergio, busca en internet personas compatibles con el perfil de Madreperla. Primero revisa el perfil '
+  + 'y el inventario (reportar.py --perfil y --inventario) y los leads que ya tenemos (--leads). Registra a cada persona con '
+  + 'reportar.py --lead, --fuente (la página donde la encontraste) y --motivo. Solo datos públicos y profesionales, sin datos '
+  + 'sensibles, y un máximo de 10 por hoy. Al terminar, pásale a Mark las de puntaje 4 o 5 con reportar.py --tarea-para mark '
+  + 'para que prepare los correos, y me cuentas en el chat del equipo. Ningún correo sale sin mi aprobación.';
+function leadSearchHTML(){
+  const puede = !live || !!server;
+  return `<div class="lead-search">
+    <p>Sergio busca en internet personas que encajan con el perfil de Madreperla, las registra con la página donde las encontró y se las pasa a Mark para los correos.</p>
+    <div class="apr-actions"><button class="apr-ok" data-buscar${puede && !leadSearch.busy ? '' : ' disabled'}>${leadSearch.busy ? 'Sergio está buscando…' : 'Pedir a Sergio que busque leads'}</button></div>
+    ${leadSearch.msg ? `<div class="apr-note" role="status">${esc(leadSearch.msg)}</div>` : ''}
+    ${leadSearch.err ? `<div class="apr-err" role="alert">${esc(leadSearch.err)}</div>` : ''}
+  </div>`;
+}
 function leadsHTML(){
   const L = leadsList();
   if (live && !server) return `<div class="apr-empty">Los leads se guardan solo en su computadora. Ábralos con el servidor local.${leadsResumen ? `<br>Registrados: ${leadsResumen.total || 0}` : ''}</div>`;
-  if (!L.length) return `<div class="apr-empty">Todavía no hay leads. Mark los registra con reportar.py --lead.</div>`;
+  if (!L.length) return leadSearchHTML() + `<div class="apr-empty">Todavía no hay leads.</div>`;
   const activos = L.filter(l => l.etapa !== 'descartado');
-  const sum = `<div class="lead-sum"><span><b>${activos.length}</b> activos</span><span><b>${activos.filter(l => (l.puntaje || 0) >= 4).length}</b> con puntaje alto</span><span><b>${L.filter(l => l.etapa === 'correo-listo').length}</b> con correo listo</span></div>`;
+  const nc = live ? privado.noContactar : 0;
+  const cuenta = (n, uno, varios) => `<span><b>${n}</b> ${n === 1 ? uno : varios}</span>`;
+  const sum = `<div class="lead-sum">${cuenta(activos.length, 'activo', 'activos')}${cuenta(activos.filter(l => l.tipo === 'prospecto').length, 'encontrado en internet', 'encontrados en internet')}${cuenta(activos.filter(l => (l.puntaje || 0) >= 4).length, 'con puntaje alto', 'con puntaje alto')}${cuenta(L.filter(l => l.etapa === 'correo-listo').length, 'con correo listo', 'con correo listo')}${nc ? cuenta(nc, 'no contactar', 'no contactar') : ''}</div>`;
   const orden = [...L].sort((x, y) => (y.puntaje || 0) - (x.puntaje || 0) || String(y.actualizado || '').localeCompare(String(x.actualizado || '')));
-  return sum + (live ? '' : '<div class="note">Modo simulación: leads de ejemplo, no son personas reales.</div>') + orden.map(l => `
+  const fuente = u => /^https:\/\//.test(u || '') ? `<a class="lead-src" href="${esc(u)}" target="_blank" rel="noopener noreferrer">Encontrado en ${esc(u.replace(/^https:\/\/(www\.)?/, '').split('/')[0])}</a>` : '';
+  return leadSearchHTML() + sum + (live ? '' : '<div class="note">Modo simulación: leads de ejemplo, no son personas reales.</div>') + orden.map(l => `
     <article class="lead-item">
       <div class="lead-top"><span class="lead-name">${esc(l.nombre || 'Sin nombre')}</span><span class="chip">${esc(ETAPA_LABEL[l.etapa] || 'Nuevo')}</span></div>
+      <span class="lead-tipo">${l.tipo === 'prospecto' ? 'Prospecto · encontrado por Sergio' : 'Interesado · nos contactó'}</span>
       <div class="lead-mail">${esc(l.correo || 'sin correo')}${l.pais ? ' · ' + esc(l.pais) : ''}</div>
+      ${l.cargo ? `<div class="lead-line">${esc(l.cargo)}</div>` : ''}
       ${l.interes ? `<div class="lead-line">${esc(l.interes)}</div>` : ''}
+      ${l.motivo ? `<div class="lead-line">Por qué encaja: ${esc(l.motivo)}</div>` : ''}
       <div class="lead-top"><span class="lead-mail">${esc(l.origen || '')}</span>${l.puntaje ? `<span class="lead-dots" aria-label="Puntaje ${l.puntaje} de 5">${'●'.repeat(l.puntaje)}${'○'.repeat(5 - l.puntaje)}</span>` : ''}</div>
+      ${fuente(l.fuente)}
       ${l.nota ? `<div class="lead-line">${esc(l.nota)}</div>` : ''}
     </article>`).join('');
+}
+async function pedirBusqueda(){
+  if (leadSearch.busy) return;
+  leadSearch.err = ''; leadSearch.msg = '';
+  if (live) {
+    if (!server) return;
+    leadSearch.busy = true; renderApprovals(true);
+    try {
+      await api('api/mensaje', { para:'todos', texto: PEDIDO_LEADS });
+      leadSearch.msg = 'Se lo pedí a Sergio en el chat del equipo. Los leads aparecerán aquí a medida que los registre.';
+      poll();
+    } catch (err) { leadSearch.err = err.message; }
+    leadSearch.busy = false; renderApprovals(true);
+    return;
+  }
+  simBuscarLeads();
+}
+/* simulación: Sergio investiga, registra prospectos y Mark prepara un correo */
+async function simBuscarLeads(){
+  leadSearch.busy = true; leadSearch.msg = 'Sergio empezó a buscar. Mira la Librería y el chat del equipo.'; renderApprovals(true);
+  post({ de:'tu', para:'todos', texto:'@Sergio, busca en internet personas compatibles con el perfil de Madreperla y pásale las mejores a Mark.' });
+  applyState({ id:'sergio', estado:'trabajando', tarea:'Buscando inversionistas compatibles en internet' });
+  await say('sergio', 'todos', 'Con gusto. Reviso el perfil y el inventario, y busco médicos, empresarios y ejecutivos en Colombia, Estados Unidos y España.');
+  await wait(16000);
+  if (live) { leadSearch.busy = false; return; }
+  if (!SIM_LEADS.some(l => l.id === 'sl4')) SIM_LEADS.push(
+    { id:'sl4', nombre:'Prospecto de ejemplo D', cargo:'Cirujano plástico, socio de una clínica', correo:'contacto@clinica-ejemplo.test', pais:'Colombia',
+      interes:'Segunda residencia frente al mar', motivo:'Habló en una entrevista pública sobre pasar temporadas en el Caribe.', fuente:'https://clinica-ejemplo.test/equipo',
+      origen:'Investigación de Sergio', etapa:'calificado', puntaje:5, tipo:'prospecto', actualizado:new Date().toISOString() },
+    { id:'sl5', nombre:'Prospecto de ejemplo E', cargo:'Directora financiera de una empresa familiar', correo:'oficina@empresa-ejemplo.test', pais:'Estados Unidos',
+      interes:'Diversificación con propiedades para alquiler', motivo:'Participa en foros de inversión inmobiliaria internacional.', fuente:'https://empresa-ejemplo.test/directorio',
+      origen:'Investigación de Sergio', etapa:'nuevo', puntaje:4, tipo:'prospecto', actualizado:new Date().toISOString() });
+  renderApprovals(true);
+  await assignFlow('sergio', 'mark', 'Correos de primer contacto para 2 prospectos (puntaje 4 y 5)');
+  applyState({ id:'sergio', estado:'trabajando', tarea:pick(SIM_TASKS.sergio) });
+  applyState({ id:'mark', estado:'trabajando', tarea:'Redactando correos de primer contacto' });
+  await wait(14000);
+  if (live) { leadSearch.busy = false; return; }
+  simAddApproval({ de:'mark', clase:'correo', titulo:'Correo: Una conversación sobre el Caribe',
+    detalle:'Correo de primer contacto con la identidad de Madreperla, listo para revisar.',
+    correo:{ para:'contacto@clinica-ejemplo.test', nombre:'Prospecto de ejemplo D', asunto:'Una conversación sobre el Caribe', texto: SIM_MAIL_PROSPECTO } });
+  await say('mark', 'todos', 'María Andrea, te dejé en Aprobaciones el primer correo. Queda a la espera de tu visto bueno.');
+  leadSearch.busy = false; leadSearch.msg = 'Listo: 2 prospectos nuevos y un correo esperando tu aprobación.'; renderApprovals(true);
 }
 
 /* el mismo diseño que arma puente/correos.py (para la simulación) */
@@ -2356,10 +2528,21 @@ function mailHTML(asunto, texto){
 </table></td></tr></table></body></html>`;
 }
 const SIM_LEADS = [
-  { id:'sl1', nombre:'Inversionista de ejemplo A', correo:'ejemplo.a@correo.test', pais:'Colombia', interes:'Villa en Cap Cana para segunda residencia', origen:'Formulario del sitio', etapa:'correo-listo', puntaje:5 },
-  { id:'sl2', nombre:'Inversionista de ejemplo B', correo:'ejemplo.b@correo.test', pais:'Estados Unidos', interes:'Apartamento en Cabeza de Toro para alquiler turístico', origen:'Evento: torneo de golf', etapa:'calificado', puntaje:4 },
-  { id:'sl3', nombre:'Familia de ejemplo C', correo:'ejemplo.c@correo.test', pais:'España', interes:'Retiro en Las Terrenas', origen:'Referido', etapa:'nuevo', puntaje:3, nota:'Prefiere conversar por videollamada.' },
+  { id:'sl1', nombre:'Inversionista de ejemplo A', correo:'ejemplo.a@correo.test', pais:'Colombia', interes:'Villa en Cap Cana para segunda residencia', origen:'Formulario del sitio', etapa:'correo-listo', puntaje:5, tipo:'interesado' },
+  { id:'sl2', nombre:'Inversionista de ejemplo B', correo:'ejemplo.b@correo.test', pais:'Estados Unidos', interes:'Apartamento en Cabeza de Toro para alquiler turístico', origen:'Evento: torneo de golf', etapa:'calificado', puntaje:4, tipo:'interesado' },
+  { id:'sl3', nombre:'Familia de ejemplo C', correo:'ejemplo.c@correo.test', pais:'España', interes:'Retiro en Las Terrenas', origen:'Referido', etapa:'nuevo', puntaje:3, tipo:'interesado', nota:'Prefiere conversar por videollamada.' },
 ];
+const SIM_MAIL_PROSPECTO = `Estimado doctor:
+
+Mi nombre es María Andrea López y dirijo Madreperla Realtors, una firma boutique que acompaña a inversionistas internacionales en decisiones inmobiliarias en República Dominicana.
+
+Me permito escribirle porque su interés por pasar temporadas en el Caribe coincide con lo que hacemos: ayudar a elegir con criterio una segunda residencia, pensando en el patrimonio y en el largo plazo.
+
+Si en algún momento desea explorar opciones en Cap Cana o Punta Cana, con gusto conversamos, sin compromiso.
+
+[Agendar una conversación](https://madreperlarealtors.com/en/contacto/)
+
+Quedo atenta.`;
 const SIM_MAIL = `Estimado inversionista:
 
 Gracias por su interés en Madreperla Realtors. A partir de lo que nos compartió, hemos preparado una selección curada de villas en Cap Cana que responden a su búsqueda de privacidad, cercanía al mar y una inversión con horizonte de largo plazo.
@@ -2396,14 +2579,14 @@ const SIM_APPROVALS = [
 let simAprIdx = 0, simAprTimer = null;
 function simAddApproval(src){
   const s = src || SIM_APPROVALS[simAprIdx++ % SIM_APPROVALS.length];
-  const correo = s.correo ? { ...s.correo, html: s.correo.html || mailHTML(s.correo.asunto, SIM_MAIL) } : undefined;
+  const correo = s.correo ? { ...s.correo, html: s.correo.html || mailHTML(s.correo.asunto, s.correo.texto || SIM_MAIL) } : undefined;
   approvals.push({ id:'s' + (++msgSeq), de:s.de, titulo:s.titulo, detalle:s.detalle, clase:s.clase, estado:'pendiente', comentario:'', t:Date.now(), td:null, correo });
   renderApprovals(true);
 }
 function startSimApprovals(){
   if (simAprTimer) return;
   simAddApproval(); simAddApproval();
-  simAprTimer = setInterval(() => { if (!live && pendingApprovals().length < 4) simAddApproval(); }, 45000);
+  simAprTimer = setInterval(() => { if (!live && !document.hidden && pendingApprovals().length < 4) simAddApproval(); }, 45000);
 }
 async function simApprovalReply(a){
   if (live) return;
@@ -2516,7 +2699,7 @@ function startPresentation(pr, opts = {}){
   presEndsAt = opts.live ? 0 : performance.now() + Math.max(30000, presPages(pr) * 8000 + 8000);
   const rb = robots[pr.de];
   if (rb && PODIUM) {
-    rb.presenting = true;
+    rb.presenting = true; rb.idle = null; rb.pending = null;
     rb.path = planPath(rb.at, rb.g.position, 'meeting', PODIUM.clone());
     rb.at = 'meeting'; rb.look = ROOMS.meeting.center.clone();
   }
@@ -2992,7 +3175,8 @@ async function prepareEvent(ev, u){
       if (aprob) setTimeout(() => {
         if (live) return;
         const detalle = draftFor(texto, ev);
-        simAddApproval({ de: para, clase:'borrador', titulo:`${texto.replace(/^Borrador de /i, '')}: ${ev.titulo}`, detalle });
+        const tt = texto.replace(/^Borrador de /i, '');
+        simAddApproval({ de: para, clase:'borrador', titulo:`${tt.charAt(0).toUpperCase() + tt.slice(1)}: ${ev.titulo}`, detalle });
         const a = approvals[approvals.length - 1]; if (a) a.evento = ev.id;
         renderEvents(true);
       }, 9000 + Math.random() * 6000);
@@ -3352,7 +3536,7 @@ const roomTags = Object.values(ROOMS).map(r => {
 function resize(){
   const w = window.innerWidth, h = window.innerHeight;
   renderer.setSize(w, h, false);
-  if (composer) { composer.setPixelRatio(Math.min(devicePixelRatio, 2)); composer.setSize(w, h); bloom.resolution.set(w/2, h/2); }
+  if (composer) { composer.setPixelRatio(NIVELES[nivel].pr); composer.setSize(w, h); bloom.resolution.set(w/2, h/2); }
   camera.aspect = w/h;
   camera.fov = w < 760 ? 58 : 42;
   camera.updateProjectionMatrix();
@@ -3461,12 +3645,17 @@ const DN_KEYS = [
 DN_KEYS.forEach(k => { k.bgC = new THREE.Color(k.bg); k.sunC = new THREE.Color(k.sun); });
 const dn = { bg: new THREE.Color(), sun: new THREE.Color(), si:0, hi:0, ex:.8, rl:1, du:.55, pos: new THREE.Vector3(), ready:false };
 const dnTmp = { bg: new THREE.Color(), sun: new THREE.Color(), pos: new THREE.Vector3() };
-function horaRD(){
+let fmtRD = null, horaCache = null, horaCacheAt = 0;
+function horaRD(){                                   // se calcula una vez por segundo, no en cada cuadro
+  const ahora = Date.now();
+  if (horaCache && ahora - horaCacheAt < 1000) return horaCache;
+  horaCacheAt = ahora;
   try {
-    const p = new Intl.DateTimeFormat('es-DO', { timeZone:'America/Santo_Domingo', hour:'2-digit', minute:'2-digit', hourCycle:'h23' }).formatToParts(new Date());
+    fmtRD ||= new Intl.DateTimeFormat('es-DO', { timeZone:'America/Santo_Domingo', hour:'2-digit', minute:'2-digit', hourCycle:'h23' });
+    const p = fmtRD.formatToParts(new Date(ahora));
     const h = +p.find(x => x.type === 'hour').value, m = +p.find(x => x.type === 'minute').value;
-    return { h, m, f: h + m/60 };
-  } catch { const d = new Date(); return { h:d.getHours(), m:d.getMinutes(), f:d.getHours() + d.getMinutes()/60 }; }
+    return horaCache = { h, m, f: h + m/60 };
+  } catch { const d = new Date(); return horaCache = { h:d.getHours(), m:d.getMinutes(), f:d.getHours() + d.getMinutes()/60 }; }
 }
 function periodo(f){ return f < 5.5 ? 'Madrugada' : f < 12 ? 'Mañana' : f < 14 ? 'Mediodía' : f < 18 ? 'Tarde' : f < 19.4 ? 'Atardecer' : 'Noche'; }
 let dnLastClock = 0;
@@ -3511,29 +3700,36 @@ if (intro.t < 1) { camera.position.copy(intro.from); controls.enabled = false; }
 /* ───────── Bucle ───────── */
 const clock = new THREE.Clock();
 const tmp = new THREE.Vector3();
-const SPEED = 2.6;
+let cuadro = 0;
 
 function project(v, el, dy = 0){
   tmp.copy(v); tmp.y += dy; tmp.project(camera);
   const vis = tmp.z < 1 && Math.abs(tmp.x) < 1.2 && Math.abs(tmp.y) < 1.2;
-  el.style.display = vis ? '' : 'none';
-  if (vis) el.style.transform = `translate(${(tmp.x*.5+.5)*innerWidth}px, ${(-tmp.y*.5+.5)*innerHeight}px) translate(-50%,-100%)`;
+  if (el._vis !== vis) { el._vis = vis; el.style.display = vis ? '' : 'none'; }     // solo si cambia
+  if (!vis) return;
+  const tr = `translate(${Math.round((tmp.x*.5+.5)*innerWidth)}px, ${Math.round((-tmp.y*.5+.5)*innerHeight)}px) translate(-50%,-100%)`;
+  if (el._tr !== tr) { el._tr = tr; el.style.transform = tr; }
 }
 
 function tick(){
-  const dt = Math.min(clock.getDelta(), 0.05), t = clock.elapsedTime;
+  const raw = clock.getDelta(), dt = Math.min(raw, 0.05), t = clock.elapsedTime;
+  medirCuadro(raw);
   updaters.forEach(fn => fn(reduceMotion ? dt*.3 : dt, reduceMotion ? t*.3 : t));
 
   const now = performance.now();
   for (const rb of MOVERS) {
     const p = rb.g.position;
+    if (rb.pending && now >= rb.reactAt) { const q = rb.pending; rb.pending = null; if (!rb.presenting) routeTo(rb, q.dest, q.estado); }
+    idleTick(rb, now);
     if (rb.path.length) {
       const target = rb.path[0];
       tmp.subVectors(target, p); tmp.y = 0;
       const d = tmp.length();
-      if (d < 0.08) { rb.path.shift(); }
+      if (d < 0.08) { rb.path.shift(); if (!rb.path.length) rb.v = 0; }
       else {
-        const step = Math.min(d, SPEED*dt);
+        const tope = rb.path.length === 1 ? Math.min(rb.speed, 0.55 + d * 1.6) : rb.speed;   // frena al llegar
+        rb.v = Math.min(tope, rb.v + rb.speed * dt * 2.4);                                   // arranca suave
+        const step = Math.min(d, rb.v * dt);
         tmp.normalize();
         p.addScaledVector(tmp, step);
         const ang = Math.atan2(tmp.x, tmp.z);
@@ -3552,17 +3748,19 @@ function tick(){
     const moving = rb.path.length > 0;
     const k = rb.phase + t;
     rb.body.position.y = (reduceMotion ? 0 : Math.sin(k*2.4) * 0.06) + 0.05;
-    const busy = rb.state === 'trabajando' && !moving && !rb.isMe;
-    rb.arms[0].rotation.x = moving ? Math.sin(k*8)*.5 : busy ? -0.9 + Math.sin(k*9)*.15 : 0;
-    rb.arms[1].rotation.x = moving ? -Math.sin(k*8)*.5 : busy ? -0.9 + Math.cos(k*9)*.15 : 0;
-    rb.head.rotation.y = rb.state === 'pensando' ? Math.sin(k*1.2)*.5 : 0;
+    const busy = rb.state === 'trabajando' && !moving && !rb.isMe && now > rb.pauseUntil;
+    const ts = rb.typeSpeed || 9;
+    rb.arms[0].rotation.x += ((moving ? Math.sin(k*8)*.5 : busy ? -0.9 + Math.sin(k*ts)*.15 : 0) - rb.arms[0].rotation.x) * Math.min(1, dt*14);
+    rb.arms[1].rotation.x += ((moving ? -Math.sin(k*8)*.5 : busy ? -0.9 + Math.cos(k*ts)*.15 : 0) - rb.arms[1].rotation.x) * Math.min(1, dt*14);
+    const yaw = rb.state === 'pensando' ? Math.sin(k*1.2)*.5 : (!moving && now < rb.glance?.until ? rb.glance.yaw : 0);
+    rb.head.rotation.y += (yaw - rb.head.rotation.y) * Math.min(1, dt*4);
     rb.body.rotation.z = rb.state === 'pensando' ? Math.sin(k*.9)*.06 : 0;
 
     let vi = 1.8, ti = 2.2;
     if (rb.state === 'inactivo') { vi = 0.5; ti = 0.6; }
     if (rb.state === 'pensando') { ti = 1 + (Math.sin(k*3)*.5+.5)*3; }
-    if (rb.state === 'error') { const on = Math.sin(k*8) > 0; rb.visorMat.emissive.set(on ? '#FF4D4D' : rb.a.color); ti = on ? 3 : .6; }
-    else rb.visorMat.emissive.set(rb.a.color);
+    if (rb.state === 'error') { const on = Math.sin(k*8) > 0; rb.visorMat.emissive.copy(on ? ROJO : rb.colorC); ti = on ? 3 : .6; }
+    else rb.visorMat.emissive.copy(rb.colorC);
     rb.visorMat.emissiveIntensity = vi; rb.tipMat.emissiveIntensity = ti;
     if (t > rb.blink.next) { rb.blink.until = t + 0.12; rb.blink.next = t + 2 + Math.random()*4; }
     const eyeY = rb.state === 'inactivo' ? 0.35 : t < rb.blink.until ? 0.1 : 1;
@@ -3573,7 +3771,7 @@ function tick(){
 
     // etiqueta
     project(p, rb.tag, 2.55);
-    if (!rb.isMe) rb.stateEl.textContent = rb.state === 'pensando' ? '…' : STATE_LABEL[rb.state].toLowerCase();
+    if (!rb.isMe) { const lbl = rb.state === 'pensando' ? '…' : STATE_LABEL[rb.state].toLowerCase(); if (rb.lblShown !== lbl) { rb.lblShown = lbl; rb.stateEl.textContent = lbl; } }
     const saying = rb.say && now < rb.sayUntil;
     const text = saying ? rb.say : rb.task;
     const talk = (saying || (!rb.isMe && (now < rb.talkUntil || selected === rb.a.id))) && text;
@@ -3601,11 +3799,13 @@ function tick(){
     if (intro.t >= 1) controls.enabled = true;
   }
   controls.update();
+  if (++cuadro % sombraCada === 0) renderer.shadowMap.needsUpdate = true;    // las sombras no hace falta calcularlas en cada cuadro
   if (composer) composer.render(); else renderer.render(scene, camera);
   requestAnimationFrame(tick);
 }
 function shortAngle(a){ return ((a + Math.PI) % (Math.PI*2) + Math.PI*2) % (Math.PI*2) - Math.PI; }
 
+if (/[?&]depurar\b/.test(location.search)) window.__habitat = { robots, perf, nivel: () => nivel, pr: () => renderer.getPixelRatio() };   // solo para pruebas
 renderRoster();
 renderApprovals(true);
 drawAprScreen();

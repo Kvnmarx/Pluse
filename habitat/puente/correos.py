@@ -18,6 +18,7 @@ from email.utils import formataddr, formatdate, make_msgid, parseaddr
 AQUI = os.path.dirname(os.path.abspath(__file__))
 PRIVADO = os.path.join(AQUI, 'privado.json')
 CONFIG = os.path.join(AQUI, 'bots.json')
+EJEMPLO = os.path.join(AQUI, 'bots.ejemplo.json')     # valores por defecto (sin claves)
 CARPETA_CORREOS = os.path.join(os.path.dirname(AQUI), 'correos')
 MAX_LEADS = 500
 MAX_CORREOS = 120
@@ -37,18 +38,53 @@ CORREO_BASE = {
     'telefono': '',
     'sitio': 'https://madreperlarealtors.com',
     'ciudad': 'Punta Cana, República Dominicana',
+    'direccion': '',            # dirección física de la oficina (algunos países la piden en correos comerciales)
     'envio': 'borrador',        # borrador: tú lo envías desde Mail · bot: el bot lo envía tras tu aprobación
+}
+LEADS_BASE = {
+    'paises': ['Colombia', 'Estados Unidos', 'España'],
+    'perfil': ('Inversionistas patrimoniales de 40 a 65 años que ya tienen capital y buscan una decisión sólida: '
+               'médicos, empresarios, profesionales y ejecutivos; familias que planean su retiro o una segunda '
+               'residencia; asesores financieros y patrimoniales que podrían ser aliados.'),
+    'por_dia': 10,              # máximo de correos a prospectos (personas encontradas en internet) por día
 }
 
 
 # ─────────────────────────── configuración y archivo privado ───────────────────────────
 
-def config():
+def _leer_json(ruta):
     try:
-        with open(CONFIG, encoding='utf-8') as f:
-            return json.load(f)
+        with open(ruta, encoding='utf-8') as f:
+            d = json.load(f)
+        return d if isinstance(d, dict) else {}
     except (OSError, ValueError):
         return {}
+
+
+def _puesto(v):
+    """Un valor de ejemplo sin completar (PEGA-AQUI…) cuenta como vacío."""
+    return v not in (None, '') and not (isinstance(v, str) and v.startswith('PEGA-AQUI'))
+
+
+def config():
+    """bots.json encima de los valores por defecto de bots.ejemplo.json (salvo las claves de los bots).
+    Así una opción nueva funciona aunque tu bots.json sea de una versión anterior."""
+    cfg = {k: v for k, v in _leer_json(EJEMPLO).items() if k != 'bots' and _puesto(v)}
+    cfg.update({k: v for k, v in _leer_json(CONFIG).items() if _puesto(v)})
+    return cfg
+
+
+def conf_leads(cfg=None):
+    cfg = cfg if cfg is not None else config()
+    c = dict(LEADS_BASE)
+    extra = cfg.get('leads') if isinstance(cfg.get('leads'), dict) else {}
+    if isinstance(extra.get('paises'), list):
+        c['paises'] = [str(x) for x in extra['paises'] if str(x).strip()][:20]
+    if isinstance(extra.get('perfil'), str) and extra['perfil'].strip():
+        c['perfil'] = extra['perfil'].strip()
+    if isinstance(extra.get('por_dia'), int) and extra['por_dia'] >= 0:
+        c['por_dia'] = extra['por_dia']
+    return c
 
 
 def conf_correo(cfg=None):
@@ -70,6 +106,8 @@ def leer_privado():
         p['leads'] = []
     if not isinstance(p.get('correos'), dict):
         p['correos'] = {}
+    if not isinstance(p.get('no_contactar'), list):
+        p['no_contactar'] = []
     return p
 
 
@@ -116,10 +154,46 @@ def buscar_lead(p, clave):
     return next((x for x in p['leads'] if x['id'] == clave or (x.get('correo') or '').lower() == clave), None)
 
 
+def bloqueado(p, correo):
+    return (correo or '').strip().lower() in p['no_contactar']
+
+
+def no_contactar(p, t, correo):
+    """Anota a alguien que pidió no recibir más correos. Nadie vuelve a escribirle."""
+    _, correo = destinatario(correo)
+    if not bloqueado(p, correo):
+        p['no_contactar'].append(correo.lower())
+    lead = buscar_lead(p, correo)
+    if lead:
+        lead.update({'etapa': 'descartado', 'nota': 'Pidió no recibir más correos.', 'actualizado': t.isoformat()})
+    return correo
+
+
+def fuente_valida(url):
+    url = (url or '').strip()
+    if not re.match(r'^https://[^\s/]+\.[^\s/]+', url):
+        raise ValueError('--fuente debe ser la dirección https:// donde encontraste a la persona.')
+    return url[:400]
+
+
+def dominio(url):
+    m = re.match(r'^https?://(?:www\.)?([^/\s:]+)', url or '')
+    return m.group(1) if m else ''
+
+
+def correos_a_prospectos_hoy(p, t):
+    hoy = t.strftime('%Y-%m-%d')
+    return sum(1 for c in p['correos'].values() if c.get('prospecto') and str(c.get('hora', '')).startswith(hoy))
+
+
 def guardar_lead(p, t, de, nombre, correo=None, **datos):
     """Crea o actualiza un lead (se reconoce por su correo o, sin correo, por su nombre)."""
     if correo:
         _, correo = destinatario(correo)
+        if bloqueado(p, correo):
+            raise ValueError('esa persona pidió no recibir correos de Madreperla; no la registres de nuevo.')
+    if datos.get('fuente'):
+        datos['fuente'] = fuente_valida(datos['fuente'])
     lead = buscar_lead(p, correo) if correo else next(
         (x for x in p['leads'] if not x.get('correo') and x.get('nombre', '').lower() == nombre.strip().lower()), None)
     nuevo = lead is None
@@ -129,9 +203,11 @@ def guardar_lead(p, t, de, nombre, correo=None, **datos):
     lead['nombre'] = nombre.strip()[:120]
     if correo:
         lead['correo'] = correo
-    for k in ('pais', 'interes', 'origen', 'presupuesto', 'nota'):
+    for k in ('pais', 'interes', 'origen', 'presupuesto', 'nota', 'motivo', 'fuente', 'cargo'):
         if datos.get(k):
             lead[k] = str(datos[k]).strip()[:600]
+    if nuevo or datos.get('fuente'):          # encontrado en internet = prospecto; vino a nosotros = interesado
+        lead['tipo'] = 'prospecto' if lead.get('fuente') else 'interesado'
     if datos.get('etapa'):
         lead['etapa'] = datos['etapa']
     if datos.get('puntaje') is not None:
@@ -145,14 +221,47 @@ def texto_leads(p):
         return 'Todavía no hay leads registrados.'
     filas = []
     for x in sorted(p['leads'], key=lambda x: (-(x.get('puntaje') or 0), x.get('actualizado', ''))):
-        partes = [x['id'], x.get('nombre', ''), x.get('correo', 'sin correo'), x.get('etapa', 'nuevo')]
+        partes = [x['id'], x.get('nombre', ''), x.get('correo', 'sin correo'), x.get('etapa', 'nuevo'),
+                  x.get('tipo', 'interesado')]
         if x.get('puntaje'):
             partes.append(f'puntaje {x["puntaje"]}/5')
+        for k in ('cargo', 'motivo'):
+            if x.get(k):
+                partes.append(f'{k}: {x[k]}')
+        if x.get('fuente'):
+            partes.append(f'fuente: {x["fuente"]}')
         for k in ('pais', 'interes', 'origen'):
             if x.get(k):
                 partes.append(f'{k}: {x[k]}')
         filas.append(' · '.join(partes))
+    if p['no_contactar']:
+        filas.append(f'No contactar ({len(p["no_contactar"])}): ' + ', '.join(p['no_contactar']))
     return '\n'.join(filas)
+
+
+def texto_perfil(cfg=None):
+    """Criterios para buscar leads compatibles: lo lee Sergio antes de investigar."""
+    L = conf_leads(cfg)
+    return '\n'.join([
+        'PERFIL DE LEAD COMPATIBLE CON MADREPERLA',
+        f'Perfil: {L["perfil"]}',
+        f'Países prioritarios: {", ".join(L["paises"]) or "sin preferencia"}.',
+        'Zonas y proyectos: los del inventario (reportar.py --inventario).',
+        '',
+        'Puntaje de 1 a 5 (un punto por cada señal):',
+        '- Encaja con el perfil (edad aproximada, profesión o cargo).',
+        '- Vive o trabaja en un país prioritario.',
+        '- Muestra interés público en invertir, segunda residencia, retiro, el Caribe, golf o náutica.',
+        '- Tiene capacidad patrimonial visible (cargo directivo, empresa propia, profesión de alto ingreso).',
+        '- Tiene un correo profesional publicado por la propia persona o su empresa.',
+        '',
+        'Reglas:',
+        '- Solo información pública y profesional. Anota con --fuente la página exacta donde la encontraste.',
+        '- Usa el correo que la persona o su empresa publicó. No adivines ni armes correos.',
+        '- Nunca guardes cédulas, pasaportes, cuentas, ingresos, patrimonio ni datos de salud o familia.',
+        '- Revisa reportar.py --leads: no registres dos veces a la misma persona ni a nadie de la lista de no contactar.',
+        f'- Máximo {L["por_dia"]} correos a prospectos por día; prioriza puntaje 4 y 5.',
+    ])
 
 
 # ─────────────────────────── correo con la identidad de Madreperla ───────────────────────────
@@ -216,7 +325,7 @@ def texto_plano(texto, c):
         else:
             lineas += [re.sub(r'\*\*', '', v), '']
     lineas += [c['firma_nombre'], c['firma_cargo']]
-    lineas += [x for x in (c['telefono'], c['sitio'].replace('https://', ''), c['ciudad']) if x]
+    lineas += [x for x in (c['telefono'], c['sitio'].replace('https://', ''), c['direccion'] or c['ciudad']) if x]
     lineas += ['', 'Si prefiere no recibir más comunicaciones nuestras, responda a este correo y lo retiraremos de la lista.']
     return '\n'.join(lineas)
 
@@ -247,7 +356,7 @@ def armar_html(asunto, texto, c=None, resumen=''):
         else:
             partes.append(f'<p style="margin:0 0 16px;font-family:{SANS};font-size:15px;line-height:1.7;'
                           f'color:{GRAFITO}">{_en_linea(v)}</p>')
-    contacto = ' · '.join(html.escape(x) for x in (c['telefono'], c['sitio'].replace('https://', ''), c['ciudad']) if x)
+    contacto = ' · '.join(html.escape(x) for x in (c['telefono'], c['sitio'].replace('https://', ''), c['direccion'] or c['ciudad']) if x)
     oculto = html.escape(resumen or '')
     return f'''<!DOCTYPE html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -337,6 +446,53 @@ def url_csv(url):
     return url
 
 
+def _norm(v):
+    return unicodedata.normalize('NFKD', v or '').encode('ascii', 'ignore').decode().strip().lower()
+
+
+INTERNAS = ('nota', 'observ', 'comision', 'interno', 'privad')
+
+
+def filas_inventario(crudo):
+    """Lee la hoja tal como está armada: títulos arriba, encabezado donde diga Proyecto,
+    filas de zona en mayúsculas (CAP CANA) y nombres de proyecto en celdas combinadas."""
+    filas = [[c.strip() for c in f] for f in csv.reader(io.StringIO(crudo))]
+    i_enc = next((i for i, f in enumerate(filas) if any(_norm(c) == 'proyecto' for c in f)), None)
+    if i_enc is None:
+        i_enc = next((i for i, f in enumerate(filas) if sum(1 for c in f if c) >= 3), None)
+    if i_enc is None:
+        raise ValueError('no encontré la fila de encabezados (la que dice «Proyecto»).')
+    enc = [h or f'Columna {i + 1}' for i, h in enumerate(filas[i_enc])]
+    nombres = [_norm(h) for h in enc]
+    col_proy = nombres.index('proyecto') if 'proyecto' in nombres else None
+    tiene_zona = 'zona' in nombres
+    zona, ultimo, out = '', '', []
+    for f in filas[i_enc + 1:]:
+        f = f + [''] * (len(enc) - len(f))
+        llenas = [c for c in f if c]
+        if not llenas:
+            continue
+        if len(llenas) == 1 and f[0] and f[0] == f[0].upper() and any(ch.isalpha() for ch in f[0]):
+            zona, ultimo = f[0], ''                        # fila de zona
+            continue
+        if col_proy is not None:
+            if f[col_proy]:
+                ultimo = f[col_proy]
+            elif ultimo:
+                f[col_proy] = ultimo                       # celda combinada: el proyecto de arriba
+        dato = {}
+        if zona and not tiene_zona:
+            dato['Zona'] = zona
+        for i, v in enumerate(f[:len(enc)]):
+            if v:
+                clave = enc[i]
+                if any(x in nombres[i] for x in INTERNAS):
+                    clave = f'{enc[i]} (interna, no citar al cliente)'
+                dato[clave] = v
+        out.append(dato)
+    return out
+
+
 def leer_inventario(cfg=None):
     cfg = cfg if cfg is not None else config()
     url = (cfg.get('inventario') or '').strip()
@@ -346,14 +502,13 @@ def leer_inventario(cfg=None):
     if crudo.lstrip().lower().startswith(('<!doctype', '<html')):
         raise ValueError('Google devolvió una página, no la hoja. Comparte la hoja como «Cualquier persona con el '
                          'enlace puede ver» o publícala en la web como CSV.')
-    filas = [f for f in csv.reader(io.StringIO(crudo)) if any(x.strip() for x in f)]
-    if not filas:
-        raise ValueError('la hoja está vacía.')
-    enc, datos = [h.strip() or f'Columna {i + 1}' for i, h in enumerate(filas[0])], filas[1:]
-    lineas = [f'Inventario de proyectos · {len(datos)} filas · leído {dt.datetime.now():%Y-%m-%d %H:%M}']
-    for f in datos[:300]:
-        lineas.append(' | '.join(f'{enc[i] if i < len(enc) else f"Columna {i + 1}"}: {v.strip()}'
-                                 for i, v in enumerate(f) if v.strip()))
+    datos = filas_inventario(crudo)
+    if not datos:
+        raise ValueError('la hoja no tiene proyectos debajo del encabezado.')
+    lineas = [f'Inventario de proyectos · {len(datos)} filas · leído {dt.datetime.now():%Y-%m-%d %H:%M}',
+              'Es la fuente más actualizada: si algo no coincide con la página web, vale lo de aquí.',
+              'Valores «desde» y fechas estimadas: menciónalos solo como referencia, sujetos a confirmación.']
+    lineas += [' | '.join(f'{k}: {v}' for k, v in d.items()) for d in datos[:300]]
     return '\n'.join(lineas)
 
 

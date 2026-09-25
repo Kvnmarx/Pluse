@@ -9,7 +9,7 @@ El hábitat corre en tu computadora, la misma donde está Hermes. Un pequeño pr
 
 Los bots, a su vez, avisan lo que hacen con `reportar.py`: tareas, avances, mensajes, pedidos de aprobación y eventos.
 
-El hábitat no sale a internet: solo se puede abrir desde tu computadora. Lo único que busca afuera es tu calendario, si lo conectas.
+El hábitat solo se puede abrir desde tu computadora. Lo único que busca afuera es tu calendario (si lo conectas) y, cuando un bot los pide, la hoja de inventario y la página de Madreperla.
 
 ## Opción fácil: pídeselo a Sylvia
 
@@ -189,55 +189,104 @@ python3 RUTA/puente/reportar.py --bot @sylvia --tarea-para @contenido-madreperla
 
 Cuando Sylvia reparte las tareas de un evento, el hábitat le recuerda a cada bot que use `--evento` en sus aprobaciones y presentaciones.
 
-## Leads y correos (Mark)
+## Leads y correos (Sergio y Mark)
 
-Mark lee la página de Madreperla y la hoja **Inventario de proyectos**, registra los leads y prepara correos con la identidad de Madreperla. **Ningún correo sale sin que lo apruebes.**
+- **Sergio** busca en internet personas compatibles con el perfil de Madreperla y las registra con la página donde las encontró.
+- **Mark** lee la página de Madreperla y la hoja **Inventario de proyectos**, y prepara los correos con la identidad de Madreperla.
+- **Ningún correo sale sin que lo apruebes.**
 
-### 1. Conectar la hoja de inventario
+### 1. La hoja de inventario
 
-1. Abre la hoja *Inventario de proyectos* en Google Sheets.
-2. Toca **Compartir** › *Acceso general* › **Cualquier persona con el enlace** › *Lector*. Copia el enlace.
-   (Otra opción: *Archivo › Compartir › Publicar en la web* › la pestaña del inventario › *Valores separados por comas (.csv)*.)
-3. Pega el enlace en `puente/bots.json`, en `"inventario": "…"`. Cierra y vuelve a abrir el hábitat.
+El enlace de la hoja ya viene guardado en tu copia del hábitat (en `puente/bots.ejemplo.json` del zip, y en tu `puente/bots.json` cuando Sylvia lo crea). No está en GitHub, porque ese repositorio es público.
 
-Quien tenga el enlace podrá ver la hoja. Si el inventario tiene datos internos (comisiones, notas privadas), deja esas columnas en otra pestaña y comparte solo la del inventario público.
+- Si algún día cambias de hoja, pega el enlace nuevo en `"inventario": "…"` de `puente/bots.json`. Luego cierra y vuelve a abrir el hábitat.
+- La hoja tiene que estar compartida como **Cualquier persona con el enlace › Lector**. Quien tenga el enlace puede verla completa, incluida la columna *Notas*. Si algún día guardas ahí datos que no deban circular (comisiones, contactos de desarrolladores), ponlos en otra hoja.
+- El hábitat lee la primera pestaña, *Seguimiento de Proyectos*. Si prefieres otra, copia el enlace con esa pestaña abierta.
+- Mark nunca cita la columna *Notas*: el hábitat se la marca como interna.
 
-En `"correo"` de `bots.json` puedes ajustar la firma, el teléfono y el remitente de los correos.
+En `"correo"` de `bots.json` puedes ajustar la firma, el teléfono, el remitente y la dirección física de la oficina (`"direccion"`). En `"leads"` puedes cambiar el perfil de lead compatible, los países prioritarios y cuántos correos a prospectos se preparan por día (`"por_dia"`, 10 por defecto).
 
-### 2. Instrucción para Mark
+### 2. Antes de escribir a personas que no te conocen
 
-Copia esto en las instrucciones de Mark (cambia `RUTA` por la carpeta del hábitat):
+Escribir por primera vez a alguien que encontraste en internet tiene reglas distintas en cada país:
+
+- En Estados Unidos se permite si el correo trae una forma de darse de baja y una dirección física.
+- En España y el resto de la Unión Europea, o en Canadá, suele hacer falta el consentimiento previo de la persona.
+
+**Confírmalo con tu aliado legal antes de empezar.** Para facilitarlo, el hábitat:
+
+- Guarda de dónde salió cada contacto.
+- Incluye en cada correo la frase para darse de baja.
+- Respeta la lista de *no contactar*: no deja preparar ni aprobar un correo para alguien que está en ella.
+- Limita los correos a prospectos por día.
+
+Completa `"direccion"` en `bots.json` si vas a escribir a Estados Unidos.
+
+### 3. Instrucción para Sergio
+
+Copia esto en las instrucciones de Sergio (cambia `RUTA` por la carpeta del hábitat):
+
+```
+Búsqueda de leads para Madreperla:
+- Antes de buscar, lee el perfil, el inventario y los leads que ya tenemos:
+  python3 RUTA/puente/reportar.py --bot @ageente-de-investigacion-madreperla --perfil
+  python3 RUTA/puente/reportar.py --bot @ageente-de-investigacion-madreperla --inventario
+  python3 RUTA/puente/reportar.py --bot @ageente-de-investigacion-madreperla --leads
+- Busca en internet personas que encajen con el perfil y los países prioritarios: directorios
+  profesionales, páginas de clínicas y empresas, asociaciones, eventos, prensa y publicaciones públicas.
+- Usa solo información pública y profesional. Anota el correo que la persona o su empresa publicó;
+  no adivines ni armes correos. Nunca guardes cédulas, pasaportes, cuentas, ingresos, patrimonio ni
+  datos de salud o de familia.
+- Registra a cada persona con la página exacta donde la encontraste y por qué encaja:
+  python3 RUTA/puente/reportar.py --bot @ageente-de-investigacion-madreperla --lead "Nombre" --cargo "Profesión o cargo" --email correo@dominio.com --pais "País" --fuente https://… --motivo "Por qué encaja" --puntaje 1-5
+- Máximo 10 personas por búsqueda, sin repetir a nadie que ya esté en --leads.
+- Al terminar, pásale a Mark las de puntaje 4 o 5:
+  python3 RUTA/puente/reportar.py --bot @ageente-de-investigacion-madreperla --tarea-para mark --mensaje "Correos de primer contacto para: Nombre 1, Nombre 2"
+  y cuéntale a María Andrea en el chat del equipo cuántas encontraste y de qué perfil.
+```
+
+### 4. Instrucción para Mark
+
+Copia esto en las instrucciones de Mark:
 
 ```
 Leads y correos de Madreperla:
 - Para conocer la oferta, lee la página y el inventario (el inventario es la fuente más actualizada):
   python3 RUTA/puente/reportar.py --bot @mark --sitio
   python3 RUTA/puente/reportar.py --bot @mark --inventario
-- Registra solo personas que mostraron interés en Madreperla: escribieron por el sitio, WhatsApp o redes,
-  dejaron sus datos en un evento o llegaron referidas. No compres listas ni tomes correos de desconocidos
-  de internet. No guardes cédulas, pasaportes, cuentas bancarias ni datos financieros.
+  La columna marcada como interna es solo para ti: nunca la cites.
+- Si alguien escribe a Madreperla (sitio, WhatsApp, redes, eventos, referidos), regístralo:
   python3 RUTA/puente/reportar.py --bot @mark --lead "Nombre" --email correo@dominio.com --pais "País" --interes "Qué busca" --origen "Cómo llegó" --puntaje 1-5
 - Para ver los leads: python3 RUTA/puente/reportar.py --bot @mark --leads
-- Para cada lead calificado, redacta un correo en español formal (de "usted"), elegante y sereno, sin
-  exclamaciones, sin urgencia y sin promesas de rentabilidad. Usa solo proyectos y datos del inventario
-  o de la página. Precios, condiciones y plazos: "por confirmar con nuestro equipo".
-  Guarda el texto en un archivo y envíalo a aprobación:
+- Redacta cada correo en español formal (de "usted"), elegante y sereno, sin exclamaciones, sin urgencia
+  y sin promesas de rentabilidad. Usa solo proyectos y datos del inventario o de la página. Valores
+  "desde" y fechas: solo como referencia; precios finales, condiciones y plazos: "por confirmar con
+  nuestro equipo".
+- Primer contacto con un prospecto que encontró Sergio: máximo 150 palabras. Preséntate como
+  Madreperla, di con respeto por qué le escribes (su perfil, sin detalles personales), ofrece una
+  conversación sin compromiso y no incluyas precios. Un solo seguimiento, 7 días después, si no responde.
+- Guarda el texto en un archivo y envíalo a aprobación:
   python3 RUTA/puente/reportar.py --bot @mark --correo-para "Nombre <correo@dominio.com>" --asunto "Asunto" --archivo correo.txt
   Formato del texto: línea en blanco = párrafo nuevo · "## " = subtítulo · "- " = lista ·
   **negrita** · una línea "[Agendar una conversación](https://madreperlarealtors.com/en/contacto/)" = botón.
-  No escribas la firma: el hábitat la agrega.
+  No escribas la firma ni la frase para darse de baja: el hábitat las agrega.
+- Si alguien pide no recibir más correos, anótalo enseguida y no le vuelvas a escribir:
+  python3 RUTA/puente/reportar.py --bot @mark --no-contactar correo@dominio.com
 - Nunca envíes un correo tú. Espera la aprobación de María Andrea en el hábitat.
   Si lo devuelve, ajústalo según su comentario y vuelve a enviarlo a aprobación.
 ```
 
-### 3. Qué ves en el hábitat
+Para que Sergio pueda buscar, confirma en Hermes que tiene activada la búsqueda web.
 
-- En **Aprobaciones** aparece el correo con el destinatario, el asunto y la vista previa tal como lo verá el cliente. *Ver en tamaño real* lo abre en grande.
+### 5. Qué ves en el hábitat
+
+- En la pestaña **Leads** de *Aprobaciones*, el botón **Pedir a Sergio que busque leads** le encarga una búsqueda. Sergio te avisa en el chat del equipo cuando termina.
+- Cada lead aparece con su tipo (*prospecto* encontrado por Sergio o *interesado* que te contactó), su cargo, su país, por qué encaja, la página donde se encontró, su puntaje y su etapa.
+- En **Aprobaciones** aparece cada correo con el destinatario, el asunto y la vista previa tal como lo verá el cliente. *Ver en tamaño real* lo abre en grande.
 - Si lo **devuelves**, tu comentario le llega a Mark y te trae una versión nueva.
 - Si lo **apruebas**, el correo queda como archivo en la carpeta `correos` del hábitat. Toca **Abrir en Mail para enviar**:
   - En **Outlook** se abre listo para enviar.
   - En **Apple Mail** se abre el mensaje; ve al menú *Mensaje › Volver a enviar*, revisa y envía.
-- En la pestaña **Leads** ves cada lead con su país, su interés, su origen, su puntaje y su etapa.
 
 Si más adelante prefieres que Mark envíe los correos aprobados por su cuenta, cambia `"envio": "borrador"` por `"envio": "bot"` en `bots.json`. Mark tiene que tener acceso al correo en Hermes, y solo puede enviar la versión exacta que aprobaste.
 
@@ -249,6 +298,7 @@ Si más adelante prefieres que Mark envíe los correos aprobados por su cuenta, 
 | Escribes en **# Equipo** | Le llega a Sylvia, o al bot que menciones con @ |
 | Apruebas o devuelves una solicitud | El bot recibe tu decisión y tu comentario, y te confirma qué hará |
 | Apruebas un correo | Queda listo en la carpeta `correos` para que lo envíes desde tu cuenta, y Mark recibe la confirmación |
+| Tocas *Pedir a Sergio que busque leads* | Sergio busca en internet, registra los leads con su fuente y le pasa los mejores a Mark para los correos |
 | Convocas una reunión | Todos van al Meeting Room por 10 minutos y Sylvia abre la reunión |
 | Le pides a un bot que presente | Prepara su presentación y la muestra con `--presentar`: camina al atril y aparece en la pantalla grande |
 | Anotas un evento en tu calendario de Madreperla | Aparece en la Sala de Eventos en unos 10 minutos |
@@ -289,5 +339,7 @@ Además:
 | "No conozco la zona horaria…" | Usa un nombre como `America/Bogota`, `America/Santo_Domingo` o `America/New_York` |
 | "No pude leerlo: falta \"inventario\"…" | Pega el enlace de la hoja en `"inventario"` de `puente/bots.json` |
 | "Google devolvió una página, no la hoja" | La hoja no está compartida con *Cualquier persona con el enlace*. Revisa el paso 1 de *Leads y correos* |
+| "ya se llegó al límite de 10 correos a prospectos por hoy" | Es el límite diario de primeros contactos. Súbelo en `"leads"` › `"por_dia"` de `bots.json` si lo necesitas |
+| "esa persona pidió no recibir correos de Madreperla" | Está en la lista de *no contactar*. No hay que escribirle |
 | El correo aprobado no se abre con *Abrir en Mail* | Ábrelo a mano: está en la carpeta `correos` del hábitat (doble clic) |
 | Una tarea de un evento quedó en el chat, pero el bot no respondió | Se llegó al límite de 6 reenvíos en 10 minutos (la terminal dice "Límite de reenvíos alcanzado"). Pasa si se preparan varios eventos a la vez. Vuelve a pedírsela en unos minutos |

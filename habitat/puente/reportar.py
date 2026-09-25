@@ -35,7 +35,10 @@ Leads y correos (Mark):
   python3 reportar.py --bot @mark --inventario        muestra la hoja «Inventario de proyectos»
   python3 reportar.py --bot @mark --sitio             muestra el texto de madreperlarealtors.com
   python3 reportar.py --bot @mark --leads             muestra los leads registrados
+  python3 reportar.py --bot @mark --perfil            muestra el perfil de lead compatible y las reglas
   python3 reportar.py --bot @mark --lead "Ana Pérez" --email ana@correo.com --pais Colombia --interes "Villa en Cap Cana" --origen "Formulario del sitio" --puntaje 4
+  python3 reportar.py --bot @ageente-de-investigacion-madreperla --lead "Dr. Luis Gómez" --cargo "Cirujano, socio de clínica" --email contacto@clinica.com --pais Colombia --fuente https://clinica.com/equipo --motivo "Publicó sobre retiro en el Caribe" --puntaje 4
+  python3 reportar.py --bot @mark --no-contactar ana@correo.com   si alguien pide no recibir más correos
   python3 reportar.py --bot @mark --correo-para "Ana Pérez <ana@correo.com>" --asunto "Villas frente al mar en Cap Cana" --archivo correo.txt
 
   El texto del correo es simple: línea en blanco = párrafo nuevo, '## ' = subtítulo,
@@ -565,6 +568,11 @@ def main():
     ap.add_argument('--etapa', choices=C.ETAPAS, help='Etapa del lead')
     ap.add_argument('--puntaje', type=int, choices=range(1, 6), help='Qué tan buen prospecto es, de 1 a 5')
     ap.add_argument('--nota', help='Nota corta sobre el lead')
+    ap.add_argument('--cargo', help='Profesión o cargo del lead (público)')
+    ap.add_argument('--fuente', help='Página https:// donde encontraste al lead (prospectos de internet)')
+    ap.add_argument('--motivo', help='Por qué es compatible con Madreperla')
+    ap.add_argument('--perfil', action='store_true', help='Muestra el perfil de lead compatible y las reglas de búsqueda')
+    ap.add_argument('--no-contactar', help='Correo de alguien que pidió no recibir más correos')
     ap.add_argument('--correo-para', help='Prepara un correo para aprobar: "Nombre <correo@dominio.com>"')
     ap.add_argument('--asunto', help='Asunto del correo')
     ap.add_argument('--subir', action='store_true', help='Además, sube estado.json a GitHub')
@@ -574,8 +582,10 @@ def main():
     bot = handle(a.bot)
     t = ahora()
     contenido = None
-    if a.inventario or a.sitio or a.leads:          # solo lectura: no toca estado.json
+    if a.inventario or a.sitio or a.leads or a.perfil:   # solo lectura: no toca estado.json
         try:
+            if a.perfil:
+                print(C.texto_perfil())
             if a.inventario:
                 print(C.leer_inventario())
             if a.sitio:
@@ -584,7 +594,7 @@ def main():
                 print(C.texto_leads(C.leer_privado()))
         except Exception as e:
             sys.exit(f'No pude leerlo: {e}')
-        if not (a.lead or a.correo_para or a.estado or a.tarea or a.mensaje or a.aprobacion or a.presentar):
+        if not (a.lead or a.correo_para or a.no_contactar or a.estado or a.tarea or a.mensaje or a.aprobacion or a.presentar):
             return
     correo = None
     if a.correo_para:
@@ -603,11 +613,15 @@ def main():
         correo = {'para': email_dest, 'nombre': nombre_dest, 'asunto': asunto, 'texto': cuerpo[:20000],
                   'texto_plano': C.texto_plano(cuerpo, cc), 'html': C.armar_html(asunto, cuerpo, cc, resumen),
                   'hora': t.isoformat(), 'de': bot}
-    if a.lead and a.email:
-        try:
+    try:                                             # se valida antes de tocar los archivos
+        if a.lead and a.email:
             C.destinatario(a.email)
-        except ValueError as e:
-            sys.exit(f'No pude registrar el lead: {e}')
+        if a.lead and a.fuente:
+            C.fuente_valida(a.fuente)
+        if a.no_contactar:
+            C.destinatario(a.no_contactar)
+    except ValueError as e:
+        sys.exit(f'No pude registrar el lead: {e}')
     if a.presentar:
         try:
             crudo = open(a.archivo, encoding='utf-8').read() if a.archivo else (a.contenido or '')
@@ -684,19 +698,37 @@ def main():
                 for x in data.get('presentaciones', []):
                     x['activa'] = False
 
-            if a.lead or correo:
+            if a.lead or correo or a.no_contactar:
                 priv = C.leer_privado()
+                if a.no_contactar:
+                    quien = C.no_contactar(priv, t, a.no_contactar).lower()
+                    for aid, c in priv['correos'].items():         # sus correos pendientes se retiran solos
+                        ap_p = next((x for x in data['aprobaciones'] if x.get('id') == aid and x.get('estado') == 'pendiente'), None)
+                        if ap_p and (c.get('para') or '').lower() == quien:
+                            ap_p.update({'estado': 'devuelta', 'comentario': 'La persona pidió no recibir más correos.',
+                                         'decidido': t.isoformat()})
+                            c['estado'] = 'devuelta'
+                    ag.setdefault('historial', []).insert(0, {'hora': t.strftime('%H:%M'), 'texto': 'Anotó a alguien en «no contactar»'})
                 if a.lead:
                     lead, lead_nuevo = C.guardar_lead(priv, t, bot, a.lead, a.email, pais=a.pais, interes=a.interes,
                                                       origen=a.origen, presupuesto=a.presupuesto, nota=a.nota,
-                                                      etapa=a.etapa, puntaje=a.puntaje)
+                                                      etapa=a.etapa, puntaje=a.puntaje, cargo=a.cargo,
+                                                      fuente=a.fuente, motivo=a.motivo)
                     ag.setdefault('historial', []).insert(0, {'hora': t.strftime('%H:%M'),
                                                               'texto': ('Registró un lead' if lead_nuevo else 'Actualizó un lead')
                                                               + (f' ({lead["puntaje"]}/5)' if lead.get('puntaje') else '')})
                 if correo:
+                    if C.bloqueado(priv, correo['para']):
+                        raise ValueError('esa persona pidió no recibir correos de Madreperla. No le escribas.')
                     lead_c = C.buscar_lead(priv, correo['para'])
                     if lead_c:
                         correo['lead'] = lead_c['id']
+                        if lead_c.get('tipo') == 'prospecto':      # primer contacto con alguien que no nos escribió
+                            correo['prospecto'] = True
+                            tope = C.conf_leads()['por_dia']
+                            if C.correos_a_prospectos_hoy(priv, t) >= tope:
+                                raise ValueError(f'ya se llegó al límite de {tope} {"correo" if tope == 1 else "correos"} a '
+                                                 'prospectos por hoy (bots.json › leads › por_dia). Deja los demás para mañana.')
                     ap_c = agregar_aprobacion(data, bot, a.aprobacion or f'Correo: {correo["asunto"]}',
                                               correo_resumen(correo), 'correo', t, evento_id,
                                               correo={'asunto': correo['asunto']})
@@ -713,6 +745,8 @@ def main():
             guardar(data, t)
     except RuntimeError as e:
         sys.exit(str(e))
+    except ValueError as e:                          # nada se guardó
+        sys.exit(f'No pude completarlo: {e}')
 
     if a.subir:
         subir(bot)

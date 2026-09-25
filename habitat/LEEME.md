@@ -155,15 +155,18 @@ No pongas en `tarea` ni en los eventos datos sensibles de clientes (nombres comp
 
 ## Leads y correos
 
-Mark lee la página de Madreperla y la hoja **Inventario de proyectos**, registra los leads y prepara correos con la identidad de Madreperla: marfil y arena, petróleo, detalles champagne, títulos con serif editorial y texto en sans. Todos los correos pasan por **Aprobaciones**, con la vista previa tal como la verá el cliente. Nada se envía sin tu visto bueno.
+Sergio busca en internet personas compatibles con el perfil de Madreperla y las registra con la página donde las encontró. Mark lee la página de Madreperla y la hoja **Inventario de proyectos**, y prepara los correos con la identidad de Madreperla: marfil y arena, petróleo, detalles champagne, títulos con serif editorial y texto en sans. Todos los correos pasan por **Aprobaciones**, con la vista previa tal como la verá el cliente. Nada se envía sin tu visto bueno.
+
+- En la pestaña **Leads**, el botón *Pedir a Sergio que busque leads* le encarga una búsqueda.
 
 - Si **apruebas** un correo, queda como archivo en la carpeta `correos` y se abre en Mail con *Abrir en Mail para enviar*.
 - Si lo **devuelves**, tu comentario le llega a Mark y te trae una versión nueva.
-- La pestaña **Leads** muestra cada lead con su país, su interés, su origen, su puntaje de 1 a 5 y su etapa.
+- La pestaña **Leads** muestra cada lead con su tipo (prospecto o interesado), su país, por qué encaja, dónde se encontró, su puntaje de 1 a 5 y su etapa.
+- Quien pide no recibir más correos queda en la lista de *no contactar*, y nadie vuelve a escribirle.
 
 Los leads y los correos completos quedan en `puente/privado.json`, solo en tu computadora: no se suben a GitHub ni aparecen en `estado.json`. En `estado.json` solo queda el asunto de cada correo y los conteos de leads (`leads_resumen`).
 
-Para configurarlo (enlace de la hoja, firma e instrucción para Mark), ve a `puente/HERMES.md` › *Leads y correos*.
+Para configurarlo (hoja, perfil de lead, firma e instrucciones para Sergio y Mark), ve a `puente/HERMES.md` › *Leads y correos*.
 
 ## Nota sobre Pluse
 

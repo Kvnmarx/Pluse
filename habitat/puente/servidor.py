@@ -124,6 +124,7 @@ def instrucciones(bot, canal):
         'Si trabajas en algo de un evento de la Sala de Eventos, agrega --evento ID en reportar.py. '
         'Los correos a clientes se preparan con reportar.py --correo-para y --asunto (quedan en Aprobaciones con '
         'la identidad de Madreperla); nunca los envíes por otra vía. '
+        'Para buscar leads, revisa reportar.py --perfil y registra a cada persona con --lead, --fuente y --motivo. '
         f'Equipo: {equipo}.'
     )
 
@@ -256,6 +257,8 @@ def recibir_aprobacion(cuerpo):
             correo = priv['correos'].get(aid)
             if not correo:
                 raise RuntimeError('No encontré el correo completo en puente/privado.json.')
+            if decision == 'aprobada' and C.bloqueado(priv, correo.get('para')):
+                raise RuntimeError('Esta persona pidió no recibir correos de Madreperla. Devuélvelo en lugar de aprobarlo.')
             correo['estado'] = decision
             if decision == 'aprobada':
                 correo['archivo'] = C.guardar_eml(aid, correo, t, cc)
@@ -299,7 +302,8 @@ def recibir_privado(cuerpo):
     correos = {k: {'para': v.get('para'), 'nombre': v.get('nombre', ''), 'asunto': v.get('asunto'),
                    'html': v.get('html', ''), 'listo': bool(v.get('archivo') and os.path.exists(v['archivo']))}
                for k, v in priv['correos'].items() if k in ids}
-    return 200, {'leads': priv['leads'][-200:], 'correos': correos, 'envio': C.conf_correo(cfg)['envio']}
+    return 200, {'leads': priv['leads'][-200:], 'correos': correos, 'envio': C.conf_correo(cfg)['envio'],
+                 'no_contactar': len(priv['no_contactar'])}
 
 
 def abrir_archivo(ruta):
