@@ -8,6 +8,7 @@
   "eventos_automaticos": ["7d", "2d", "1d", "despues"],
   "inventario": "PEGA-AQUI-EL-ENLACE-DE-LA-HOJA-INVENTARIO-DE-PROYECTOS",
   "sitio": ["https://madreperlarealtors.com/", "https://madreperlarealtors.com/en/"],
+  "frentes_ayuda": "Opcional: agrega aquí frentes propios o cambia plazos, por ejemplo [{\"id\": \"instagram\", \"limite_dias\": 5}]. Si no pones nada, se usan los de base.",
   "leads": {
     "paises": ["Latinoamérica", "Estados Unidos", "Canadá", "Europa"],
     "primer_contacto": ["Estados Unidos"],

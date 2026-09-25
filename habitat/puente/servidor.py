@@ -347,6 +347,16 @@ def recibir_abrir_correo(cuerpo):
     return 200, {'ok': True, 'archivo': os.path.basename(ruta)}
 
 
+def recibir_frente(cuerpo):
+    """María Andrea marca un frente como retomado desde el hábitat."""
+    fid = str(cuerpo.get('id', '')).strip().lower()
+    try:
+        f = con_estado(lambda data, t: R.marcar_frente(data, fid, 'tu', t))
+    except ValueError as e:
+        return 400, {'error': str(e)}
+    return 200, {'ok': True, 'frente': f['id']}
+
+
 def recibir_reunion(cuerpo):
     tema = str(cuerpo.get('tema', '')).strip()[:200] or 'Reunión convocada por María Andrea'
     minutos = max(2, min(60, int(cuerpo.get('minutos', 10) or 10)))
@@ -370,6 +380,44 @@ def recibir_reunion(cuerpo):
 
 # ─────────────────────────── vigilante ───────────────────────────
 
+ultima_revision_frentes = [0]
+
+
+def revisar_frentes(data, juntas):
+    """Cada 10 minutos: avisa si un frente lleva demasiado sin actividad.
+    Pasado el plazo, recordatorio en el chat; pasado el doble, su responsable convoca una junta."""
+    t = R.ahora()
+    cambio = False
+    hora_rd = t.astimezone(R.zona_tz()).hour if hasattr(R, 'zona_tz') else t.hour
+    for f in R.frentes(data, cfg, t):
+        dias, nivel = R.nivel_frente(f, t)
+        if nivel == 'al-dia' or f.get('aviso') == nivel or (nivel == 'atencion' and f.get('aviso') == 'urgente'):
+            continue
+        dueno = f.get('dueno')
+        if nivel == 'atencion':
+            R.agregar_mensaje(data, 'sistema', f'Recordatorio: «{f["nombre"]}» lleva {dias} días sin actividad '
+                              f'(plazo: {f["limite_dias"]}). A cargo de {nombre(dueno)}. {f.get("importancia", "")}',
+                              para='todos', tipo='sistema', t=t, frente=f['id'])
+            f['aviso'] = 'atencion'; cambio = True
+        else:
+            j = data.get('junta') if isinstance(data.get('junta'), dict) else {}
+            if j.get('hasta', 0) > time.time() or not (8 <= hora_rd < 20) or dueno not in cfg['bots']:
+                continue                                   # sin juntas encimadas ni de noche
+            tema = f'Descuido: {f["nombre"]} lleva {dias} días sin actividad'
+            hasta = time.time() + 10 * 60
+            for ag in data['agentes']:
+                if ag.get('estado') != 'reunion':
+                    ag['_antes_reunion'] = {'estado': ag.get('estado'), 'tarea': ag.get('tarea', '')}
+                ag.update({'estado': 'reunion', 'tarea': tema, '_reunion_hasta': hasta})
+                ag.pop('sala', None)
+            data['junta'] = {'id': R.nuevo_id(t, dueno), 'de': dueno, 'tema': tema, 'hora': t.isoformat(), 'ts': t.timestamp(),
+                             'hasta': hasta, 'aviso': True, 'urgente': True}
+            R.agregar_mensaje(data, dueno, f'Convoco una junta urgente en el Meeting Room: {tema}.', t=t)
+            juntas.append({'de': dueno, 'tema': tema, 'motivo': f.get('importancia', ''), 'frente': f['id']})
+            f['aviso'] = 'urgente'; cambio = True
+    return cambio
+
+
 def vigilante():
     """Cada 2 segundos: termina reuniones vencidas y reenvía tareas entre bots."""
     while True:
@@ -381,6 +429,9 @@ def vigilante():
             def revisar(data):
                 cambio = False
                 ahora_s = time.time()
+                if ahora_s - ultima_revision_frentes[0] > 600:
+                    ultima_revision_frentes[0] = ahora_s
+                    cambio = revisar_frentes(data, juntas) or cambio
                 j = data.get('junta')
                 if isinstance(j, dict) and not j.get('aviso') and j.get('de') in cfg['bots']:
                     j['aviso'] = True                  # quien convocó abre la junta en el chat del equipo
@@ -412,10 +463,16 @@ def vigilante():
                     if revisar(data):
                         R.guardar(data)
             for j in juntas:
-                en_hilo(preguntar, j['de'],
-                        f'Convocaste una junta en el Meeting Room del Hábitat: «{j["tema"]}». Ábrela con el equipo: '
-                        'explica en 3 o 4 frases por qué es importante y qué propones. Si hace falta una decisión de '
-                        'María Andrea, dilo claro.', 'equipo', 'todos')
+                if j.get('frente'):
+                    texto = (f'El Hábitat detectó un descuido en un frente a tu cargo y convocó una junta urgente en tu nombre: '
+                             f'«{j["tema"]}». Por qué importa: {j.get("motivo", "")} Ábrela con el equipo en 3 o 4 frases: '
+                             'reconoce el descuido, explica el riesgo y propone un plan concreto para esta semana. Cuando '
+                             f'lo retomes, regístralo con reportar.py --frente {j["frente"]}.')
+                else:
+                    texto = (f'Convocaste una junta en el Meeting Room del Hábitat: «{j["tema"]}». Ábrela con el equipo: '
+                             'explica en 3 o 4 frases por qué es importante y qué propones. Si hace falta una decisión de '
+                             'María Andrea, dilo claro.')
+                en_hilo(preguntar, j['de'], texto, 'equipo', 'todos')
             for m in pendientes:
                 ahora_s = time.time()
                 reenvios[:] = [x for x in reenvios if ahora_s - x < 600]
@@ -944,7 +1001,7 @@ class Manejador(SimpleHTTPRequestHandler):
         rutas = {'/api/mensaje': recibir_mensaje, '/api/aprobacion': recibir_aprobacion, '/api/reunion': recibir_reunion,
                  '/api/evento': recibir_evento, '/api/evento/preparar': recibir_preparar,
                  '/api/evento/borrar': recibir_borrar_evento, '/api/privado': recibir_privado,
-                 '/api/correo/abrir': recibir_abrir_correo, '/api/inventario': recibir_inventario}
+                 '/api/correo/abrir': recibir_abrir_correo, '/api/inventario': recibir_inventario, '/api/frente': recibir_frente}
         fn = rutas.get(urlparse(self.path).path)
         if not fn:
             return self._json(404, {'error': 'No encontrado.'})

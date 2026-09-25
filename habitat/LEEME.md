@@ -181,6 +181,7 @@ Para configurarlo (hoja, perfil de lead, firma e instrucciones para Sergio y Mar
 - **Cierre del día:** botón en el chat del equipo. En la simulación llega solo a las 6 p. m.
 - **Maqueta de República Dominicana** en la Sala de Ventas: toca una zona para ver sus proyectos del inventario.
 - **Ánimo de los robots:** ojos contentos al terminar algo, concentrados al trabajar, preocupados si esperan tu aprobación.
+- **Frentes que no se pueden descuidar** (botón *Frentes*): Instagram, LinkedIn, pipeline del CRM, seguimiento de leads, campañas, prospectos, inventario, propuestas y prioridades. Cada uno tiene un responsable y un plazo. Si pasa el plazo sin actividad, el responsable avisa. Si pasa el doble, convoca una junta urgente. Los bots registran actividad con `reportar.py --frente`.
 - **Tu atuendo:** saco de noche después de las 7:30 p. m., y la corona brilla los días de evento.
 
 ## Nota sobre Pluse

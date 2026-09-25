@@ -104,6 +104,14 @@ Reporta tu trabajo al Hábitat de Madreperla con la terminal:
 - Logros (pared de logros de la oficina de María Andrea; el equipo lo celebra):
     --logro "Visita agendada en Cap Cana"
 - Para ir a la oficina de María Andrea: --sala oficina
+- Frentes que no se pueden descuidar. Cada vez que trabajes en uno a tu cargo,
+  regístralo (así el hábitat sabe que está al día):
+    --frente instagram | linkedin | pipeline | seguimiento | campanas |
+             prospectos | inventario | propuestas | prioridades
+  Para ver cómo están todos: --frentes
+  Si un frente a tu cargo pasa su plazo, el hábitat te lo recuerda; si pasa el
+  doble, convoca una junta urgente en tu nombre: ábrela, reconoce el descuido y
+  propone un plan concreto.
 
 Textos cortos y profesionales. Nunca incluyas datos sensibles de clientes
 (cédulas, cuentas, montos, teléfonos), tampoco en los eventos. Nada se envía
@@ -327,6 +335,9 @@ Si más adelante prefieres que Mark envíe los correos aprobados por su cuenta, 
 | Tocas *Pedir a Sergio que busque leads* | Sergio busca en internet, registra los leads con su fuente y le pasa los mejores a Mark para los correos |
 | Convocas una reunión | Todos van al Meeting Room por 10 minutos y Sylvia abre la reunión |
 | Un bot convoca una junta (`--convocar`) | Todos van al Meeting Room, arriba aparece quién la convocó y el bot la abre en **# Equipo** |
+| Un frente pasa su plazo sin actividad | Aparece un recordatorio en **# Equipo** y el botón *Frentes* se marca |
+| Un frente pasa el doble de su plazo | Su responsable convoca una junta urgente (de 8 a. m. a 8 p. m.) y la abre explicando el riesgo |
+| Tocas *Lo retomamos hoy* en un frente | Queda al día y se reinicia su plazo |
 | Tocas *Cierre del día* en el chat | Sylvia pide a cada bot un resumen de lo que hizo y lo que queda pendiente |
 | Te acercas a un bot y tocas *Encargar tarea* | La tarea le llega a ese bot en privado |
 | Le pides a un bot que presente | Prepara su presentación y la muestra con `--presentar`: camina al atril y aparece en la pantalla grande |

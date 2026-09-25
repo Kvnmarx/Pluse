@@ -307,6 +307,15 @@
 
   /* Sala de Eventos */
   .evbtn{border-color:#E0C27A;color:#E0C27A} .evbtn .badge{background:#E0C27A;color:#0B252A}
+  .frbtn{border-color:#8FB3B5;color:#CFE0DF} .frbtn .badge{background:#E07A5F;color:#0B252A}
+  .frbtn.alerta{border-color:#E07A5F;color:#F2B7A6}
+  .fr-item{border:1px solid var(--line);border-left:3px solid var(--c);border-radius:12px;padding:11px 12px;display:grid;gap:6px}
+  .fr-item.urgente{border-color:rgba(224,122,95,.55);background:rgba(224,122,95,.07)}
+  .fr-top{display:flex;justify-content:space-between;gap:8px;align-items:center}
+  .fr-name{font:600 13.5px/1.3 var(--body)} .fr-who{font:11px var(--mono);color:var(--muted)}
+  .fr-dias{font:12px/1.4 var(--mono);color:var(--ivory)} .fr-imp{font-size:12.5px;line-height:1.45;opacity:.85}
+  .chip.fr-al-dia{color:var(--ok);border-color:rgba(127,214,164,.45)} .chip.fr-atencion{color:var(--warn);border-color:rgba(233,196,106,.5)}
+  .chip.fr-urgente{color:#F2B7A6;border-color:#E07A5F}
   .evp{--c:#E0C27A}
   .ev-src{font:11.5px/1.45 var(--mono);color:var(--muted)}
   .ev-src b{color:var(--ivory);font-weight:500}
@@ -390,6 +399,7 @@
       <button class="chatbtn" id="chatBtn" aria-controls="chat">Chat del equipo <span class="badge" id="chatBadge" hidden>0</span></button>
       <button class="aprbtn" id="aprBtn" aria-controls="aprPanel">Aprobaciones <span class="badge" id="aprBadge" hidden>0</span></button>
       <button class="aprbtn evbtn" id="evBtn" aria-controls="evPanel">Eventos <span class="badge" id="evBadge" hidden>0</span></button>
+      <button class="aprbtn frbtn" id="frBtn" aria-controls="frPanel">Frentes <span class="badge" id="frBadge" hidden>0</span></button>
     </div>
   </div>
   <div class="hint">Arrastra para girar · pellizca o rueda para acercar · toca un robot o su nombre para ver su ficha</div>
@@ -434,6 +444,7 @@
   </div>
 </div>
 <aside class="ui detail evp" id="evPanel" hidden aria-label="Eventos"></aside>
+<aside class="ui detail frp" id="frPanel" hidden aria-label="Frentes del negocio"></aside>
 <div class="ui toasts" id="toasts" aria-live="polite"></div>
 
 <form class="ui av-task" id="avTaskForm" hidden>
@@ -1873,6 +1884,7 @@ async function poll(){
     if (Array.isArray(data.presentaciones)) loadLivePresentations(data.presentaciones);
     if (Array.isArray(data.eventos)) loadLiveEvents(data.eventos);
     vidaLive(data);
+    if (Array.isArray(data.frentes)) loadLiveFrentes(data.frentes);
     if (Array.isArray(data.escribiendo)) {
       for (const k in typing) delete typing[k];
       data.escribiendo.forEach(e => { const id = resolveId(e.bot); typing[e.canal === 'equipo' ? 'equipo' : resolveId(e.canal)] = id; });
@@ -2556,6 +2568,7 @@ function aprItem(a, canDecide){
 function openApprovals(){
   if (selected) select(null);
   if (evOpen) closeEvents();
+  if (frOpen) closeFrentes();
   aprOpen = true; aprPanel.hidden = false; rosterEl.hidden = true;
   aprBtn.setAttribute('aria-expanded', 'true');
   renderApprovals(true); aprPanel.scrollTop = 0;
@@ -2564,7 +2577,7 @@ function openApprovals(){
 function closeApprovals(){
   aprOpen = false; aprPanel.hidden = true;
   aprBtn.setAttribute('aria-expanded', 'false');
-  if (!selected && !evOpen) rosterEl.hidden = false;
+  if (!selected && !evOpen && !frOpen) rosterEl.hidden = false;
 }
 aprBtn.addEventListener('click', () => aprOpen ? closeApprovals() : openApprovals());
 avApr.addEventListener('click', openApprovals);
@@ -3596,6 +3609,7 @@ function evItem(ev, now, open, isNext, canEdit){
 function openEvents(id){
   if (selected) select(null);
   if (aprOpen) closeApprovals();
+  if (frOpen) closeFrentes();
   evOpen = true; evPanel.hidden = false; rosterEl.hidden = true;
   if (id) evExpanded = id;
   evBtn.setAttribute('aria-expanded', 'true');
@@ -3604,7 +3618,7 @@ function openEvents(id){
 function closeEvents(){
   evOpen = false; evPanel.hidden = true;
   evBtn.setAttribute('aria-expanded', 'false');
-  if (!selected && !aprOpen) rosterEl.hidden = false;
+  if (!selected && !aprOpen && !frOpen) rosterEl.hidden = false;
 }
 evBtn.addEventListener('click', () => evOpen ? closeEvents() : openEvents());
 avEv.addEventListener('click', () => openEvents());
@@ -4182,6 +4196,111 @@ function vidaTick(dt, now){
 
 drawMetas(); drawLogros(); construirMapa();
 
+/* ───────── Frentes: lo importante que no se puede descuidar ─────────
+   Cada frente tiene un responsable y un plazo sin actividad. Pasado el plazo, el
+   responsable avisa; pasado el doble, convoca una junta urgente. Con Hermes lo
+   decide el servidor (reportar.py --frente para registrar actividad).            */
+const FR_LABEL = { 'al-dia':'Al día', atencion:'Atención', urgente:'Urgente' };
+const FRENTES_SIM = [
+  ['instagram', 'Instagram de Madreperla', 'bety', 7, 16, 'Es la vitrina de la marca: sin publicaciones perdemos alcance y la confianza de quienes nos siguen.',
+   ['Llevamos 16 días sin publicar en Instagram, y es la vitrina de Madreperla.', 'Propongo retomar esta semana con tres publicaciones de Cap Cana y Cabeza de Toro; las dejo en Aprobaciones mañana.', 'María Andrea, ¿te parece si las programamos martes, jueves y sábado?']],
+  ['linkedin', 'LinkedIn de María Andrea', 'bety', 7, 3, 'Sostiene la marca personal de María Andrea y atrae a inversionistas patrimoniales.'],
+  ['pipeline', 'Pipeline del CRM', 'marcelo', 3, 4, 'Si el pipeline no está al día, se pierden oportunidades y no sabemos en qué etapa está cada cliente.'],
+  ['seguimiento', 'Seguimiento de leads', 'marcelo', 5, 2, 'Un lead sin respuesta durante una semana suele enfriarse.'],
+  ['campanas', 'Campañas y captación de leads', 'mark', 7, 1, 'Sin campañas activas no entran leads nuevos.'],
+  ['prospectos', 'Búsqueda de prospectos', 'sergio', 14, 5, 'Mantiene lleno el embudo con inversionistas compatibles.'],
+  ['inventario', 'Inventario de proyectos', 'sergio', 14, 0, 'Los correos y las propuestas dependen de precios y fechas al día.'],
+  ['propuestas', 'Propuestas y visitas a clientes', 'viktor', 10, 6, 'Son las conversaciones que se convierten en ventas.'],
+  ['prioridades', 'Revisión de prioridades con María Andrea', 'sylvia', 7, 2, 'Alinea al equipo con lo que más importa en la semana.'],
+].map(([id, nombre, dueno, limite, hace, importancia, junta]) => ({ id, nombre, dueno, limite, ultimo: Date.now() - hace * 864e5, importancia, junta, aviso: null }));
+let frentes = FRENTES_SIM, frOpen = false, frUI = {};
+const frPanel = document.getElementById('frPanel'), frBtn = document.getElementById('frBtn'), frBadge = document.getElementById('frBadge');
+function nivelFrente(f){
+  const dias = Math.max(0, Math.floor((Date.now() - f.ultimo) / 864e5)), lim = Math.max(1, f.limite || 7);
+  return { dias, nivel: dias >= 2 * lim ? 'urgente' : dias >= lim ? 'atencion' : 'al-dia' };
+}
+function loadLiveFrentes(list){
+  frentes = list.map(f => ({ id: String(f.id), nombre: String(f.nombre || f.id), dueno: resolveId(f.dueno), limite: +f.limite_dias || 7,
+    ultimo: Date.parse(f.ultimo) || Date.now(), importancia: String(f.importancia || ''), aviso: f.aviso || null }));
+  renderFrentes();
+}
+function renderFrentes(){
+  const conNivel = frentes.map(f => ({ ...f, ...nivelFrente(f) }));
+  const malos = conNivel.filter(f => f.nivel !== 'al-dia');
+  frBadge.hidden = !malos.length; frBadge.textContent = malos.length;
+  frBtn.classList.toggle('alerta', malos.some(f => f.nivel === 'urgente'));
+  for (const rb of Object.values(robots)) rb.descuido = conNivel.some(f => f.dueno === rb.a.id && f.nivel === 'urgente');
+  if (!frOpen) return;
+  const orden = { urgente: 0, atencion: 1, 'al-dia': 2 };
+  const puede = !live || !!server;
+  frPanel.innerHTML = `
+    <div class="d-head"><div class="d-avatar" aria-hidden="true" style="--c:#8FB3B5"></div>
+      <div><h2>Frentes del negocio</h2><div class="sub">Lo importante que no se puede descuidar</div></div>
+      <button class="x" id="frClose" aria-label="Cerrar frentes">×</button></div>
+    ${live ? '' : '<div class="note">Modo simulación: fechas de ejemplo.</div>'}
+    <div class="apr-note">Si un frente pasa su plazo sin actividad, su responsable avisa en el chat. Si pasa el doble, convoca una junta urgente.</div>
+    <div class="apr-list">${conNivel.sort((a, b) => orden[a.nivel] - orden[b.nivel] || b.dias - a.dias).map(f => {
+      const rb = robots[f.dueno], ui = frUI[f.id] || {};
+      return `<article class="fr-item ${f.nivel}" style="--c:${rb?.a.color || '#8FB3B5'}">
+        <div class="fr-top"><span class="fr-name">${esc(f.nombre)}</span><span class="chip fr-${f.nivel}">${FR_LABEL[f.nivel]}</span></div>
+        <span class="fr-who">A cargo de ${esc(rb?.a.name || f.dueno)}</span>
+        <span class="fr-dias">${f.dias === 0 ? 'Con actividad hoy' : `${f.dias} ${f.dias === 1 ? 'día' : 'días'} sin actividad`} · plazo ${f.limite} días</span>
+        ${f.nivel !== 'al-dia' ? `<div class="fr-imp">${esc(f.importancia)}</div>` : ''}
+        ${f.nivel !== 'al-dia' ? `<div class="apr-actions"><button class="apr-back" data-fr="${esc(f.id)}"${puede && !ui.busy ? '' : ' disabled'}>Lo retomamos hoy</button></div>` : ''}
+        ${ui.err ? `<div class="apr-err" role="alert">${esc(ui.err)}</div>` : ''}
+      </article>`; }).join('')}</div>`;
+}
+function openFrentes(){
+  if (selected) select(null);
+  if (aprOpen) closeApprovals();
+  if (evOpen) closeEvents();
+  frOpen = true; frPanel.hidden = false; rosterEl.hidden = true; frBtn.setAttribute('aria-expanded', 'true');
+  renderFrentes(); frPanel.scrollTop = 0;
+}
+function closeFrentes(){
+  frOpen = false; frPanel.hidden = true; frBtn.setAttribute('aria-expanded', 'false');
+  if (!selected && !aprOpen && !evOpen) rosterEl.hidden = false;
+}
+frBtn.addEventListener('click', () => frOpen ? closeFrentes() : openFrentes());
+frPanel.addEventListener('click', async e => {
+  if (e.target.closest('#frClose')) return closeFrentes();
+  const b = e.target.closest('[data-fr]'); if (!b) return;
+  const f = frentes.find(x => x.id === b.dataset.fr); if (!f) return;
+  const ui = (frUI[f.id] ||= {});
+  if (live) {
+    if (!server) return;
+    ui.busy = true; renderFrentes();
+    try { await api('api/frente', { id: f.id }); ui.err = ''; poll(); } catch (err) { ui.err = err.message; }
+    ui.busy = false; renderFrentes(); return;
+  }
+  f.ultimo = Date.now(); f.aviso = null; renderFrentes();
+  const rb = robots[f.dueno];
+  if (rb) { rb.happyUntil = performance.now() + 5000; say(f.dueno, 'todos', `Gracias, María Andrea. Retomo «${f.nombre}» hoy mismo y lo mantengo al día.`); }
+});
+/* simulación: los responsables avisan solos */
+let frRevision = performance.now() + 40000;
+function frentesTick(now){
+  if (now < frRevision) return;
+  frRevision = now + 60000;
+  renderFrentes();
+  if (live || document.hidden) return;
+  for (const f of frentes) {
+    const { dias, nivel } = nivelFrente(f);
+    if (nivel === 'al-dia' || f.aviso === nivel || (nivel === 'atencion' && f.aviso === 'urgente')) continue;
+    if (nivel === 'urgente') {
+      if (now < meetingUntil || cierreEnCurso) continue;
+      f.aviso = 'urgente';
+      simJunta(f.dueno, `Descuido: ${f.nombre} lleva ${dias} días sin actividad`, f.junta || [`${f.nombre} lleva ${dias} días sin actividad. ${f.importancia}`, 'Propongo retomarlo esta semana con un plan concreto; se lo presento a María Andrea hoy.']);
+      aviso('Urgente', `${robots[f.dueno]?.a.name || 'Un agente'} convocó una junta: ${f.nombre} lleva ${dias} días sin actividad.`, 'Ver frentes', openFrentes);
+      break;                                                    // una junta a la vez
+    }
+    f.aviso = 'atencion';
+    say(f.dueno, 'todos', `Recordatorio: «${f.nombre}» lleva ${dias} días sin actividad (el plazo es de ${f.limite}). ${f.importancia} Me pongo al día hoy.`);
+    aviso('Atención', `${f.nombre}: ${dias} días sin actividad.`, 'Ver frentes', openFrentes);
+  }
+}
+renderFrentes();
+
 /* ───────── Interacción ───────── */
 
 const ray = new THREE.Raycaster(), ptr = new THREE.Vector2();
@@ -4485,7 +4604,7 @@ function tick(){
     rb.visorMat.emissiveIntensity = vi; rb.tipMat.emissiveIntensity = ti;
     if (t > rb.blink.next) { rb.blink.until = t + 0.12; rb.blink.next = t + 2 + Math.random()*4; }
     // ánimo: contento al terminar o al celebrar, concentrado al trabajar, preocupado si espera tu aprobación
-    const feliz = now < (rb.happyUntil || 0), espera = !rb.isMe && rb.espera && !feliz;
+    const feliz = now < (rb.happyUntil || 0), espera = !rb.isMe && (rb.espera || rb.descuido) && !feliz;
     const animo = feliz ? .42 : rb.isMe ? 1 : rb.state === 'trabajando' && !moving ? .72 : espera ? .85 : 1;
     const eyeY = rb.state === 'inactivo' ? 0.35 : t < rb.blink.until ? 0.1 : animo;
     const tilt = espera ? .38 : 0, alza = feliz ? .025 : rb.state === 'pensando' ? .03 : 0;
@@ -4520,6 +4639,7 @@ function tick(){
   presTick(dt, now);
   eventsTick(now);
   vidaTick(dt, now);
+  frentesTick(now);
   roomTags.forEach(({ r, el }) => project(r.labelPos, el, 0));
   ordenarEtiquetas(now);
 
@@ -4536,7 +4656,7 @@ function tick(){
 }
 function shortAngle(a){ return ((a + Math.PI) % (Math.PI*2) + Math.PI*2) % (Math.PI*2) - Math.PI; }
 
-if (/[?&]depurar\b/.test(location.search)) window.__habitat = { robots, avatar, perf, camera, controls, scene, vida: { simJunta, openMapa, celebrar, cierreDelDia, rutaLead, TEMAS_JUNTA }, nivel: () => nivel, pr: () => renderer.getPixelRatio() };   // solo para pruebas
+if (/[?&]depurar\b/.test(location.search)) window.__habitat = { robots, avatar, perf, camera, controls, scene, vida: { simJunta, openMapa, celebrar, cierreDelDia, rutaLead, TEMAS_JUNTA, openFrentes, frentes: () => frentes }, nivel: () => nivel, pr: () => renderer.getPixelRatio() };   // solo para pruebas
 renderRoster();
 renderApprovals(true);
 drawAprScreen();

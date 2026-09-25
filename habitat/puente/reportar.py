@@ -99,6 +99,66 @@ FRASES = {
 }
 
 
+# Frentes: lo importante que no se puede descuidar. Cada uno tiene un responsable y un plazo sin actividad.
+FRENTES_BASE = [
+    ('instagram', 'Instagram de Madreperla', '@contenido-madreperla', 7,
+     'Es la vitrina de la marca: sin publicaciones perdemos alcance y la confianza de quienes nos siguen.'),
+    ('linkedin', 'LinkedIn de María Andrea', '@contenido-madreperla', 7,
+     'Sostiene la marca personal de María Andrea y atrae a inversionistas patrimoniales.'),
+    ('pipeline', 'Pipeline del CRM', '@marcelo', 3,
+     'Si el pipeline no está al día, se pierden oportunidades y no sabemos en qué etapa está cada cliente.'),
+    ('seguimiento', 'Seguimiento de leads', '@marcelo', 5, 'Un lead sin respuesta durante una semana suele enfriarse.'),
+    ('campanas', 'Campañas y captación de leads', '@mark', 7, 'Sin campañas activas no entran leads nuevos.'),
+    ('prospectos', 'Búsqueda de prospectos', '@ageente-de-investigacion-madreperla', 14,
+     'Mantiene lleno el embudo con inversionistas compatibles.'),
+    ('inventario', 'Inventario de proyectos', '@ageente-de-investigacion-madreperla', 14,
+     'Los correos y las propuestas dependen de precios y fechas al día.'),
+    ('propuestas', 'Propuestas y visitas a clientes', '@viktor', 10, 'Son las conversaciones que se convierten en ventas.'),
+    ('prioridades', 'Revisión de prioridades con María Andrea', '@sylvia', 7, 'Alinea al equipo con lo que más importa en la semana.'),
+]
+
+
+def frentes(data, config=None, t=None):
+    """La lista de frentes en estado.json, completada con los de bots.json › frentes y los de base."""
+    t = t or ahora()
+    lista = data.get('frentes') if isinstance(data.get('frentes'), list) else []
+    por_id = {f.get('id'): f for f in lista if isinstance(f, dict)}
+    base = [dict(id=i, nombre=n, dueno=d, limite_dias=l, importancia=imp) for i, n, d, l, imp in FRENTES_BASE]
+    for extra in (config or {}).get('frentes', []) if isinstance((config or {}).get('frentes'), list) else []:
+        if isinstance(extra, dict) and extra.get('id'):
+            base = [b for b in base if b['id'] != extra['id']] + [extra]
+    for b in base:
+        f = por_id.setdefault(b['id'], {'id': b['id'], 'ultimo': t.isoformat()})
+        for k in ('nombre', 'dueno', 'limite_dias', 'importancia'):
+            if b.get(k) is not None:
+                f[k] = b[k]
+    data['frentes'] = list(por_id.values())
+    return data['frentes']
+
+
+def nivel_frente(f, t=None):
+    """(días sin actividad, 'al-dia' | 'atencion' | 'urgente')"""
+    t = t or ahora()
+    try:
+        ult = dt.datetime.fromisoformat(f.get('ultimo'))
+    except (TypeError, ValueError):
+        return 0, 'al-dia'
+    dias = max(0, (t - ult).days)
+    lim = max(1, int(f.get('limite_dias') or 7))
+    return dias, 'urgente' if dias >= 2 * lim else 'atencion' if dias >= lim else 'al-dia'
+
+
+def marcar_frente(data, fid, quien, t=None, nota=''):
+    t = t or ahora()
+    f = next((x for x in frentes(data, t=t) if x['id'] == fid), None)
+    if not f:
+        raise ValueError(f'no conozco el frente «{fid}». Frentes: ' + ', '.join(x['id'] for x in data['frentes']))
+    f.update({'ultimo': t.isoformat(), 'por': quien, 'aviso': None})
+    if nota:
+        f['nota'] = nota[:200]
+    return f
+
+
 def ahora():
     return dt.datetime.now().astimezone()
 
@@ -586,6 +646,8 @@ def main():
     ap.add_argument('--idioma', choices=['es', 'en'], default='es', help='Idioma del correo: es (español) o en (inglés)')
     ap.add_argument('--correo-para', help='Prepara un correo para aprobar: "Nombre <correo@dominio.com>"')
     ap.add_argument('--asunto', help='Asunto del correo')
+    ap.add_argument('--frente', help='Registra actividad en un frente (instagram, linkedin, pipeline, seguimiento, campanas, prospectos, inventario, propuestas, prioridades)')
+    ap.add_argument('--frentes', action='store_true', help='Muestra los frentes y cuántos días llevan sin actividad')
     ap.add_argument('--convocar', help='Convoca una junta en el Meeting Room sobre un tema importante')
     ap.add_argument('--minutos', type=int, default=10, help='Duración de la junta (5 a 30 minutos)')
     ap.add_argument('--meta', help='Meta de la semana (tablero del Meeting Room): nombre, por ejemplo "Leads calificados"')
@@ -600,6 +662,16 @@ def main():
     bot = handle(a.bot)
     t = ahora()
     contenido = None
+    if a.frentes:
+        with Bloqueo():
+            data = leer()
+            for f in frentes(data, C.config(), t):
+                dias, niv = nivel_frente(f, t)
+                print(f'{f["id"]:<12} {f["nombre"]} · a cargo de {f["dueno"]} · {dias} días sin actividad '
+                      f'(plazo {f["limite_dias"]}) · {niv}')
+            guardar(data, t)
+        if not (a.frente or a.estado or a.tarea or a.mensaje):
+            return
     if a.inventario or a.sitio or a.leads or a.perfil:   # solo lectura: no toca estado.json
         try:
             if a.perfil:
@@ -770,6 +842,9 @@ def main():
                 agregar_aprobacion(data, bot, a.aprobacion, a.detalle, a.clase, t, evento_id)
                 ag.setdefault('historial', []).insert(0, {'hora': t.strftime('%H:%M'), 'texto': 'Pidió aprobación: ' + a.aprobacion})
 
+            if a.frente:
+                f = marcar_frente(data, a.frente.strip().lower(), bot, t, a.nota or '')
+                ag.setdefault('historial', []).insert(0, {'hora': t.strftime('%H:%M'), 'texto': 'Al día: ' + f['nombre']})
             if a.convocar:
                 previa = data.get('junta') if isinstance(data.get('junta'), dict) else {}
                 if previa.get('de') == bot and t.timestamp() - previa.get('ts', 0) < 1800:
