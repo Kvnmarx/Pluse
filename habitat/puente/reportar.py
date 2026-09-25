@@ -20,7 +20,7 @@ Ejemplos:
   python3 reportar.py --bot @viktor --logro "Visita agendada en Cap Cana"
 
 Sala de Eventos:
-  python3 reportar.py --bot @sylvia --evento-nuevo "Torneo de golf Bogotá" --fecha 2026-09-26T08:00 --zona America/Bogota --lugar "Club El Rincón"
+  python3 reportar.py --bot @sylvia --evento-nuevo "Torneo de golf Bogotá" --fecha 2026-09-29 --fin 2026-10-02 --zona America/Bogota --lugar "Club El Rincón"
   python3 reportar.py --bot @sylvia --evento-nuevo "Feria inmobiliaria" --fecha 2026-10-03 --fin 2026-10-04
   python3 reportar.py --bot @sylvia --tarea-para @contenido-madreperla --mensaje "Borrador de invitación al torneo" --evento her-1790000000000
   python3 reportar.py --bot @contenido-madreperla --aprobacion "Invitación al torneo" --detalle "Texto…" --evento her-1790000000000

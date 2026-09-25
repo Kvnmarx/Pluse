@@ -161,7 +161,7 @@ Ten en cuenta:
 | `ahora` | Mientras dura el evento | "Ya empezó «…»" | No, solo avisa |
 | `despues` | Al terminar (hasta 3 días después) | "Terminó «…». Es buen momento para el seguimiento." | Sí, organiza el seguimiento |
 
-Cada aviso llega una sola vez, con la fecha y la hora del lugar del evento. Por ejemplo: *Faltan 2 días para «Torneo de golf Bogotá» (sábado 26 de septiembre, 08:00 · Bogotá).* Si agregas un evento cuando falta un día, solo llega "Mañana es…", no los avisos anteriores.
+Cada aviso llega una sola vez, con la fecha y la hora del lugar del evento. Por ejemplo: *Faltan 2 días para «Torneo de golf Bogotá» (del martes 29 de septiembre al viernes 2 de octubre · Bogotá).* Si agregas un evento cuando falta un día, solo llega "Mañana es…", no los avisos anteriores.
 
 ### Qué hace Sylvia sola
 
@@ -184,7 +184,7 @@ También puedes tocar **Preparar ahora** en el panel *Eventos* cuando quieras. Y
 Un bot puede agendar un evento:
 
 ```
-python3 RUTA/puente/reportar.py --bot @sylvia --evento-nuevo "Torneo de golf Bogotá" --fecha 2026-09-26T08:00 --zona America/Bogota --lugar "Club El Rincón"
+python3 RUTA/puente/reportar.py --bot @sylvia --evento-nuevo "Torneo de golf Bogotá" --fecha 2026-09-29 --fin 2026-10-02 --zona America/Bogota --lugar "Club El Rincón"
 ```
 
 - Opcionales: `--fin`, `--zona`, `--lugar` y `--descripcion`.

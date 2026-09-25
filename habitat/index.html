@@ -3206,7 +3206,12 @@ function ciudad(zona){ if (!zona) return ''; const k = zona.split('/').pop(); re
 function fechaTexto(ev){
   const zona = ev.zona || TZ_RD;
   const dia = fmtParts(ev.inicio, zona, { weekday:'long', day:'numeric', month:'long' });
-  if (ev.todoDia) return `${dia} · todo el día`;
+  if (ev.todoDia) {
+    const ult = ev.fin ? ev.fin - 1 : ev.inicio;                           // el fin de un evento de todo el día es exclusivo
+    const dias = Math.floor((ult - ev.inicio) / DAY) + 1;
+    if (dias > 1) return `del ${dia} al ${fmtParts(ult, zona, { weekday:'long', day:'numeric', month:'long' })} · ${dias} días`;
+    return `${dia} · todo el día`;
+  }
   const hora = fmtParts(ev.inicio, zona, { hour:'2-digit', minute:'2-digit', hourCycle:'h23' });
   let out = `${dia} · ${hora}`;
   if (zona !== TZ_RD) out += ` (hora de ${ciudad(zona)}; ${fmtParts(ev.inicio, TZ_RD, { hour:'2-digit', minute:'2-digit', hourCycle:'h23' })} en Santo Domingo)`;
@@ -3281,14 +3286,12 @@ function seedSampleEvents(){
     return Date.parse(`${ymd}T${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}:00${off}`);
   };
   const add = (r) => { const e = normEvent({ ...r, fuente:'ejemplo' }); if (e) eventos.push(e); };
-  // el torneo: el próximo 08:00 de Bogotá que caiga entre 24 y 48 horas (así el aviso es de 2 días)
-  const t0 = now + DAY, bog = new Date(t0 - 5 * H);
-  let golf = Date.UTC(bog.getUTCFullYear(), bog.getUTCMonth(), bog.getUTCDate(), 13, 0);   // 08:00 en Bogotá = 13:00 UTC
-  if (golf <= t0) golf += DAY;
-  add({ id:'ej-golf', titulo:'Torneo de golf Bogotá', inicio: golf, zona:'America/Bogota', lugar:'Bogotá, Colombia',
-        descripcion:'Torneo con inversionistas y aliados. Oportunidad para presentar Cap Cana y Cabeza de Toro (Coral Golf Resort).' });
-  add({ id:'ej-almuerzo', titulo:'Almuerzo con inversionistas', inicio: at(4, 13, 0, TZ_RD), zona:TZ_RD, lugar:'Cap Cana', descripcion:'Almuerzo privado con dos familias interesadas en segunda residencia.' });
-  add({ id:'ej-open', titulo:'Open house en Cap Cana', inicio: at(6, 10, 0, TZ_RD), zona:TZ_RD, lugar:'Cap Cana', descripcion:'Recorrido por villas seleccionadas.' });
+  // el torneo de golf en Bogotá: cuatro días, del martes 29 de septiembre al viernes 2 de octubre de 2026
+  add({ id:'ej-golf', titulo:'Torneo de golf Bogotá', inicio: Date.parse('2026-09-29T00:00:00-05:00'), fin: Date.parse('2026-10-03T00:00:00-05:00'),
+        todo_el_dia: true, zona:'America/Bogota', lugar:'Bogotá, Colombia',
+        descripcion:'Cuatro días de torneo, del martes 29 de septiembre al viernes 2 de octubre, con inversionistas y aliados. Oportunidad para presentar Cap Cana y Cabeza de Toro (Coral Golf Resort).' });
+  add({ id:'ej-almuerzo', titulo:'Almuerzo con inversionistas', inicio: at(10, 13, 0, TZ_RD), zona:TZ_RD, lugar:'Cap Cana', descripcion:'Almuerzo privado con dos familias interesadas en segunda residencia.' });
+  add({ id:'ej-open', titulo:'Open house en Cap Cana', inicio: at(12, 10, 0, TZ_RD), zona:TZ_RD, lugar:'Cap Cana', descripcion:'Recorrido por villas seleccionadas.' });
   add({ id:'ej-feria', titulo:'Feria inmobiliaria internacional', inicio: at(18, 9, 0, TZ_RD), zona:TZ_RD, lugar:'Miami, Estados Unidos', descripcion:'Stand compartido con aliados.' });
 }
 function eventsTick(now){

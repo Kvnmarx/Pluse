@@ -144,7 +144,7 @@ Cada aviso llega a `mensajes` como un mensaje de tipo `evento`:
 
 ```json
 { "id": "…", "de": "sistema", "para": "todos", "tipo": "evento", "evento": "cal-3f9a1c0b7d2e4a51", "umbral": "2d",
-  "texto": "Faltan 2 días para «Torneo de golf Bogotá» (sábado 26 de septiembre, 08:00 · Bogotá).", "hora": "2026-09-24T08:10:00-04:00" }
+  "texto": "Faltan 2 días para «Torneo de golf Bogotá» (del martes 29 de septiembre al viernes 2 de octubre · Bogotá).", "hora": "2026-09-27T08:10:00-04:00" }
 ```
 
 La fecha del texto va en español, con hora de 24 horas, en la zona del evento (o en la de Santo Domingo, si no se conoce).
