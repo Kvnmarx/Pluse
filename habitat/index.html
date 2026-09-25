@@ -481,12 +481,12 @@ const ROOMS = {
 };
 
 const AGENTS = [
-  { id:'sylvia',  hermes:'@sylvia',                               name:'Sylvia',  role:'Coordina',       home:'meeting',   color:'#FF8663' },
-  { id:'viktor',  hermes:'@viktor',                               name:'Viktor',  role:'Ventas',         home:'ventas',    color:'#3FD0E0' },
-  { id:'sergio',  hermes:'@ageente-de-investigacion-madreperla',  name:'Sergio',  role:'Investigación',  home:'libreria',  color:'#6FD68E' },
-  { id:'bety',    hermes:'@contenido-madreperla',                 name:'Bety',    role:'Contenido',      home:'design',    color:'#E86AC0' },
-  { id:'mark',    hermes:'@mark',                                 name:'Mark',    role:'Marketing',      home:'analitica', color:'#F2B544' },
-  { id:'marcelo', hermes:'@marcelo',                              name:'Marcelo', role:'CRM y clientes', home:'archivo',   color:'#9C82FF' },
+  { id:'sylvia',  hermes:'@sylvia',                               name:'Sylvia',  role:'Coordina',       home:'meeting',   color:'#FF8663', shell:'#5E1F1A', extra:'cascos' },
+  { id:'viktor',  hermes:'@viktor',                               name:'Viktor',  role:'Ventas',         home:'ventas',    color:'#3FD0E0', shell:'#093E48', extra:'corbata' },
+  { id:'sergio',  hermes:'@ageente-de-investigacion-madreperla',  name:'Sergio',  role:'Investigación',  home:'libreria',  color:'#6FD68E', shell:'#143F28', extra:'lentes' },
+  { id:'bety',    hermes:'@contenido-madreperla',                 name:'Bety',    role:'Contenido',      home:'design',    color:'#E86AC0', shell:'#4A143B', extra:'boina' },
+  { id:'mark',    hermes:'@mark',                                 name:'Mark',    role:'Marketing',      home:'analitica', color:'#F2B544', shell:'#5E3C0B', extra:'antenas' },
+  { id:'marcelo', hermes:'@marcelo',                              name:'Marcelo', role:'CRM y clientes', home:'archivo',   color:'#9C82FF', shell:'#271B57', extra:'visor' },
 ];
 /* acepta el id o el usuario de Hermes (con o sin @) */
 function resolveId(x){
@@ -1133,12 +1133,60 @@ function glowTexture(){
 }
 const GLOW_TEX = glowTexture();
 
+/* un detalle por rol, para reconocer a cada uno de lejos */
+function accesorio(a, headG, body, pearl, trim){
+  const luz = glow(a.color, 1.8);
+  const add = (m, x, y, z, parent = headG) => { m.position.set(x, y, z); parent.add(m); return m; };
+  switch (a.extra) {
+    case 'cascos': {                                  // Sylvia coordina: diadema con micrófono
+      const band = add(new THREE.Mesh(new THREE.TorusGeometry(0.46, 0.028, 8, 40, Math.PI), trim), 0, 0.02, 0);
+      const mic = add(new THREE.Mesh(new THREE.CapsuleGeometry(0.018, 0.24, 4, 8), trim), 0.4, -0.17, 0.22);
+      mic.rotation.set(0.9, 0, 0.5);
+      add(new THREE.Mesh(new THREE.SphereGeometry(0.035, 12, 10), luz), 0.34, -0.25, 0.36);
+      break;
+    }
+    case 'corbata': {                                 // Viktor ventas: corbata
+      const knot = add(new THREE.Mesh(new THREE.ConeGeometry(0.05, 0.07, 4), luz), 0, 1.07, 0.47, body);
+      knot.rotation.x = Math.PI;
+      const tie = add(new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.26, 4), luz), 0, 0.9, 0.52, body);
+      tie.rotation.set(Math.PI - 0.12, Math.PI/4, 0);
+      break;
+    }
+    case 'lentes': {                                  // Sergio investiga: lentes redondos
+      [-1, 1].forEach(sd => add(new THREE.Mesh(new THREE.TorusGeometry(0.085, 0.013, 8, 28), trim), sd*0.14, 0.03, 0.47));
+      add(new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.014, 0.014), trim), 0, 0.05, 0.48);
+      break;
+    }
+    case 'boina': {                                   // Bety contenido: boina
+      const b = add(new THREE.Mesh(new THREE.SphereGeometry(0.3, 24, 12, 0, Math.PI*2, 0, Math.PI/2.4), pearl), -0.06, 0.3, -0.02);
+      b.scale.set(1.3, 0.5, 1.25); b.rotation.z = 0.25;
+      add(new THREE.Mesh(new THREE.SphereGeometry(0.035, 10, 8), luz), -0.1, 0.45, -0.02);
+      break;
+    }
+    case 'antenas': {                                 // Mark marketing: dos antenas con señal
+      [-1, 1].forEach(sd => {
+        const st = add(new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.28, 6), trim), sd*0.3, 0.42, 0);
+        st.rotation.z = -sd*0.35;
+        add(new THREE.Mesh(new THREE.SphereGeometry(0.04, 12, 10), luz), sd*0.35, 0.56, 0);
+      });
+      break;
+    }
+    case 'visor': {                                   // Marcelo CRM: visera de datos
+      const v = add(new THREE.Mesh(new THREE.TorusGeometry(0.47, 0.03, 8, 40, Math.PI), luz), 0, 0.22, 0);
+      v.rotation.x = Math.PI/2 - 0.3;
+      break;
+    }
+  }
+}
+
 function buildRobot(a, idx){
   const col = new THREE.Color(a.color);
   const g = new THREE.Group();
   const Phys = THREE.MeshPhysicalMaterial || THREE.MeshStandardMaterial;
-  const shell = new Phys({ color:col, roughness:.3, metalness:.2, clearcoat:1, clearcoatRoughness:.15, envMapIntensity:.55 });
-  const pearl = new Phys({ color:'#D9D2C4', roughness:.3, metalness:.05, clearcoat:1, clearcoatRoughness:.1, envMapIntensity:.45 });
+  const dark = !!a.shell;                          // los bots: carrocería oscura; tu avatar: perla clara
+  const shell = new Phys({ color: a.shell || col, roughness: dark ? .38 : .3, metalness: dark ? .1 : .2, clearcoat: dark ? .7 : 1, clearcoatRoughness:.12, envMapIntensity: dark ? .3 : .55 });
+  const pearl = new Phys({ color: dark ? '#C9C1B2' : '#D9D2C4', roughness:.3, metalness:.08, clearcoat:1, clearcoatRoughness:.1, envMapIntensity:.45 });
+  const trim = new Phys({ color:'#1A1D1F', roughness:.35, metalness:.7, clearcoat:.6, envMapIntensity:.8 });
   const face  = new Phys({ color:'#050E10', roughness:.12, metalness:.4, clearcoat:1, envMapIntensity:.8 });
   const visorMat = new THREE.MeshStandardMaterial({ color:'#061619', emissive:col, emissiveIntensity:2.2, roughness:.2 });
   const tipMat = glow(a.color, 2.6);
@@ -1158,12 +1206,22 @@ function buildRobot(a, idx){
   torso.castShadow = true; body.add(torso);
   const belt = new THREE.Mesh(new THREE.TorusGeometry(0.49, 0.04, 10, 40), pearl);
   belt.rotation.x = Math.PI/2; belt.position.y = 0.6; body.add(belt);
-  const chest = new THREE.Mesh(new THREE.CircleGeometry(0.08, 24), glow(a.color, 2));
-  chest.position.set(0, 0.82, 0.5); body.add(chest);
+  const plate = new THREE.Mesh(new THREE.SphereGeometry(0.5, 32, 16, -0.55, 1.1, 1.05, 0.62), pearl);   // placa del pecho
+  plate.position.y = 0.72; plate.scale.set(1.02, 1, 1.04); body.add(plate);
+  const chest = new THREE.Mesh(new THREE.CircleGeometry(0.075, 24), glow(a.color, 2.2));
+  chest.position.set(0, 0.84, 0.515); body.add(chest);
+  const stripe = new THREE.Mesh(new THREE.TorusGeometry(0.43, 0.014, 8, 48), glow(a.color, 1.6));      // línea de luz
+  stripe.rotation.x = Math.PI/2; stripe.position.y = 0.42; body.add(stripe);
+  [-1, 1].forEach(sd => {                                                                             // hombros
+    const sh = new THREE.Mesh(new THREE.SphereGeometry(0.15, 20, 14), trim);
+    sh.position.set(sd*0.52, 0.98, 0); sh.scale.set(1, .8, 1); body.add(sh);
+  });
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.26, 0.08, 28), trim);                 // base
+  base.position.y = 0.3; body.add(base);
 
   // cabeza: grupo que gira entero
   const headG = new THREE.Group(); headG.position.y = 1.5; body.add(headG);
-  const head = new THREE.Mesh(new THREE.SphereGeometry(0.44, 40, 28), pearl);
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.44, 40, 28), dark ? shell : pearl);
   head.scale.set(1.08, 0.92, 1); head.castShadow = true; headG.add(head);
   const screenFace = new THREE.Mesh(new THREE.SphereGeometry(0.452, 32, 20, Math.PI/2 - 0.95, 1.9, 0.95, 1.2), face);
   screenFace.scale.set(1.08, 0.92, 1); headG.add(screenFace);
@@ -1172,12 +1230,13 @@ function buildRobot(a, idx){
     e.position.set(sd*0.14, 0.03, 0.455); headG.add(e); return e;
   });
   [-1, 1].forEach(sd => {
-    const ear = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.12, 20), shell);
+    const ear = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.12, 20), dark ? pearl : shell);
     ear.rotation.z = Math.PI/2; ear.position.set(sd*0.47, 0, 0); headG.add(ear);
     const er = new THREE.Mesh(new THREE.TorusGeometry(0.07, 0.015, 8, 24), glow(a.color, 2));
     er.rotation.y = Math.PI/2; er.position.set(sd*0.535, 0, 0); headG.add(er);
   });
   cyl(0.018, 0.018, 0.32, M.metal, 0, 0.52, 0, 8, headG);
+  accesorio(a, headG, body, pearl, trim);
   const tip = new THREE.Mesh(new THREE.SphereGeometry(0.07, 16, 12), tipMat);
   tip.position.y = 0.72; headG.add(tip);
   const tipGlow = new THREE.Sprite(new THREE.SpriteMaterial({ map:GLOW_TEX, color:col, transparent:true, opacity:.7, depthWrite:false, blending:THREE.AdditiveBlending }));
@@ -3815,7 +3874,7 @@ function tick(){
 }
 function shortAngle(a){ return ((a + Math.PI) % (Math.PI*2) + Math.PI*2) % (Math.PI*2) - Math.PI; }
 
-if (/[?&]depurar\b/.test(location.search)) window.__habitat = { robots, perf, nivel: () => nivel, pr: () => renderer.getPixelRatio() };   // solo para pruebas
+if (/[?&]depurar\b/.test(location.search)) window.__habitat = { robots, perf, camera, controls, nivel: () => nivel, pr: () => renderer.getPixelRatio() };   // solo para pruebas
 renderRoster();
 renderApprovals(true);
 drawAprScreen();
