@@ -4,6 +4,8 @@ Laboratorio personal donde agentes de IA trabajan en proyectos distintos: códig
 
 ## Áreas y agentes de ejemplo
 
+El laboratorio es abierto: no hay paredes, cada área se distingue por su color (piso, contorno de luz y marco elevado) y todas se conectan con el núcleo central sobre la Sala central.
+
 | Área | Agente | Proyecto |
 |---|---|---|
 | Sala central | Mentor | Coordina el laboratorio y las juntas |
@@ -14,7 +16,9 @@ Laboratorio personal donde agentes de IA trabajan en proyectos distintos: códig
 | Biblioteca | Sage | Aprendizaje e investigación |
 | Archivo | Orden | Vida personal y trámites |
 | Ala Madreperla | Perla | Enlace con el hábitat de Madreperla |
-| Tu oficina | María Andrea | Desde donde apruebas todo |
+| Puesto de mando | María Andrea | Desde donde apruebas todo |
+| Núcleo de datos | (libre) | Servidores y automatizaciones |
+| Invernadero | (libre) | Salud y bienestar |
 
 Los agentes, proyectos y textos son de ejemplo. Para cambiarlos, edita al principio de `index.html` los bloques `ROOMS` (áreas), `AGENTS` (agentes), `PROFILE` (misión de cada uno) y `SIM_TASKS` (tareas), y más abajo `FRENTES_SIM` (frentes y plazos).
 
