@@ -4,7 +4,7 @@ Laboratorio personal donde agentes de IA trabajan en proyectos distintos: códig
 
 ## Áreas y agentes de ejemplo
 
-El laboratorio es una gran nave abierta: no hay salas ni paredes. Cada área es un bloque hexagonal con piso de su color, lleno de módulos, cúpulas y torres, y todas se conectan con el núcleo central sobre la Sala central.
+El laboratorio es un panal de hexágonos pegados dentro de una gran nave: no hay salas, pasillos ni paredes. Lo único que separa las áreas es el color de su piso. Cada hexágono está lleno de módulos, cúpulas y torres; los agentes caminan entre los centros de los hexágonos y todas las áreas se conectan con el núcleo central sobre la Sala central.
 
 | Área | Agente | Proyecto |
 |---|---|---|
