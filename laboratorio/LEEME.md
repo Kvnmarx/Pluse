@@ -4,7 +4,7 @@ Laboratorio personal donde agentes de IA trabajan en proyectos distintos: códig
 
 ## Áreas y agentes de ejemplo
 
-El laboratorio es una sola nave abierta, blanca y azul, al estilo del Laboratorio de Dexter. Cada área es una zona del piso pintada de su color, pegada a la siguiente: no hay paredes entre ellas. Junto a los muros están las máquinas gigantes (supercomputadora, robot en construcción, tubos de químicos, cintas transportadoras) y en la Agenda hay un teletransportador. Todas las áreas se conectan con el cerebro central sobre la Sala central.
+El laboratorio es una nave oscura con luces de neón. Cada área es una zona del piso de su color, pegada a la siguiente y con borde de neón; no hay paredes entre ellas. Cada agente trabaja en un círculo de luz frente a su consola, con una terminal flotante que muestra lo que está haciendo, y el nombre de cada área va en un cartel en el piso. Junto a los muros están las máquinas gigantes (supercomputadora, robot en construcción, tubos de químicos, cintas transportadoras), en la Agenda hay un teletransportador y todas las áreas se conectan con el cerebro central sobre la Sala central. Los robots tienen casco con visor negro y ojos de luz, cuerpo redondo, brazos con manos y piernas.
 
 | Área | Agente | Proyecto |
 |---|---|---|
