@@ -1121,14 +1121,68 @@ const FURNITURE = {
     cyl(2.6, 2.6, 0.14, DX.blanco, 0, 0.88, 0, 40, g);                    // mesa redonda del consejo
     cyl(1.0, 1.3, 0.82, DX.gris, 0, 0.41, 0, 24, g);
     const filo = new THREE.Mesh(new THREE.TorusGeometry(2.6, 0.05, 8, 64), DX.azul); filo.rotation.x = Math.PI/2; filo.position.y = 0.96; g.add(filo);
-    const chairAt = (p, rotY) => {
+    const chairAt = (p, rotY) => {                                         // silla de agente
       const ch = new THREE.Group(); ch.position.copy(p); ch.rotation.y = rotY;
       cyl(0.4, 0.4, 0.1, DX.blanco, 0, 0.5, 0, 20, ch); cyl(0.05, 0.05, 0.5, DX.gris, 0, 0.25, 0, 8, ch);
       box(0.8, 0.75, 0.1, DX.blanco, 0, 0.92, -0.36, ch); box(0.8, 0.06, 0.11, DX.azul, 0, 1.3, -0.36, ch).castShadow = false;
       g.add(ch);
     };
-    const ang = [Math.PI, -2.62, -1.92, -1.22, -0.52, 2.62, 1.92, 1.22, 0.52, 0];     // 0 Mentor, 9 tú
-    r.seats = ang.map(a => { const p = L(Math.cos(a) * 3.8, Math.sin(a) * 3.8); chairAt(p, hacia(p, L(0, 0))); return PT(r, Math.cos(a) * 3.65, Math.sin(a) * 3.65); });
+    /* Jerarquía en las juntas: en la cabecera este, tres sillas ejecutivas juntas para la dirección
+       (tú al centro, María Fernanda y Kevin a los lados); enfrente, separadas, las sillas de los
+       agentes, más juntas entre sí y con Mentor al medio mirando a la dirección.                    */
+    const AG = [0, -1, 1, -2, 2, -3, 3, -4, 4].map(k => Math.PI + k * 0.44);      // 0 Mentor al centro, luego hacia los lados
+    const agentes = AG.map(a => { const p = L(Math.cos(a) * 3.75, Math.sin(a) * 3.75); chairAt(p, hacia(p, L(0, 0))); return PT(r, Math.cos(a) * 3.55, Math.sin(a) * 3.55); });
+    const JEFES = [{ a: 0, nombre: 'María Andrea' }, { a: -0.5, nombre: 'María Fernanda' }, { a: 0.5, nombre: 'Kevin Marx' }];
+    const oroMat = new THREE.MeshStandardMaterial({ color:'#C9A04E', roughness:.25, metalness:.95, envMapIntensity:1.1 });
+    const cuero = new (THREE.MeshPhysicalMaterial || THREE.MeshStandardMaterial)({ color:'#141217', roughness:.45, metalness:.05, clearcoat:.5, clearcoatRoughness:.35, envMapIntensity:.6 });
+    const ejecutiva = (p, rotY) => {                                       // silla ejecutiva premium de cuero con detalles dorados
+      const ch = new THREE.Group(); ch.position.copy(p); ch.rotation.y = rotY; g.add(ch);
+      for (let i = 0; i < 5; i++) {                                         // base de cinco patas con ruedas
+        const a = i / 5 * Math.PI * 2, pata = box(0.06, 0.05, 0.44, oroMat, Math.sin(a) * 0.22, 0.08, Math.cos(a) * 0.22, ch); pata.rotation.y = a;
+        const rueda = new THREE.Mesh(new THREE.SphereGeometry(0.045, 10, 8), M.dark); rueda.position.set(Math.sin(a) * 0.43, 0.045, Math.cos(a) * 0.43); ch.add(rueda);
+      }
+      cyl(0.05, 0.065, 0.42, oroMat, 0, 0.3, 0, 14, ch);                   // pistón dorado
+      const asiento = new THREE.Mesh(cajaRedonda(0.94, 0.2, 0.88, 0.08, 6), cuero); asiento.position.y = 0.6; asiento.castShadow = true; ch.add(asiento);
+      const resp = new THREE.Group(); resp.position.set(0, 0.66, -0.4); resp.rotation.x = -0.14; ch.add(resp);   // respaldo alto, un poco reclinado
+      const respaldo = new THREE.Mesh(cajaRedonda(0.92, 1.32, 0.2, 0.09, 6), cuero); respaldo.position.y = 0.7; respaldo.castShadow = true; resp.add(respaldo);
+      const cabecera = new THREE.Mesh(cajaRedonda(0.62, 0.26, 0.24, 0.1, 6), cuero); cabecera.position.set(0, 1.45, 0.03); resp.add(cabecera);
+      [-1, 1].forEach(sd => box(0.026, 1.3, 0.026, oroMat, sd * 0.462, 0.7, 0.04, resp).castShadow = false);   // ribetes dorados
+      box(0.94, 0.026, 0.026, oroMat, 0, 1.36, 0.04, resp).castShadow = false;
+      for (let fi = 0; fi < 3; fi++) for (let co = -1; co <= 1; co++) {      // capitoné con botones dorados
+        const b = new THREE.Mesh(new THREE.SphereGeometry(0.022, 8, 6), oroMat); b.position.set(co * 0.24, 0.35 + fi * 0.32, 0.105); resp.add(b);
+      }
+      [-1, 1].forEach(sd => {                                               // brazos con apoyo de cuero
+        box(0.07, 0.34, 0.07, oroMat, sd * 0.5, 0.82, 0.05, ch);
+        const apoyo = new THREE.Mesh(cajaRedonda(0.15, 0.07, 0.64, 0.03, 4), cuero); apoyo.position.set(sd * 0.5, 1.0, 0.05); ch.add(apoyo);
+      });
+      const luz = new THREE.Mesh(new THREE.RingGeometry(0.47, 0.53, 40), glow('#E6B85C', 1.3)); luz.rotation.x = -Math.PI/2; luz.position.y = 0.015; ch.add(luz);
+      return ch;
+    };
+    const placa = (p, nombre) => {                                         // placa con el nombre sobre la mesa, legible por ambos lados
+      const cv = document.createElement('canvas'); cv.width = 512; cv.height = 128; const x = cv.getContext('2d');
+      x.fillStyle = '#0B0A0D'; x.fillRect(0, 0, 512, 128); x.strokeStyle = '#C9A04E'; x.lineWidth = 8; x.strokeRect(6, 6, 500, 116);
+      x.fillStyle = '#E6C27A'; let f = 58; x.font = `700 ${f}px Georgia, serif`;
+      while (x.measureText(nombre).width > 450 && f > 30) { f -= 2; x.font = `700 ${f}px Georgia, serif`; }
+      x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(nombre, 256, 68);
+      const tex = new THREE.CanvasTexture(cv); tex.encoding = THREE.sRGBEncoding;
+      const pg = new THREE.Group(); pg.position.copy(p).setY(1.04); pg.rotation.y = hacia(p, L(0, 0)); g.add(pg);
+      box(0.78, 0.03, 0.14, oroMat, 0, -0.07, 0, pg).castShadow = false;
+      [1, -1].forEach(sd => { const m = new THREE.Mesh(new THREE.PlaneGeometry(0.74, 0.185), new THREE.MeshBasicMaterial({ map:tex })); m.position.z = sd * 0.035; m.rotation.set(-sd * 0.3, sd > 0 ? 0 : Math.PI, 0); pg.add(m); });
+    };
+    const jefes = JEFES.map(({ a, nombre }) => {
+      const p = L(Math.cos(a) * 4.35, Math.sin(a) * 4.35); ejecutiva(p, hacia(p, L(0, 0)));
+      placa(L(Math.cos(a) * 2.25, Math.sin(a) * 2.25), nombre);
+      return PT(r, Math.cos(a) * 3.95, Math.sin(a) * 3.95);
+    });
+    { // zona de dirección: alfombra negra con borde dorado y filo dorado en la mesa
+      const alf = new THREE.Mesh(new THREE.RingGeometry(3.45, 5.3, 48, 1, -0.8, 1.6), new THREE.MeshStandardMaterial({ color:'#0E0B0D', roughness:.9 }));
+      alf.rotation.x = -Math.PI/2; alf.position.y = 0.048; alf.receiveShadow = true; alf.userData.suelo = true; g.add(alf);
+      [[3.45, 3.53], [5.22, 5.3]].forEach(([a, b]) => { const o = new THREE.Mesh(new THREE.RingGeometry(a, b, 48, 1, -0.8, 1.6), glow('#C9A04E', 1.1)); o.rotation.x = -Math.PI/2; o.position.y = 0.052; o.userData.suelo = true; g.add(o); });
+      const arco = new THREE.Group(); arco.rotation.y = 0.75; g.add(arco);
+      const filoOro = new THREE.Mesh(new THREE.TorusGeometry(2.6, 0.055, 8, 40, 1.5), oroMat); filoOro.rotation.x = Math.PI/2; filoOro.position.y = 0.965; arco.add(filoOro);
+    }
+    r.seats = [...agentes, jefes[0]];                                       // 0-8 agentes, 9 tú
+    r.jefes = jefes;                                                        // los tres puestos de la dirección
     { const p = L(-9.5, -4.2); APR_SCREEN = panelHolo(g, p, 4.8, 1.8, hacia(p, L(0, 0)), 640, 240); }
     { const p = L(9.5, -4.2); METAS_SCREEN = panelHolo(g, p, 4.8, 1.8, hacia(p, L(0, 0)), 640, 240); }
     { const p = L(0, -7.4), s = panelHolo(g, p, 6.0, 2.6, 0, 1024, 448);
@@ -1648,7 +1702,7 @@ MOVERS.forEach(rb => {
 });
 /* rincones de cada sala para darse una vuelta mientras trabajan:
    ruta = puntos (lado, fondo) que esquivan los muebles; mira = hacia dónde se queda mirando */
-const RINCONES = { meeting: [ { ruta:[[-6.2, 2.2]], mira:[-9.5, -4.2], plano:true }, { ruta:[[6.2, -2.2]], mira:[9.5, -4.2], plano:true } ] };
+const RINCONES = { meeting: [ { ruta:[[-6.2, 2.6]], mira:[-9.5, -4.2], plano:true }, { ruta:[[-6.0, -2.8]], mira:[-9.5, -4.2], plano:true } ] };
 for (const k of ['code', 'design', 'analitica', 'libreria', 'archivo', 'ventas']) {
   const r = ROOMS[k], rel = (lx, lz) => { const p = PT(r, lx, lz); return [p.x - r.x, p.z - r.z]; };
   RINCONES[k] = [[5.6, -2.6, 6.5, -4.6], [-5.6, -2.6, -6.5, -4.6], [0, 4.2, 0, 6.0]].map(([a, b, c, d]) => ({ ruta:[rel(a, b)], mira:rel(c, d), plano:true }));
@@ -4898,7 +4952,7 @@ function tick(){
 }
 function shortAngle(a){ return ((a + Math.PI) % (Math.PI*2) + Math.PI*2) % (Math.PI*2) - Math.PI; }
 
-if (/[?&]depurar\b/.test(location.search)) window.__habitat = { robots, avatar, perf, camera, controls, scene, vida: { simJunta, openMapa, celebrar, cierreDelDia, rutaLead, TEMAS_JUNTA, openFrentes, frentes: () => frentes }, nivel: () => nivel, pr: () => renderer.getPixelRatio() };   // solo para pruebas
+if (/[?&]depurar\b/.test(location.search)) window.__habitat = { robots, avatar, perf, camera, controls, scene, rooms: ROOMS, vida: { simJunta, openMapa, celebrar, cierreDelDia, rutaLead, TEMAS_JUNTA, openFrentes, frentes: () => frentes }, nivel: () => nivel, pr: () => renderer.getPixelRatio() };   // solo para pruebas
 renderRoster();
 renderApprovals(true);
 drawAprScreen();
