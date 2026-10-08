@@ -510,23 +510,23 @@ const REFRESCO_MS = 15000;
 
 /* El laboratorio es una sola nave abierta, blanca y azul. Cada área es una zona del piso
    pintada de su color, pegada a la siguiente: no hay paredes entre ellas.                 */
-const ZW = 18, ZD = 15;                                   // tamaño de cada zona
+const ZW = 26, ZD = 22;                                   // tamaño de cada zona
 const ROOMS = {
-  code:        { name:'Code Lab',        sub:'Proyectos de código',           x:-27, z:-15 },
-  design:      { name:'Estudio',         sub:'Marca personal y contenido',    x:-9, z:-15 },
-  analitica:   { name:'Observatorio',    sub:'Finanzas y datos',              x:9, z:-15 },
-  nucleo:      { name:'Núcleo de datos', sub:'Servidores y automatizaciones', x:27, z:-15, color:'#00E5FF', fija:true },
-  oficina:     { name:'Puesto de mando', sub:'María Andrea',                  x:-27, z:0, color:'#D4A537', fija:true },
+  code:        { name:'Code Lab',        sub:'Proyectos de código',           x:-39, z:-22 },
+  design:      { name:'Estudio',         sub:'Marca personal y contenido',    x:-13, z:-22 },
+  analitica:   { name:'Observatorio',    sub:'Finanzas y datos',              x:13, z:-22 },
+  nucleo:      { name:'Núcleo de datos', sub:'Servidores y automatizaciones', x:39, z:-22, color:'#00E5FF', fija:true },
+  oficina:     { name:'Puesto de mando', sub:'María Andrea',                  x:-39, z:0, color:'#D4A537', fija:true },
   meeting:     { name:'Sala central',    sub:'Juntas del laboratorio',        x:0, z:0, w: 2 * ZW },
-  eventos:     { name:'Agenda',          sub:'Calendario y viajes',           x:27, z:0, color:'#FF6D00', fija:true },
-  libreria:    { name:'Biblioteca',      sub:'Aprendizaje e investigación',   x:-27, z:15 },
-  archivo:     { name:'Archivo',         sub:'Vida personal y trámites',      x:-9, z:15 },
-  ventas:      { name:'Ala Madreperla',  sub:'Proyecto laboral',              x:9, z:15 },
-  invernadero: { name:'Invernadero',     sub:'Salud y bienestar',             x:27, z:15, color:'#AEEA00', fija:true },
+  eventos:     { name:'Agenda',          sub:'Calendario y viajes',           x:39, z:0, color:'#FF6D00', fija:true },
+  libreria:    { name:'Biblioteca',      sub:'Aprendizaje e investigación',   x:-39, z:22 },
+  archivo:     { name:'Archivo',         sub:'Vida personal y trámites',      x:-13, z:22 },
+  ventas:      { name:'Ala Madreperla',  sub:'Proyecto laboral',              x:13, z:22 },
+  invernadero: { name:'Invernadero',     sub:'Salud y bienestar',             x:39, z:22, color:'#AEEA00', fija:true },
 };
 /* cada zona mira hacia afuera: sus máquinas quedan del lado del muro y el centro libre para caminar */
 for (const r of Object.values(ROOMS)) r.rot = r.z < 0 ? 0 : r.z > 0 ? Math.PI : r.x < 0 ? -Math.PI/2 : r.x > 0 ? Math.PI/2 : 0;
-const FW = 100, FD = 72, CZ = 0;   // tamaño de la nave
+const FW = 128, FD = 86, CZ = 0;   // tamaño de la nave
 
 const AGENTS = [
   { id:'sylvia',  hermes:'@mentor', name:'Mentor', role:'Coordina',          home:'meeting',   color:'#E53935', shell:'#5E1F1A', extra:'cascos' },
@@ -613,17 +613,17 @@ renderer.toneMappingExposure = 1.0;
 let composer = null, bloom = null;   // se crean más abajo si hay postprocesado
 const scene = new THREE.Scene();
 scene.background = new THREE.Color('#04060A');
-scene.fog = new THREE.Fog('#04060A', 140, 280);
+scene.fog = new THREE.Fog('#04060A', 190, 380);
 
-const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 340);
-camera.position.set(0, 54, 60);
+const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 480);
+camera.position.set(0, 74, 82);
 
 const controls = new THREE.OrbitControls(camera, canvas);
 controls.enableDamping = true;
 controls.dampingFactor = 0.08;
 controls.maxPolarAngle = 1.25;
 controls.minDistance = 10;
-controls.maxDistance = 185;
+controls.maxDistance = 240;
 controls.target.set(0, 0, 0);
 
 /* reflejos suaves: un estudio neutro como entorno */
@@ -637,10 +637,10 @@ const ROOM_LIGHTS = [], NIGHT_GLOWS = [];      // se ajustan con la hora del dí
 const rim = new THREE.DirectionalLight('#7fd3d6', 0.35);      // contraluz frío
 rim.position.set(20, 14, -26); scene.add(rim);
 const sun = new THREE.DirectionalLight('#ffe9c9', 0.95);
-sun.position.set(-30, 56, 24);
+sun.position.set(-40, 72, 30);
 sun.castShadow = true;
 sun.shadow.mapSize.set(3072, 3072);
-Object.assign(sun.shadow.camera, { left:-54, right:54, top:40, bottom:-40, near:1, far:160 });
+Object.assign(sun.shadow.camera, { left:-70, right:70, top:50, bottom:-50, near:1, far:220 });
 sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.02;
 scene.add(sun);
 
@@ -782,19 +782,26 @@ function brazoRobot(parent, x, z, color, escala = 1){       // brazo robótico q
   // franja azul al pie de los muros
   [[0, -FD/2 + .1, FW, .12], [0, FD/2 - .1, FW, .12], [-FW/2 + .1, 0, .12, FD], [FW/2 - .1, 0, .12, FD]].forEach(([x, z, w, d]) => box(w, 0.06, d, DX.azul, x, 0.05, z).castShadow = false);
 
-  // supercomputadora: una pared entera de gabinetes con cintas que giran y luces que parpadean
-  const NZ = -FD/2 + 1.6, carretes = [], lucesSC = [DX.azul, DX.rojo, DX.amarillo, DX.verde].map(m => m.clone());
-  for (let x = -FW/2 + 4; x <= FW/2 - 4; x += 3.6) {
-    if (Math.abs(x) < 8) continue;                                  // en el centro va la pantalla gigante
-    box(3.3, 7.5, 2.4, DX.blanco, x, 3.75, NZ);
-    box(2.8, 2.4, 0.06, DX.panel, x, 5.6, NZ + 1.22).castShadow = false;
-    [-0.7, 0.7].forEach(o => { const c = cyl(0.6, 0.6, 0.12, DX.gris, x + o, 5.7, NZ + 1.3, 20); c.rotation.x = Math.PI/2; c.castShadow = false; carretes.push(c);
-      const eje = cyl(0.18, 0.18, 0.14, DX.panel, x + o, 5.7, NZ + 1.32, 12); eje.rotation.x = Math.PI/2; eje.castShadow = false; });
-    box(2.8, 1.5, 0.06, DX.panel, x, 3.3, NZ + 1.22).castShadow = false;
-    for (let i = 0; i < 4; i++) for (let j = 0; j < 3; j++) box(0.32, 0.22, 0.05, lucesSC[(i + j + Math.round(x)) & 3], x - 0.9 + i * 0.6, 2.85 + j * 0.42, NZ + 1.26).castShadow = false;
-    box(3.34, 0.12, 2.44, DX.azul, x, 7.3, NZ).castShadow = false;
-  }
-  updaters.push((dt, t) => { carretes.forEach((c, i) => c.rotation.y += dt * (i % 2 ? 2.2 : -1.6)); lucesSC.forEach((m, i) => m.emissiveIntensity = Math.sin(t * (3 + i) + i * 1.7) > 0 ? 1.6 : .15); });
+  // supercomputadora: una pared entera de gabinetes con cintas y luces que parpadean
+  // (las piezas repetidas van en un solo bloque por tipo: se dibuja mucho más rápido)
+  const NZ = -FD/2 + 1.6, lucesSC = [DX.azul, DX.rojo, DX.amarillo, DX.verde].map(m => m.clone());
+  const XS = []; for (let x = -FW/2 + 4; x <= FW/2 - 4; x += 3.6) if (Math.abs(x) >= 8) XS.push(x);   // en el centro va la pantalla gigante
+  const molde = new THREE.Object3D();
+  const bloque = (geo, mat, puntos, sombra = false, rotX = 0) => {
+    const im = new THREE.InstancedMesh(geo, mat, puntos.length);
+    puntos.forEach(([x, y, z], i) => { molde.position.set(x, y, z); molde.rotation.set(rotX, 0, 0); molde.updateMatrix(); im.setMatrixAt(i, molde.matrix); });
+    im.castShadow = sombra; im.receiveShadow = true; scene.add(im); return im;
+  };
+  bloque(new THREE.BoxGeometry(3.3, 7.5, 2.4), DX.blanco, XS.map(x => [x, 3.75, NZ]), true);
+  bloque(new THREE.BoxGeometry(2.8, 2.4, 0.06), DX.panel, XS.map(x => [x, 5.6, NZ + 1.22]));
+  bloque(new THREE.BoxGeometry(2.8, 1.5, 0.06), DX.panel, XS.map(x => [x, 3.3, NZ + 1.22]));
+  bloque(new THREE.CylinderGeometry(0.6, 0.6, 0.12, 20), DX.gris, XS.flatMap(x => [[x - 0.7, 5.7, NZ + 1.3], [x + 0.7, 5.7, NZ + 1.3]]), false, Math.PI/2);
+  bloque(new THREE.CylinderGeometry(0.18, 0.18, 0.14, 12), DX.panel, XS.flatMap(x => [[x - 0.7, 5.7, NZ + 1.32], [x + 0.7, 5.7, NZ + 1.32]]), false, Math.PI/2);
+  bloque(new THREE.BoxGeometry(3.34, 0.12, 2.44), DX.azul, XS.map(x => [x, 7.3, NZ]));
+  const porLuz = [[], [], [], []], luzGeo = new THREE.BoxGeometry(0.32, 0.22, 0.05);
+  XS.forEach(x => { for (let i = 0; i < 4; i++) for (let j = 0; j < 3; j++) porLuz[(i + j + Math.round(x)) & 3].push([x - 0.9 + i * 0.6, 2.85 + j * 0.42, NZ + 1.26]); });
+  porLuz.forEach((pts, m) => { if (pts.length) bloque(luzGeo, lucesSC[m], pts); });
+  updaters.push((dt, t) => { lucesSC.forEach((m, i) => m.emissiveIntensity = Math.sin(t * (3 + i) + i * 1.7) > 0 ? 1.6 : .15); });
   { // pantalla gigante en el centro de la supercomputadora
     box(15.5, 8.5, 2.4, DX.blanco, 0, 4.25, NZ);
     const pt = canvasTex(512, 256, (x, w, h) => {
@@ -833,9 +840,9 @@ function brazoRobot(parent, x, z, color, escala = 1){       // brazo robótico q
     updaters.push((dt, t) => { const on = Math.sin(t * 13) > .2 && Math.sin(t * 1.3) > -.3; chispa.scale.setScalar(on ? .9 + Math.random() * .8 : 0.01); visor.material.emissiveIntensity = .8 + Math.sin(t * 2) * .4; });
   }
   // al este: fila de tubos de químicos gigantes
-  [[-26, '#5BE37D'], [-14, '#3FA9F5'], [14, '#FF6FB5'], [26, '#B57BFF']].forEach(([z, c]) => tuboQuimico(scene, FW/2 - 5, z, 5.5, c, 1.1));
+  [[-32, '#5BE37D'], [-16, '#3FA9F5'], [16, '#FF6FB5'], [32, '#B57BFF']].forEach(([z, c]) => tuboQuimico(scene, FW/2 - 5, z, 5.5, c, 1.1));
   // al sur: cinta transportadora baja (no tapa la vista)
-  cintaTransportadora(scene, -18, FD/2 - 4, 22); cintaTransportadora(scene, 18, FD/2 - 4, 22);
+  cintaTransportadora(scene, -24, FD/2 - 4, 28); cintaTransportadora(scene, 24, FD/2 - 4, 28);
 }
 
 /* red de caminos: del centro de cada hexágono al de sus vecinos (la Sala central queda fuera:
@@ -923,7 +930,7 @@ function buildRoom(key){
       return { inner: r.center.clone().addScaledVector(d, 5.4), outer: r.center.clone().addScaledVector(d, 7.6), node: k };
     });
   } else r.doors = [{ inner: r.center.clone(), outer: r.center.clone(), node: key }];
-  const pl = new THREE.PointLight(r.color, 0.6, 16, 2);
+  const pl = new THREE.PointLight(r.color, 0.75, 24, 2);
   pl.position.set(r.x, 3.6, r.z); g.add(pl);
   pl.userData.base = pl.intensity; ROOM_LIGHTS.push(pl);
 
@@ -1259,7 +1266,7 @@ function cartelZona(k, r){
   x.fillStyle = r.color; x.fillText(sub, 100, 196);
   const tex = new THREE.CanvasTexture(cv); tex.encoding = THREE.sRGBEncoding; tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
   const m = new THREE.Mesh(new THREE.PlaneGeometry(6, 1.5), new THREE.MeshBasicMaterial({ map:tex, transparent:true, depthWrite:false }));
-  const p = PT(r, 0, 6.0); m.rotation.x = -Math.PI/2; m.position.set(p.x, 0.05, p.z); m.userData.suelo = true; scene.add(m);
+  const p = PT(r, 0, ((Math.abs(Math.sin(r.rot)) > .5 ? (r.w || W) : (r.d || D)) / 2) - 1.7); m.rotation.x = -Math.PI/2; m.position.set(p.x, 0.05, p.z); m.userData.suelo = true; scene.add(m);
 }
 /* terminales flotantes sobre cada puesto: muestran lo que hace el agente */
 const TERMINALES = [];
@@ -1343,7 +1350,7 @@ function decorarLaboratorio(){
 /* partículas flotando en el aire del laboratorio */
 var DUST = null;
 {
-  const N = 1000, pos = new Float32Array(N*3), spd = new Float32Array(N);
+  const N = 1500, pos = new Float32Array(N*3), spd = new Float32Array(N);
   for (let i = 0; i < N; i++) { pos[i*3] = (Math.random()-.5)*FW; pos[i*3+1] = Math.random()*11; pos[i*3+2] = (Math.random()-.5)*FD; spd[i] = .08 + Math.random()*.25; }
   const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
   const dust = new THREE.Points(geo, new THREE.PointsMaterial({ map:GLOW_TEX_EARLY(), color:'#7FD8FF', size:.22, transparent:true, opacity:.55, depthWrite:false, blending:THREE.AdditiveBlending }));
@@ -1628,7 +1635,7 @@ const MOVERS = [...Object.values(robots), avatar];
 
 /* Cada robot tiene su propio ritmo: velocidad, tiempo de reacción y pequeñas
    rutinas en su sala. Así nunca se mueven todos en el mismo instante.        */
-const PASO = 2.6;                                 // velocidad base al caminar (m/s)
+const PASO = 3.1;                                 // velocidad base al caminar (m/s)
 const RITMO = { sylvia:.7, nova:.8, kai:.9, viktor:.95, sergio:1.15, bety:.95, mark:.85, marcelo:1.2 };   // quién reacciona más rápido
 const ROJO = new THREE.Color('#FF4D4D');
 MOVERS.forEach(rb => {
@@ -1675,6 +1682,103 @@ function poblarAreas(){
     });
   }
 }
+
+/* ───────── Equipos extra: llenan las áreas grandes sin estorbar ─────────
+   Cada equipo se ubica solo, lejos de los puestos, de los caminos y de lo que ya hay. */
+function equiparZonas(){
+  let semilla = 23;
+  const azar = () => { semilla = (semilla * 16807) % 2147483647; return (semilla - 1) / 2147483646; };
+  scene.updateMatrixWorld(true);
+  const ocupado = [], bb = new THREE.Box3();
+  scene.traverse(o => {
+    if (!o.isMesh || o.isInstancedMesh || o.userData.suelo) return;
+    bb.setFromObject(o);
+    if (bb.isEmpty() || bb.min.y > 3.0 || bb.max.y < 0.15 || bb.max.x - bb.min.x > 16 || bb.max.z - bb.min.z > 16) return;
+    ocupado.push([bb.min.x, bb.min.z, bb.max.x, bb.max.z]);
+  });
+  const LED = [DX.azul, DX.verde, DX.amarillo].map(m => m.clone());
+  updaters.push((dt, t) => LED.forEach((m, i) => m.emissiveIntensity = Math.sin(t * (3.5 + i) + i * 2) > .1 ? 1.7 : .2));
+  const NEON = ['#00B0FF', '#00E676', '#FF3D00', '#FFC400', '#D500F9', '#1DE9B6'];
+  const holoMat = {}, grupo = (x, z) => { const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = Math.floor(azar() * 4) * Math.PI / 2; scene.add(g); return g; };
+  const PROPS = {
+    rack(x, z){ const g = grupo(x, z);                                             // gabinete de servidores
+      box(1.2, 2.6, 1.0, DX.blanco, 0, 1.3, 0, g); box(1.0, 2.2, 0.04, DX.panel, 0, 1.35, 0.52, g).castShadow = false;
+      for (let i = 0; i < 6; i++) box(0.8, 0.05, 0.03, LED[(i + Math.floor(azar() * 3)) % 3], 0, 0.5 + i * 0.36, 0.55, g).castShadow = false; },
+    cajas(x, z){ const g = grupo(x, z), raya = DX.amarillo.clone(); raya.emissiveIntensity = .5;   // cajas de suministros
+      [[-.38, 0, -.2], [.38, 0, .15], [0, 1, 0]].forEach(([a, n, b]) => { box(.7, .55, .7, n ? DX.gris : DX.blanco, a, .28 + n * .55, b, g); box(.72, .06, .72, raya, a, .42 + n * .55, b, g).castShadow = false; }); },
+    gas(x, z, c){ const g = grupo(x, z), tapa = glow(c, 1.3);                     // cilindros de gas
+      [-.27, .27].forEach(a => { cyl(.22, .22, 1.8, DX.gris, a, .9, 0, 18, g); cyl(.13, .16, .18, tapa, a, 1.9, 0, 12, g).castShadow = false; });
+      box(.8, .06, .5, DX.blanco, 0, 1.1, 0, g); },
+    holo(x, z, c){ const g = grupo(x, z);                                          // holograma sobre un pedestal
+      cyl(.6, .72, .8, DX.blanco, 0, .4, 0, 24, g);
+      const aro = new THREE.Mesh(new THREE.TorusGeometry(.6, .03, 8, 40), glow(c, 1.8)); aro.rotation.x = Math.PI/2; aro.position.y = .82; g.add(aro);
+      const m = holoMat[c] || (holoMat[c] = new THREE.MeshBasicMaterial({ color:c, wireframe:true, transparent:true, opacity:.8 }));
+      const f = new THREE.Mesh(azar() < .5 ? new THREE.IcosahedronGeometry(.42, 1) : new THREE.TorusKnotGeometry(.28, .08, 48, 6), m); f.position.y = 1.55; g.add(f);
+      const fase = azar() * 6; updaters.push((dt, t) => { f.rotation.y += dt * .7; f.rotation.x = Math.sin(t * .6 + fase) * .4; f.position.y = 1.55 + Math.sin(t * 1.3 + fase) * .08; }); },
+    monitor(x, z, c){ const g = grupo(x, z);                                       // monitor de pie con código
+      box(.9, .1, .7, DX.blanco, 0, .05, 0, g); box(.16, 1.3, .16, DX.gris, 0, .7, 0, g);
+      box(1.3, .82, .1, DX.blanco, 0, 1.6, 0, g);
+      const tex = codeTex(c); screen(tex, 1.16, .68, new THREE.Vector3(0, 1.6, .06), 0, g);
+      const v = .02 + azar() * .03; updaters.push(dt => { tex.offset.y -= dt * v; }); },
+    generador(x, z, c){ const g = grupo(x, z);                                     // generador con ventilador
+      box(1.9, 1.3, 1.3, DX.blanco, 0, .65, 0, g);
+      const rej = glow(c, 1.1); [-.5, 0, .5].forEach(a => box(.32, .7, .04, rej, a, .7, .66, g).castShadow = false);
+      cyl(.45, .45, .1, DX.gris, 0, 1.36, 0, 24, g);
+      const aspa = new THREE.Group(); aspa.position.y = 1.43; g.add(aspa);
+      for (let k = 0; k < 3; k++) { const a = box(.8, .03, .12, DX.panel, 0, 0, 0, aspa); a.rotation.y = k * Math.PI / 3; }
+      updaters.push(dt => { aspa.rotation.y += dt * 4; }); },
+    tubo(x, z, c){ tuboQuimico(scene, x, z, 2.2 + azar() * 1.2, c, .55); },
+    brazo(x, z, c){ brazoRobot(scene, x, z, c, 1.0); },
+  };
+  const TAM = { generador:1.25, rack:.95, holo:.9, brazo:1.0, monitor:.85, gas:.75, cajas:.8, tubo:.8 };
+  const ORDEN = ['generador', 'rack', 'holo', 'brazo', 'monitor', 'gas', 'cajas', 'tubo', 'rack', 'holo'];
+  const distSeg = (x, z, a, b) => {
+    const dx = b.x - a.x, dz = b.z - a.z, L2 = dx * dx + dz * dz || 1;
+    const t = Math.max(0, Math.min(1, ((x - a.x) * dx + (z - a.z) * dz) / L2));
+    return Math.hypot(x - a.x - t * dx, z - a.z - t * dz);
+  };
+  const caminos = EDGE_LIST.map(([a, b]) => [NODES[a], NODES[b]]);
+  for (const d of ROOMS.meeting.doors) caminos.push([d.inner, NODES[d.node]]);
+  for (const [k, r] of Object.entries(ROOMS)) {
+    const w = r.w || W, d = r.d || D, hw = w/2, hd = d/2;
+    const aqui = ocupado.filter(([a, b, c2, d2]) => c2 > r.x - hw - 2 && a < r.x + hw + 2 && d2 > r.z - hd - 2 && b < r.z + hd + 2);
+    const despejar = [], tramos = caminos.slice();
+    const libreEn = (p, rad = 1.3) => { if (p) despejar.push([p.x, p.z, rad]); };
+    const puestos = [r.spot, r.miSilla, ...(r.spots || []), ...(r.visitSpots || []), ...(r.seats || [])].filter(Boolean);
+    puestos.forEach(p => libreEn(p));
+    [-1.4, 0, 1.4].forEach(o => libreEn(PT(r, o, 2.4)));
+    if (k === 'meeting') { libreEn(r.center, 5.6); if (PODIUM) libreEn(PODIUM, 1.5); }
+    else if (k === 'eventos') libreEn(PT(r, 0, -0.6), 3.6);
+    else libreEn(PT(r, 0, -0.9), 3.2);
+    (RINCONES[k] || []).forEach(o => [...o.ruta, o.mira].forEach(([lx, lb]) => libreEn(new THREE.Vector3(r.x + lx, 0, r.z + lb), 1.1)));
+    const cz = PT(r, 0, ((Math.abs(Math.sin(r.rot)) > .5 ? w : d) / 2) - 1.7);
+    aqui.push([cz.x - 3.2, cz.z - 1.0, cz.x + 3.2, cz.z + 1.0]);                  // el cartel del piso queda libre
+    for (const dd of r.doors) { tramos.push([dd.inner, dd.outer], [dd.inner, r.center]); puestos.forEach(p => tramos.push([dd.inner, p])); }
+    const libre = (x, z, R) => {
+      for (const [a, b, c2, d2] of aqui) if (x > a - R - .3 && x < c2 + R + .3 && z > b - R - .3 && z < d2 + R + .3) return false;
+      for (const [px, pz, rad] of despejar) if (Math.hypot(x - px, z - pz) < rad + R) return false;
+      for (const [a, b] of tramos) if (distSeg(x, z, a, b) < 1.1 + R) return false;
+      return true;
+    };
+    const cands = [];
+    for (let lx = -hw + 1; lx <= hw - 1; lx += 0.8) for (let lz = -hd + 1; lz <= hd - 1; lz += 0.8)
+      cands.push([lx, lz, Math.max(Math.abs(lx) / hw, Math.abs(lz) / hd) + azar() * .35]);
+    cands.sort((a, b) => b[2] - a[2]);                                               // primero cerca de los bordes
+    const cuantos = k === 'meeting' ? ORDEN.length : 8;
+    for (let i = 0; i < cuantos; i++) {
+      const tipo = ORDEN[i], R = TAM[tipo];
+      for (const [lx, lz] of cands) {
+        if (Math.abs(lx) > hw - R - 0.5 || Math.abs(lz) > hd - R - 0.5) continue;
+        const x = r.x + lx, z = r.z + lz;
+        if (!libre(x, z, R)) continue;
+        PROPS[tipo](x, z, azar() < .5 ? r.color : NEON[Math.floor(azar() * NEON.length)]);
+        aqui.push([x - R, z - R, x + R, z + R]);
+        break;
+      }
+    }
+  }
+}
+equiparZonas();
 poblarAreas();
 
 /* un cambio de estado no mueve al robot al instante: cada uno reacciona a su tiempo */
@@ -4635,7 +4739,7 @@ try { const v = localStorage.getItem('habitat-hora'); if (v && [...horaSel.optio
 updateDayNight(0);
 
 /* entrada de cámara */
-const intro = { t: reduceMotion ? 1 : 0, from: new THREE.Vector3(-30, 104, 112), to: camera.position.clone() };
+const intro = { t: reduceMotion ? 1 : 0, from: new THREE.Vector3(-40, 140, 150), to: camera.position.clone() };
 if (intro.t < 1) { camera.position.copy(intro.from); controls.enabled = false; }
 
 /* ───────── Bucle ───────── */
@@ -4658,7 +4762,7 @@ function ponerEn(el, x, y){
    De lejos se ocultan el estado y los subtítulos para que se lea mejor. */
 let medidasAt = 0;
 function ordenarEtiquetas(now){
-  const lejos = camera.position.distanceTo(controls.target) > 90;
+  const lejos = camera.position.distanceTo(controls.target) > 125;
   if (document.body.classList.contains('lejos') !== lejos) { document.body.classList.toggle('lejos', lejos); medidasAt = 0; }
   const tags = MOVERS.map(rb => rb.tag).filter(el => el._vis), salas = roomTags.map(t => t.el).filter(el => el._vis);
   if (now - medidasAt > 800) {
