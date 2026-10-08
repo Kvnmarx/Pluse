@@ -6,6 +6,12 @@ Laboratorio personal donde agentes de IA trabajan en proyectos distintos: códig
 
 El laboratorio es una nave oscura con luces de neón. Cada área es una zona del piso de su color, pegada a la siguiente y con borde de neón; no hay paredes entre ellas. Cada agente trabaja en un círculo de luz frente a su consola, con una terminal flotante que muestra lo que está haciendo, y el nombre de cada área va en un cartel en el piso. Junto a los muros están las máquinas gigantes (supercomputadora, robot en construcción, tubos de químicos, cintas transportadoras), en la Agenda hay un teletransportador y todas las áreas se conectan con el cerebro central sobre la Sala central. Los robots tienen casco con visor negro y ojos de luz, cuerpo redondo, brazos con manos y piernas. Las áreas son amplias (26 × 22 m) y el espacio libre se llena solo con equipos: servidores, hologramas, generadores, cilindros de gas, cajas y tubos, ubicados donde no estorban a los agentes ni a sus caminos. En la mesa redonda de la Sala central hay jerarquía: en la cabecera, tres sillas ejecutivas de cuero negro y detalles dorados para la dirección (María Andrea al centro, María Fernanda y Kevin a los lados, con su placa en la mesa y una alfombra negra con borde dorado); enfrente, separadas, las sillas de los agentes, más juntas entre sí y con Mentor al medio. Para cambiar los nombres, edita `JEFES` en la función `meeting` de `index.html`.
 
+## Modo juego y paneles
+
+- **Modo juego (tercera persona):** botón «Modo juego» o tecla **V**. La cámara va detrás de tu avatar y lo sigue. **W A S D** o flechas para caminar, **Shift** para correr, arrastra o **Q / E** para girar la cámara, rueda para acercar o alejar, **V** o **Esc** para volver a la vista general. En el celular aparece una palanca para caminar. El laboratorio recuerda en qué vista lo dejaste.
+- **Paneles plegables:** cada panel, menos el principal, se pliega con su flecha (lista de agentes, actividad reciente, avisos de junta y presentación, barra de tu avatar, ayuda y controles del juego). Se recuerda cómo los dejaste. La tecla **H** pliega o despliega todos a la vez. Los avisos flotantes se cierran con su ×.
+- Los paneles se acomodan solos para no encimarse: la columna derecha baja si algo de arriba la tapa y la franja de abajo se angosta cuando hay una ficha abierta.
+
 | Área | Agente | Proyecto |
 |---|---|---|
 | Sala central | Mentor | Coordina el laboratorio y las juntas |

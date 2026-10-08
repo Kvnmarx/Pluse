@@ -42,10 +42,31 @@
   .mode.live i{background:var(--ok);box-shadow:0 0 8px var(--ok);animation:pulse 1.6s infinite}
   .mode.lost i{background:var(--bad)}
   @keyframes pulse{50%{opacity:.35}}
-  .hint{font:12px/1.3 var(--body);color:var(--muted);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 12px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+  .hint{font:12px/1.3 var(--body);color:var(--muted);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 12px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:flex;align-items:center;gap:8px}
+  .hint{max-width:min(680px, 100%);box-sizing:border-box}
+  .hint b{color:var(--champagne);font-weight:600}
+  .hint-tg{all:unset;cursor:pointer;flex:none;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--line);color:var(--champagne);font:600 12px/1 var(--mono)}
+  .hint:not(.plegado) .h-q,.hint.plegado .h-x{display:none}
+  .hint.plegado{padding:5px;border-radius:999px}
+  .hint.plegado #hintTxt{display:none}
 
   /* Roster */
-  .roster{top:calc(env(safe-area-inset-top,0px) + 108px);right:16px;width:300px;max-height:calc(100% - 220px);overflow:auto;display:grid;gap:8px;padding-right:2px}
+  .roster{top:var(--der-top, calc(env(safe-area-inset-top,0px) + 108px));right:16px;width:300px;max-height:calc(100% - var(--der-top, 108px) - 240px);display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+  .roster-list{display:grid;gap:8px;overflow:auto;padding-right:2px;min-height:0;width:100%;box-sizing:border-box}
+  .roster.plegado .roster-list{display:none}
+  .roster.plegado{width:auto}
+  .roster > .pl-tg{background:var(--panel);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:999px;padding:7px 12px}
+  .pl-dots{display:none;gap:5px;align-items:center}
+  .roster.plegado .pl-dots{display:inline-flex}
+  .pl-dots i{width:8px;height:8px;border-radius:50%;background:var(--c);box-shadow:0 0 6px var(--c)}
+  .pl-dots i.st-inactivo{opacity:.35;box-shadow:none}
+  /* paneles que se pliegan */
+  .pl-tg{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;gap:8px;pointer-events:auto;color:var(--champagne)}
+  .pl-tg:focus-visible,.nb-min:focus-visible,.hint-tg:focus-visible{outline:2px solid var(--champagne);outline-offset:2px;border-radius:999px}
+  .pl-ch{width:12px;height:12px;flex:none;transition:transform .2s}
+  .pl-arriba .pl-ch{transform:rotate(180deg)}
+  .plegado .pl-arriba .pl-ch{transform:none}
+  .plegado > .pl-tg:not(.pl-arriba) .pl-ch,.avbar.plegado .av-pl .pl-ch{transform:rotate(180deg)}
   .card{all:unset;pointer-events:auto;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:12px 1fr auto;gap:4px 10px;align-items:center;background:var(--panel);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:12px;padding:10px 12px;transition:border-color .2s, transform .2s}
   .card:hover{border-color:rgba(205,187,147,.4)}
   .card:focus-visible{outline:2px solid var(--champagne);outline-offset:2px}
@@ -59,8 +80,16 @@
   .st-trabajando{color:var(--ok)} .st-pensando{color:var(--warn)} .st-reunion{color:var(--meet)} .st-inactivo{color:var(--idle)} .st-error{color:var(--bad)}
 
   /* Feed */
-  .feed{left:16px;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);width:min(380px, calc(100% - 32px));background:var(--panel);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:14px;padding:10px 14px}
+  .feed{flex:none;width:min(380px, 38vw);box-sizing:border-box;background:var(--panel);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:14px;padding:10px 14px}
   .feed ol{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:4px;font-size:12.5px}
+  .feed > .pl-tg{display:flex;width:100%;justify-content:space-between}
+  .feed.plegado{width:auto;padding:8px 12px;border-radius:999px}
+  .feed.plegado ol{display:none}
+  /* franja de abajo: nada se encima */
+  .dock{left:16px;right:16px;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);display:flex;align-items:flex-end;gap:12px;z-index:4}
+  .dock > .dock-centro{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none}
+  .dock-centro > *{pointer-events:auto;max-width:100%;box-sizing:border-box}
+  .dock-centro > .toasts{pointer-events:none}
   .feed li{display:grid;grid-template-columns:44px 1fr;gap:8px;color:var(--ivory);opacity:.9}
   .feed li span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .feed time{font:11px/1.6 var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
@@ -81,7 +110,7 @@
   .room small{display:block;margin-top:4px;font:10px/1 var(--mono);letter-spacing:.08em;color:var(--muted);text-transform:none;text-align:center}
 
   /* Ficha del agente */
-  .detail{pointer-events:auto;top:calc(env(safe-area-inset-top,0px) + 108px);right:16px;width:348px;max-height:calc(100% - 124px - env(safe-area-inset-top,0px));overflow:auto;background:var(--panel-solid);border:1px solid var(--line);border-top:3px solid var(--c);border-radius:14px;padding:16px;display:grid;gap:18px;box-shadow:0 20px 50px rgba(0,0,0,.45);animation:slidein .28s ease-out}
+  .detail{pointer-events:auto;top:var(--det-top, calc(env(safe-area-inset-top,0px) + 108px));right:16px;width:348px;max-height:calc(100% - var(--det-top, 108px) - 16px);overflow:auto;background:var(--panel-solid);border:1px solid var(--line);border-top:3px solid var(--c);border-radius:14px;padding:16px;display:grid;gap:18px;box-shadow:0 20px 50px rgba(0,0,0,.45);animation:slidein .28s ease-out}
   @keyframes slidein{from{transform:translateX(24px);opacity:.3}}
   .d-head{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center}
   .d-avatar{width:44px;height:44px;border-radius:12px;background:radial-gradient(circle at 35% 30%, #fff8 0 12%, transparent 13%), var(--c);display:grid;place-items:center;box-shadow:0 0 18px color-mix(in srgb, var(--c) 55%, transparent)}
@@ -233,7 +262,9 @@
   body.chat-open .feed{display:none}
 
   /* Barra de tu avatar */
-  .avbar{left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 16px);display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:center;background:var(--panel);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:999px;padding:6px 8px;max-width:calc(100% - 32px);box-sizing:border-box}
+  .avbar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:center;background:var(--panel);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:999px;padding:6px 8px;max-width:100%;box-sizing:border-box}
+  .avbar.plegado > :not(.av-me):not(#avJuego):not(#avTg){display:none}
+  .av-pl{padding:8px 10px}
   .av-me,.av-btn{all:unset;pointer-events:auto;cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;font:600 12px/1 var(--display);color:var(--ivory)}
   .av-me{background:rgba(230,211,168,.14)}
   .av-me .pearl{width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 35% 30%, #fff 0 18%, #f3e9d6 40%, #cdb98f 75%, #9fb8c6 100%);box-shadow:0 0 10px rgba(255,240,210,.6)}
@@ -241,19 +272,39 @@
   .av-btn.on{border-color:var(--champagne);color:var(--champagne)}
   .av-talk{border-color:var(--c, var(--champagne));background:color-mix(in srgb, var(--c, #CDBB93) 18%, transparent)}
   .av-me:focus-visible,.av-btn:focus-visible{outline:2px solid var(--champagne)}
-  .av-hint{font:11px var(--mono);color:var(--muted);padding:0 8px}
+  .av-hint{display:none}
+  /* modo juego: cámara en tercera persona */
+  .tp-ayuda{display:flex;align-items:center;gap:10px;font:11.5px/1.4 var(--mono);color:var(--ivory);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:7px 12px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);white-space:nowrap;max-width:100%;overflow:hidden}
+  .tp-txt{overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .tp-ayuda.plegado{padding:6px 12px;border-radius:999px}
+  .tp-ayuda.plegado .tp-txt{display:none}
+  .tp-ayuda b{color:var(--champagne);font-weight:600}
+  .tp-stick{pointer-events:auto;left:calc(env(safe-area-inset-left,0px) + 22px);bottom:calc(env(safe-area-inset-bottom,0px) + 96px);width:124px;height:124px;border-radius:50%;background:rgba(255,255,255,.05);border:1px solid var(--line);touch-action:none;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+  .tp-stick span{position:absolute;left:50%;top:50%;width:54px;height:54px;margin:-27px 0 0 -27px;border-radius:50%;background:rgba(205,187,147,.3);border:1px solid var(--champagne);pointer-events:none}
+  .av-juego svg{flex:none}
+  body.juego .hint, body.juego #avFollow{display:none}
+  body.juego .tag.me{opacity:0}
   .tag.me .name{border-color:#E6D3A8;background:rgba(40,34,22,.85)}
   body.chat-open .avbar{display:none}
 
   /* Presentaciones */
-  .nowbar{top:calc(env(safe-area-inset-top,0px) + 16px);left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;background:var(--panel-solid);border:1px solid var(--c, var(--champagne));border-radius:999px;padding:6px 6px 6px 14px;max-width:min(460px, calc(100% - 32px));box-shadow:0 10px 30px rgba(0,0,0,.4)}
+  .nowbar{display:flex;align-items:center;gap:10px;background:var(--panel-solid);border:1px solid var(--c, var(--champagne));border-radius:999px;padding:6px 6px 6px 14px;max-width:100%;box-sizing:border-box;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+  .avisos{flex:1 1 260px;max-width:460px;min-width:0;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+  .top > .avisos{pointer-events:none}
+  .avisos > *{pointer-events:auto}
+  .avisos:not(:has(> .nowbar:not([hidden]))){display:none}
+  .nb-corto{display:none;font:600 12px/1 var(--display);color:var(--ivory)}
+  .nb-min{all:unset;cursor:pointer;flex:none;display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;color:var(--ivory)}
+  .nb-min:hover{background:rgba(255,255,255,.08)}
+  .nowbar.plegado{cursor:pointer;padding:6px 6px 6px 12px}
+  .nowbar.plegado .nb-text,.nowbar.plegado .nb-btn{display:none}
+  .nowbar.plegado .nb-corto{display:inline}
   .nowbar .dot{width:9px;height:9px;border-radius:50%;background:var(--c, var(--champagne));box-shadow:0 0 10px var(--c, var(--champagne));animation:pulse 1.6s infinite;flex:none}
   .nb-text{font:500 12.5px/1.3 var(--body);color:var(--ivory);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
   .nb-text b{font-weight:600}
   .nb-btn{all:unset;cursor:pointer;flex:none;padding:7px 12px;border-radius:999px;background:var(--champagne);color:#0B252A;font:600 11.5px/1 var(--display)}
   .nb-btn:focus-visible{outline:2px solid var(--ivory);outline-offset:2px}
-  .nowbar.junta{top:calc(env(safe-area-inset-top,0px) + 64px)}
-  .av-task{left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 72px);display:flex;gap:6px;align-items:center;background:var(--panel-solid);border:1px solid var(--c, var(--champagne));border-radius:999px;padding:6px;width:min(460px, calc(100% - 32px));box-sizing:border-box;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+  .av-task{display:flex;gap:6px;align-items:center;background:var(--panel-solid);border:1px solid var(--c, var(--champagne));border-radius:999px;padding:6px;width:min(460px, 100%);box-sizing:border-box;box-shadow:0 10px 30px rgba(0,0,0,.4)}
   .av-task input{flex:1;min-width:0;background:transparent;border:0;color:var(--ivory);font:13px/1.3 var(--body);padding:6px 10px}
   .av-task input:focus{outline:none}
   .mapa-z{display:grid;gap:8px}
@@ -304,7 +355,7 @@
   .d-pres:hover{border-color:var(--c)} .d-pres:focus-visible{outline:2px solid var(--champagne)}
   .d-pres b{font:500 13px/1.3 var(--body)} .d-pres small{font:11px var(--mono);color:var(--muted)}
   body.presenting .hint{display:none}
-  @media (max-width: 760px){ .nowbar{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 190px)} .nowbar.junta{bottom:calc(env(safe-area-inset-bottom,0px) + 238px)} .vw-body{padding:14px} }
+  @media (max-width: 760px){ .vw-body{padding:14px} }
 
   /* Sala de Eventos */
   .evbtn{border-color:#E0C27A;color:#E0C27A} .evbtn .badge{background:#E0C27A;color:#0B252A}
@@ -344,13 +395,15 @@
   .ev-form label{font:11px var(--mono);color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
   .card-msg.evt{border-left-color:#E0C27A;background:rgba(224,194,122,.06)}
   .evt-line{align-self:stretch;max-width:100%}
-  .toasts{bottom:calc(env(safe-area-inset-bottom,0px) + 76px);left:50%;transform:translateX(-50%);display:grid;gap:8px;width:min(340px, calc(100% - 32px));pointer-events:none}
+  .toasts{display:grid;gap:8px;width:min(340px, 100%);pointer-events:none}
   .toast{pointer-events:auto;background:var(--panel-solid);border:1px solid #E0C27A;border-radius:12px;padding:10px 12px;display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;box-shadow:0 12px 30px rgba(0,0,0,.45);animation:slidein .28s ease-out}
-  .toast .eyebrow{grid-column:1 / 3;color:#E0C27A}
+  .toast .eyebrow{grid-column:1 / 3;color:#E0C27A;padding-right:22px}
+  .toast{position:relative}
+  .toast .t-x{position:absolute;top:5px;right:6px;width:22px;height:22px;padding:0;display:grid;place-items:center;border-radius:50%;background:none;color:var(--muted);font:17px/1 var(--body)}
+  .toast .t-x:hover{color:var(--ivory);background:rgba(255,255,255,.08)}
   .toast p{margin:0;font:13px/1.4 var(--body)}
   .toast button{all:unset;cursor:pointer;padding:6px 10px;border-radius:8px;background:#E0C27A;color:#0B252A;font:600 11.5px/1 var(--display)}
   .toast button:focus-visible{outline:2px solid var(--ivory)}
-  @media (max-width: 760px){ .toasts{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 250px)} }
 
   .loading{position:fixed;inset:0;display:grid;place-items:center;z-index:5;background:var(--bg);font:12px var(--mono);color:var(--muted);letter-spacing:.14em;text-transform:uppercase;transition:opacity .6s}
   .loading.done{opacity:0;pointer-events:none}
@@ -358,11 +411,15 @@
   @media (max-width: 760px){
     h1{font-size:17px}
     .hint{display:none}
-    .roster{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);right:16px;left:16px;width:auto;max-height:none;display:flex;overflow-x:auto;overflow-y:hidden;gap:8px;scroll-snap-type:x mandatory;padding-bottom:2px}
+    .roster{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);right:16px;left:16px;width:auto;max-height:none}
+    .roster.plegado{left:auto}
+    .roster-list{display:flex;overflow-x:auto;overflow-y:hidden;gap:8px;scroll-snap-type:x mandatory;padding-bottom:2px}
     .card{flex:0 0 78%;scroll-snap-align:start}
     .feed{display:none}
-    .avbar{bottom:calc(env(safe-area-inset-bottom,0px) + 132px);border-radius:14px}
+    .avbar{border-radius:14px}
     .av-hint{display:none}
+    .tp-ayuda{display:none}
+    .tp-stick{bottom:calc(env(safe-area-inset-bottom,0px) + 210px)}
     .chat{left:0;right:0;top:0;bottom:0;width:auto;border-radius:0;grid-template-columns:1fr;grid-template-rows:auto 1fr;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
     .ch-list{flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line);padding:10px}
     .ch-list .eyebrow{display:none}
@@ -404,22 +461,31 @@
       <a class="aprbtn" href="https://claude.ai/artifact/U8a5VVRcfqcCexb7n7VLZx" target="_blank" rel="noopener">Hábitat Madreperla ↗</a>
     </div>
   </div>
-  <div class="hint">Arrastra para girar · pellizca o rueda para acercar · toca un robot o su nombre para ver su ficha</div>
+  <div class="avisos" id="avisos">
+  <div class="nowbar junta" id="juntaBar" hidden>
+    <span class="dot" aria-hidden="true"></span>
+    <span class="nb-corto">Junta</span>
+    <span class="nb-text" id="jbText"></span>
+    <button class="nb-btn" id="jbGo" type="button">Ir a la junta</button>
+    <button class="nb-min pl-arriba" id="jbMin" type="button" aria-expanded="true"><svg class="pl-ch" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="nowbar" id="nowbar" hidden>
+    <span class="dot" aria-hidden="true"></span>
+    <span class="nb-corto">Presentación</span>
+    <span class="nb-text" id="nbText"></span>
+    <button class="nb-btn" id="nbOpen" type="button">Ver en grande</button>
+    <button class="nb-min pl-arriba" id="nbMin" type="button" aria-expanded="true"><svg class="pl-ch" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  </div>
+  <div class="hint" id="hint"><button class="hint-tg" id="hintTg" type="button" aria-expanded="true"><span class="h-x" aria-hidden="true">×</span><span class="h-q" aria-hidden="true">?</span></button><span id="hintTxt">Arrastra: girar · rueda: acercar · toca el piso: caminar · toca un robot: su ficha · <b>V</b> modo juego · <b>H</b> plegar paneles</span></div>
 </div>
 
-<div class="ui roster" id="roster" role="list" aria-label="Agentes"></div>
-
-<div class="ui avbar" id="avbar" aria-label="Tu avatar">
-  <button class="av-me" id="avFocus" type="button"><span class="pearl" aria-hidden="true"></span>María Andrea</button>
-  <button class="av-btn" id="avFollow" type="button" aria-pressed="false">Seguirme</button>
-  <button class="av-btn av-talk" id="avTalk" type="button" hidden>Hablar</button>
-  <button class="av-btn" id="avTask" type="button" hidden>Encargar tarea</button>
-  <button class="av-btn" id="avOffice" type="button" hidden>Mi oficina</button>
-  <button class="av-btn" id="avMeet" type="button" hidden>Convocar reunión</button>
-  <button class="av-btn" id="avApr" type="button" hidden>Ver aprobaciones</button>
-  <button class="av-btn" id="avEv" type="button" hidden>Ver eventos</button>
-  <span class="av-hint">Toca el piso para caminar</span>
+<div class="ui roster" id="roster" aria-label="Agentes">
+  <button class="pl-tg pl-arriba" id="rosterTg" type="button" aria-expanded="true" aria-controls="rosterList"><span class="eyebrow">Agentes</span><span class="pl-dots" id="rosterDots" aria-hidden="true"></span><svg class="pl-ch" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  <div class="roster-list" id="rosterList" role="list"></div>
 </div>
+
+<div class="ui tp-stick" id="tpStick" hidden aria-hidden="true"><span></span></div>
 
 <section class="ui chat" id="chat" hidden aria-label="Chat del equipo">
   <nav class="ch-list" id="chList" aria-label="Conversaciones"></nav>
@@ -447,25 +513,8 @@
 </div>
 <aside class="ui detail evp" id="evPanel" hidden aria-label="Eventos"></aside>
 <aside class="ui detail frp" id="frPanel" hidden aria-label="Frentes del negocio"></aside>
-<div class="ui toasts" id="toasts" aria-live="polite"></div>
 
-<form class="ui av-task" id="avTaskForm" hidden>
-  <label class="sr" for="avTaskIn">Tarea</label>
-  <input id="avTaskIn" maxlength="300" autocomplete="off" placeholder="¿Qué necesitas?">
-  <button type="submit" class="nb-btn">Encargar</button>
-  <button type="button" class="x" id="avTaskX" aria-label="Cancelar">×</button>
-</form>
-<div class="ui nowbar junta" id="juntaBar" hidden>
-  <span class="dot" aria-hidden="true"></span>
-  <span class="nb-text" id="jbText"></span>
-  <button class="nb-btn" id="jbGo" type="button">Ir a la junta</button>
-</div>
 <aside class="ui detail mapa" id="mapaCard" hidden aria-label="Proyectos por zona"></aside>
-<div class="ui nowbar" id="nowbar" hidden>
-  <span class="dot" aria-hidden="true"></span>
-  <span class="nb-text" id="nbText"></span>
-  <button class="nb-btn" id="nbOpen" type="button">Ver en grande</button>
-</div>
 
 <div class="viewer" id="viewer" hidden role="dialog" aria-modal="true" aria-labelledby="vwTitle">
   <div class="vw-box" id="vwBox">
@@ -479,9 +528,35 @@
   </div>
 </div>
 
-<div class="ui feed" aria-live="polite">
-  <span class="eyebrow">Actividad reciente</span>
-  <ol id="feed"></ol>
+
+<div class="ui dock" id="dock">
+  <div class="feed" id="feedBox" aria-label="Actividad reciente">
+    <button class="pl-tg" id="feedTg" type="button" aria-expanded="true" aria-controls="feed"><span class="eyebrow">Actividad reciente</span><svg class="pl-ch" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <ol id="feed" aria-live="polite"></ol>
+  </div>
+  <div class="dock-centro">
+    <div class="toasts" id="toasts" aria-live="polite"></div>
+    <form class="av-task" id="avTaskForm" hidden>
+      <label class="sr" for="avTaskIn">Tarea</label>
+      <input id="avTaskIn" maxlength="300" autocomplete="off" placeholder="¿Qué necesitas?">
+      <button type="submit" class="nb-btn">Encargar</button>
+      <button type="button" class="x" id="avTaskX" aria-label="Cancelar">×</button>
+    </form>
+    <div class="tp-ayuda" id="tpAyuda" hidden><button class="pl-tg" id="tpTg" type="button" aria-expanded="true"><span class="eyebrow">Controles</span><svg class="pl-ch" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button><span class="tp-txt"><b>W A S D</b> o flechas: caminar · <b>Shift</b>: correr · <b>arrastra</b> o <b>Q E</b>: girar la cámara · <b>rueda</b>: acercar · <b>H</b>: plegar paneles · <b>V</b> o <b>Esc</b>: vista general</span></div>
+    <div class="avbar" id="avbar" aria-label="Tu avatar">
+      <button class="av-me" id="avFocus" type="button"><span class="pearl" aria-hidden="true"></span>María Andrea</button>
+      <button class="av-btn" id="avFollow" type="button" aria-pressed="false">Seguirme</button>
+      <button class="av-btn av-juego" id="avJuego" type="button" aria-pressed="false" title="Cámara detrás de tu avatar (tecla V)"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 7h10a5 5 0 0 1 4.9 6l-.7 3.4a2.4 2.4 0 0 1-4.1 1.2L15 15.5H9l-2.1 2.1a2.4 2.4 0 0 1-4.1-1.2L2.1 13A5 5 0 0 1 7 7Zm0 3v1.3H5.7v1.6H7v1.3h1.6v-1.3h1.3v-1.6H8.6V10H7Zm9.6.3a1 1 0 1 0 0 2 1 1 0 0 0 0-2Zm2 2a1 1 0 1 0 0 2 1 1 0 0 0 0-2Z"/></svg>Modo juego</button>
+      <button class="av-btn av-talk" id="avTalk" type="button" hidden>Hablar</button>
+      <button class="av-btn" id="avTask" type="button" hidden>Encargar tarea</button>
+      <button class="av-btn" id="avOffice" type="button" hidden>Mi oficina</button>
+      <button class="av-btn" id="avMeet" type="button" hidden>Convocar reunión</button>
+      <button class="av-btn" id="avApr" type="button" hidden>Ver aprobaciones</button>
+      <button class="av-btn" id="avEv" type="button" hidden>Ver eventos</button>
+      <span class="av-hint">Toca el piso para caminar</span>
+      <button class="av-btn av-pl" id="avTg" type="button" aria-expanded="true"><svg class="pl-ch" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+  </div>
 </div>
 
 <div class="loading" id="loading">Encendiendo el laboratorio…</div>
@@ -1724,7 +1799,7 @@ function poblarAreas(){
   // robots de ayuda: pequeños, blancos, van y vienen entre las zonas
   const rutas = EDGE_LIST.map(([a, b]) => [NODES[a].x, NODES[a].z, NODES[b].x, NODES[b].z]);
   for (let i = 0; i < 14; i++) {
-    const [x1, z1, x2, z2] = rutas[i % rutas.length], b = new THREE.Group(); scene.add(b);
+    const [x1, z1, x2, z2] = rutas[i % rutas.length], b = new THREE.Group(); b.userData.movil = true; scene.add(b);
     cyl(.22, .26, .34, DX.blanco, 0, .24, 0, 14, b);
     const cab = new THREE.Mesh(new THREE.SphereGeometry(.18, 14, 10), DX.blanco); cab.position.y = .52; b.add(cab);
     const ojo = new THREE.Mesh(new THREE.SphereGeometry(.06, 10, 8), [DX.azul, DX.rojo, DX.verde][i % 3]); ojo.position.set(0, .55, .16); b.add(ojo);
@@ -2005,10 +2080,11 @@ function log(rb, dest){
 function esc(s){ return String(s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c])); }
 
 /* roster */
-const rosterEl = document.getElementById('roster');
+const rosterEl = document.getElementById('roster'), rosterList = document.getElementById('rosterList'), rosterDots = document.getElementById('rosterDots');
 let selected = null;
 function renderRoster(){
-  rosterEl.innerHTML = AGENTS.map(a => {
+  rosterDots.innerHTML = AGENTS.map(a => `<i class="st-${robots[a.id].state}" style="--c:${a.color}"></i>`).join('');
+  rosterList.innerHTML = AGENTS.map(a => {
     const rb = robots[a.id];
     const waiting = typeof approvals !== 'undefined' && approvals.some(x => x.de === a.id && x.estado === 'pendiente');
     const where = (rb.room ? ROOMS[rb.room].name : 'Pasillo') + (waiting ? ' · espera tu aprobación' : '');
@@ -3321,6 +3397,8 @@ function presTick(dt, now){
 }
 function renderNowBar(){
   const pr = presActive;
+  if (pr && pr !== nowbar._pr && PLEGABLES && PLEGABLES.presenta) PLEGABLES.presenta.poner(false, false);
+  nowbar._pr = pr;
   nowbar.hidden = !pr;
   document.body.classList.toggle('presenting', !!pr);
   if (!pr) return;
@@ -3966,13 +4044,18 @@ evPanel.addEventListener('submit', async e => {
 });
 
 /* --- avisos flotantes --- */
+function cerrable(el){                                 // botón × para cerrar un aviso
+  const x = document.createElement('button'); x.type = 'button'; x.className = 't-x'; x.setAttribute('aria-label', 'Cerrar aviso'); x.textContent = '×';
+  x.addEventListener('click', () => el.remove()); el.append(x);
+}
 function toastText(texto, evento){ showToast({ texto, evento, umbral: evento ? 'manual' : null }); }
 function showToast(m){
   const el = document.createElement('div'); el.className = 'toast';
   el.innerHTML = `<span class="eyebrow">${esc(UMBRAL_LABEL[m.umbral] || 'Sala de Eventos')}</span><p>${esc(m.texto)}</p>${m.evento ? `<button type="button">Ver</button>` : '<span></span>'}`;
   const b = el.querySelector('button'); if (b) b.addEventListener('click', () => { el.remove(); openEvents(m.evento); });
+  cerrable(el);
   toastsEl.prepend(el);
-  while (toastsEl.children.length > 3) toastsEl.lastChild.remove();
+  while (toastsEl.children.length > 2) toastsEl.lastChild.remove();
   setTimeout(() => el.remove(), 9000);
 }
 
@@ -4082,8 +4165,9 @@ function aviso(eyebrow, texto, boton, accion){
   const el = document.createElement('div'); el.className = 'toast';
   el.innerHTML = `<span class="eyebrow">${esc(eyebrow)}</span><p>${esc(texto)}</p>${boton ? `<button type="button">${esc(boton)}</button>` : '<span></span>'}`;
   const b = el.querySelector('button'); if (b) b.addEventListener('click', () => { el.remove(); if (accion) accion(); });
+  cerrable(el);
   toastsEl.prepend(el);
-  while (toastsEl.children.length > 3) toastsEl.lastChild.remove();
+  while (toastsEl.children.length > 2) toastsEl.lastChild.remove();
   setTimeout(() => el.remove(), 11000);
 }
 
@@ -4183,7 +4267,7 @@ function lanzarConfeti(centro){
   }
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
-  const p = new THREE.Points(geo, new THREE.PointsMaterial({ size: .16, vertexColors:true, transparent:true, opacity:1, depthWrite:false }));
+  const p = new THREE.Points(geo, new THREE.PointsMaterial({ size: (TP && TP.on) ? .07 : .16, vertexColors:true, transparent:true, opacity:1, depthWrite:false }));
   scene.add(p); confeti = { p, vel, t: 0 };
 }
 function efectosTick(dt){
@@ -4267,6 +4351,7 @@ function mostrarJunta(j){
   const antes = juntaActual?.de + '|' + juntaActual?.tema;
   juntaActual = j; juntaBar.hidden = !j;
   if (!j || antes === j.de + '|' + j.tema) return;
+  if (PLEGABLES && PLEGABLES.junta) PLEGABLES.junta.poner(false, false);
   const rb = robots[j.de];
   juntaBar.style.setProperty('--c', rb?.a.color || '#CDBB93');
   jbText.innerHTML = `<b>${esc(rb?.a.name || 'Un agente')}</b> convocó una junta · ${esc(j.tema)}`;
@@ -4291,7 +4376,7 @@ function simJunta(id, tema, puntos){
   AGENTS.forEach(a => applyState({ id:a.id, estado:'reunion', tarea: tema }));
   setTimeout(async () => { for (const t of puntos) { if (live) return; await say(id, 'todos', t); await wait(2600); } }, 10000);
   setTimeout(() => {
-    if (live) return;
+    if (live || !juntaActual || juntaActual.de !== id || juntaActual.tema !== tema) return;   // ya hay otra junta en curso
     mostrarJunta(null);
     AGENTS.forEach(a => { if (robots[a.id].state === 'reunion') applyState({ id:a.id, estado:'trabajando', tarea: pick(SIM_TASKS[a.id]) }); });
   }, 55000);
@@ -4639,7 +4724,7 @@ function resize(){
   renderer.setSize(w, h, false);
   if (composer) { composer.setPixelRatio(NIVELES[nivel].pr); composer.setSize(w, h); bloom.resolution.set(w/2, h/2); }
   camera.aspect = w/h;
-  camera.fov = w < 760 ? 58 : 42;
+  camera.fov = (TP && TP.on) ? (w < 760 ? 70 : 60) : (w < 760 ? 58 : 42);
   camera.updateProjectionMatrix();
   if (!selected) controls.target.set(w < 760 ? 0 : 6, 0, w < 760 ? 4 : 3);   // deja libre el panel lateral
 }
@@ -4696,6 +4781,210 @@ function avatarWorld(now){
     }
   }
 }
+
+/* ───────── Modo juego: cámara en tercera persona detrás de tu avatar ─────────
+   W A S D o flechas para caminar (Shift corre), arrastra o Q/E para girar la cámara,
+   rueda para acercar o alejar, V o Esc para volver a la vista general.
+   En el celular aparece una palanca para caminar. Se recuerda la última vista.   */
+var TP = { on:false, pendiente:false, yaw:0, pitch:.3, dist:5.4, teclas:new Set(), stick:{ x:0, y:0 }, arrastre:null, moviendo:false, obst:null };
+const avJuego = document.getElementById('avJuego'), tpAyuda = document.getElementById('tpAyuda'), tpStick = document.getElementById('tpStick');
+const tpDeseo = new THREE.Vector3(), tpMira = new THREE.Vector3(), tpPaso = new THREE.Vector3();
+const tactil = window.matchMedia('(pointer: coarse)').matches;
+function tpObstaculos(){                               // lo que hay en el piso, en cajas por celdas de 4 m
+  const cel = new Map(), K = 4, bb = new THREE.Box3(), propios = new Set();
+  MOVERS.forEach(rb => rb.g.traverse(o => propios.add(o)));
+  scene.traverse(o => { if (o.userData.movil) o.traverse(c => propios.add(c)); });   // lo que se mueve no es obstáculo
+  scene.updateMatrixWorld(true);
+  scene.traverse(o => {
+    if (!o.isMesh || o.isInstancedMesh || o.userData.suelo || propios.has(o)) return;
+    bb.setFromObject(o);
+    if (bb.isEmpty() || bb.min.y > 1.2 || bb.max.y < 0.3) return;
+    if (bb.max.x - bb.min.x > 30 || bb.max.z - bb.min.z > 30) return;
+    const r = [bb.min.x, bb.min.z, bb.max.x, bb.max.z, bb.max.y];
+    for (let i = Math.floor(r[0] / K); i <= Math.floor(r[2] / K); i++) for (let j = Math.floor(r[1] / K); j <= Math.floor(r[3] / K); j++) {
+      const k = i + ',' + j; if (!cel.has(k)) cel.set(k, []); cel.get(k).push(r);
+    }
+  });
+  return { cel, K };
+}
+function tpChoca(x, z, R = 0.38, y = 0){              // ¿hay algo en (x, z)? y = altura (para la cámara)
+  if (x < -FW/2 + 1.2 || x > FW/2 - 1.2 || z < -FD/2 + 3.4 || z > FD/2 - 1.2) return true;
+  const { cel, K } = TP.obst;
+  for (let i = Math.floor((x - R) / K); i <= Math.floor((x + R) / K); i++) for (let j = Math.floor((z - R) / K); j <= Math.floor((z + R) / K); j++) {
+    const L = cel.get(i + ',' + j); if (!L) continue;
+    for (const [a, b, c, d, alto] of L) if (y < alto && x + R > a && x - R < c && z + R > b && z - R < d) return true;
+  }
+  return false;
+}
+function entrarJuego(){
+  if (TP.on) return;
+  TP.on = true; TP.pendiente = false; intro.t = 1;
+  TP.obst ||= tpObstaculos();
+  select(null); setFollow(false);
+  controls.enabled = false;
+  TP.yaw = avatar.g.rotation.y + Math.PI + 0.5; TP.pitch = .38; TP.dist = 5.6;   // un poco de lado y desde arriba: se ve el cuerpo entero
+  camera.fov = innerWidth < 760 ? 70 : 60; camera.updateProjectionMatrix();
+  document.body.classList.add('juego');
+  avJuego.setAttribute('aria-pressed', 'true'); avJuego.classList.add('on');
+  tpAyuda.hidden = false; tpStick.hidden = !tactil;
+  try { localStorage.setItem('lab.vista', 'juego'); } catch {}
+}
+function salirJuego(){
+  if (!TP.on) return;
+  TP.on = false; TP.teclas.clear(); TP.stick.x = TP.stick.y = 0; TP.moviendo = false; TP.arrastre = null;
+  const p = avatar.g.position;
+  controls.target.set(p.x, 0.8, p.z);
+  camera.position.set(p.x + Math.sin(TP.yaw) * 16, 20, p.z + Math.cos(TP.yaw) * 16);
+  camera.fov = innerWidth < 760 ? 58 : 42; camera.updateProjectionMatrix();
+  controls.enabled = true; controls.update();
+  document.body.classList.remove('juego');
+  avJuego.setAttribute('aria-pressed', 'false'); avJuego.classList.remove('on');
+  tpAyuda.hidden = true; tpStick.hidden = true;
+  try { localStorage.setItem('lab.vista', 'general'); } catch {}
+}
+avJuego.addEventListener('click', () => TP.on ? salirJuego() : entrarJuego());
+try { TP.pendiente = localStorage.getItem('lab.vista') === 'juego'; } catch {}
+
+const TECLAS_JUEGO = new Set(['w', 'a', 's', 'd', 'q', 'e', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'shift']);
+const escribiendo = e => e.target && e.target.closest && e.target.closest('input, textarea, select, [contenteditable="true"]');
+window.addEventListener('keydown', e => {
+  if (escribiendo(e) || viewerState.open) return;
+  const k = e.key.toLowerCase();
+  if (k === 'v' && !e.metaKey && !e.ctrlKey && !e.altKey) { TP.on ? salirJuego() : entrarJuego(); return; }
+  if (!TP.on) return;
+  if (k === 'escape') { if (!(chatOpen || evOpen || aprOpen || selected || !mailView.hidden)) salirJuego(); return; }
+  if (TECLAS_JUEGO.has(k)) { TP.teclas.add(k); if (k.startsWith('arrow')) e.preventDefault(); }
+}, true);
+window.addEventListener('keyup', e => TP.teclas.delete(e.key.toLowerCase()));
+window.addEventListener('blur', () => TP.teclas.clear());
+// arrastrar para girar la cámara y rueda para acercar
+canvas.addEventListener('pointerdown', e => { if (TP.on) TP.arrastre = { x:e.clientX, y:e.clientY, id:e.pointerId }; });
+window.addEventListener('pointermove', e => {
+  const A = TP.arrastre; if (!TP.on || !A || e.pointerId !== A.id) return;
+  TP.yaw -= (e.clientX - A.x) * 0.0055;
+  TP.pitch = Math.max(0.04, Math.min(1.15, TP.pitch + (e.clientY - A.y) * 0.004));
+  A.x = e.clientX; A.y = e.clientY;
+});
+window.addEventListener('pointerup', e => { if (TP.arrastre && e.pointerId === TP.arrastre.id) TP.arrastre = null; });
+canvas.addEventListener('wheel', e => { if (!TP.on) return; e.preventDefault(); TP.dist = Math.max(2.4, Math.min(11, TP.dist * (1 + Math.sign(e.deltaY) * 0.1))); }, { passive:false });
+{ // palanca en pantalla (celular)
+  const pom = tpStick.querySelector('span'); let id = null;
+  const mover = e => {
+    const r = tpStick.getBoundingClientRect(), R = r.width / 2 - 8;
+    let dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2); const L = Math.hypot(dx, dy);
+    if (L > R) { dx *= R / L; dy *= R / L; }
+    TP.stick.x = dx / R; TP.stick.y = -dy / R; pom.style.transform = `translate(${dx}px, ${dy}px)`;
+  };
+  tpStick.addEventListener('pointerdown', e => { id = e.pointerId; tpStick.setPointerCapture(id); mover(e); e.preventDefault(); });
+  tpStick.addEventListener('pointermove', e => { if (e.pointerId === id) mover(e); });
+  const suelta = e => { if (e.pointerId !== id) return; id = null; TP.stick.x = TP.stick.y = 0; pom.style.transform = ''; };
+  tpStick.addEventListener('pointerup', suelta); tpStick.addEventListener('pointercancel', suelta);
+}
+function tpMover(dt){                                  // caminar con teclado o palanca, sin atravesar las cosas
+  const k = TP.teclas;
+  let f = (k.has('w') || k.has('arrowup') ? 1 : 0) - (k.has('s') || k.has('arrowdown') ? 1 : 0) + TP.stick.y;
+  let s = (k.has('d') || k.has('arrowright') ? 1 : 0) - (k.has('a') || k.has('arrowleft') ? 1 : 0) + TP.stick.x;
+  if (k.has('q')) TP.yaw += dt * 2.2;
+  if (k.has('e')) TP.yaw -= dt * 2.2;
+  const L = Math.hypot(f, s); if (L > 1) { f /= L; s /= L; }
+  TP.moviendo = L > 0.08;
+  if (!TP.moviendo) return;
+  const p = avatar.g.position, sy = Math.sin(TP.yaw), cy = Math.cos(TP.yaw);
+  const vx = -sy * f + cy * s, vz = -cy * f - sy * s, n = Math.hypot(vx, vz) || 1;
+  const vel = (k.has('shift') ? 6.4 : 3.4) * Math.min(1, L);
+  avatar.path = []; avatar.look = null;
+  const nx = p.x + vx / n * vel * dt, nz = p.z + vz / n * vel * dt;
+  if (tpChoca(p.x, p.z) || !tpChoca(nx, nz)) { p.x = nx; p.z = nz; }    // si quedó encima de algo, puede salir
+  else if (!tpChoca(nx, p.z)) p.x = nx;                                  // se desliza junto a la pared
+  else if (!tpChoca(p.x, nz)) p.z = nz;
+  avatar.g.rotation.y += shortAngle(Math.atan2(vx, vz) - avatar.g.rotation.y) * Math.min(1, dt * 12);
+  if (f > 0.2 && !TP.arrastre) TP.yaw += shortAngle(avatar.g.rotation.y + Math.PI - TP.yaw) * Math.min(1, dt * 1.6);   // la cámara se acomoda detrás
+  avatar.at = roomAt(p);
+}
+function tpCamara(dt){                                 // cámara detrás y un poco arriba; si hay una máquina en medio, se acerca
+  const p = avatar.g.position, alt = p.y + 1.3;
+  tpMira.set(p.x, alt, p.z);
+  const hz = Math.cos(TP.pitch) * TP.dist;
+  tpDeseo.set(p.x + Math.sin(TP.yaw) * hz, alt + Math.sin(TP.pitch) * TP.dist, p.z + Math.cos(TP.yaw) * hz);
+  for (let t = 0.35; t <= 1.0001; t += 0.13) {
+    tpPaso.lerpVectors(tpMira, tpDeseo, t);
+    if (tpChoca(tpPaso.x, tpPaso.z, 0.25, tpPaso.y)) { tpDeseo.lerpVectors(tpMira, tpDeseo, Math.max(0.3, t - 0.13)); break; }
+  }
+  tpDeseo.x = Math.max(-FW/2 + 0.6, Math.min(FW/2 - 0.6, tpDeseo.x));
+  tpDeseo.z = Math.max(-FD/2 + 0.6, Math.min(FD/2 - 0.6, tpDeseo.z));
+  camera.position.lerp(tpDeseo, 1 - Math.exp(-dt * 12));
+  camera.lookAt(tpMira);
+  controls.target.copy(tpMira);
+}
+
+/* ───────── Paneles que se pliegan ─────────
+   Cada panel, menos el principal, tiene un botón para plegarlo o desplegarlo y se recuerda
+   cómo lo dejaste. La tecla H pliega o despliega todos a la vez.                          */
+var PLEGABLES = {};
+function plegable(id, panel, boton, nombre, recordar = true){
+  let cerrado = false;
+  if (recordar) try { cerrado = localStorage.getItem('lab.pliegue.' + id) === '1'; } catch {}
+  const poner = (v, guardar = recordar) => {
+    cerrado = !!v; panel.classList.toggle('plegado', cerrado);
+    boton.setAttribute('aria-expanded', String(!cerrado));
+    boton.setAttribute('aria-label', (cerrado ? 'Mostrar ' : 'Plegar ') + nombre);
+    if (guardar) try { localStorage.setItem('lab.pliegue.' + id, cerrado ? '1' : '0'); } catch {}
+    acomodarPronto();
+  };
+  boton.addEventListener('click', e => { e.stopPropagation(); poner(!cerrado); });
+  PLEGABLES[id] = { poner, cerrado: () => cerrado };
+  poner(cerrado, false);
+}
+const dockEl = document.getElementById('dock'), raizEl = document.documentElement;
+let acomodoPendiente = false;
+function acomodarPronto(){ if (!acomodoPendiente) { acomodoPendiente = true; requestAnimationFrame(() => { acomodoPendiente = false; acomodar(); }); } }
+plegable('agentes', rosterEl, document.getElementById('rosterTg'), 'la lista de agentes');
+plegable('actividad', document.getElementById('feedBox'), document.getElementById('feedTg'), 'la actividad reciente');
+plegable('avatar', document.getElementById('avbar'), document.getElementById('avTg'), 'la barra de tu avatar');
+plegable('ayuda', document.getElementById('hint'), document.getElementById('hintTg'), 'la ayuda');
+plegable('controles', tpAyuda, document.getElementById('tpTg'), 'los controles del juego');
+plegable('junta', juntaBar, document.getElementById('jbMin'), 'el aviso de la junta', false);
+plegable('presenta', nowbar, document.getElementById('nbMin'), 'el aviso de la presentación', false);
+[['junta', juntaBar], ['presenta', nowbar]].forEach(([id, bar]) => bar.addEventListener('click', e => {   // tocar el aviso plegado lo abre
+  if (bar.classList.contains('plegado') && !e.target.closest('.nb-min')) PLEGABLES[id].poner(false);
+}));
+window.addEventListener('keydown', e => {
+  if (e.key.toLowerCase() !== 'h' || e.metaKey || e.ctrlKey || e.altKey || escribiendo(e) || viewerState.open) return;
+  const L = Object.values(PLEGABLES), mostrar = L.every(p => p.cerrado());
+  L.forEach(p => p.poner(!mostrar));
+});
+
+/* Acomoda los paneles para que no se encimen: la columna derecha baja si algo de arriba
+   la tapa; la franja de abajo se angosta si la columna derecha llega hasta abajo; en el
+   celular, la franja queda encima de la lista de agentes o de la ficha abierta.          */
+const COL_DER = ['roster', 'detail', 'aprPanel', 'evPanel', 'frPanel', 'mapaCard'].map(id => document.getElementById(id)).filter(Boolean);
+function acomodar(){
+  const W = innerWidth, H = innerHeight, movil = W <= 760;
+  const arriba = ancho => {                           // la columna derecha empieza debajo de lo que la tapa arriba
+    let t = 108;
+    if (!movil) for (const el of document.querySelectorAll('.top > *')) {
+      const r = el.getBoundingClientRect();
+      if (r.width && r.height && r.right > W - 16 - ancho - 10) t = Math.max(t, Math.ceil(r.bottom) + 10);
+    }
+    return t + 'px';
+  };
+  const v = arriba(300), vd = arriba(384);           // lista de agentes y fichas (más anchas)
+  if (raizEl.style.getPropertyValue('--der-top') !== v) raizEl.style.setProperty('--der-top', v);
+  if (raizEl.style.getPropertyValue('--det-top') !== vd) raizEl.style.setProperty('--det-top', vd);
+  let der = 16, abajo = 0;
+  for (const el of COL_DER) {
+    const r = el.getBoundingClientRect(); if (!r.width || !r.height) continue;
+    if (movil) abajo = Math.max(abajo, Math.ceil(H - r.top) + 8);
+    else if (r.bottom > H - 230) der = Math.max(der, Math.ceil(W - r.left) + 12);
+  }
+  const d = der + 'px', b = abajo ? abajo + 'px' : '';
+  if (dockEl.style.right !== d) dockEl.style.right = d;
+  if (dockEl.style.bottom !== b) dockEl.style.bottom = b;
+  if (!tpStick.hidden) { const r = dockEl.getBoundingClientRect(), s = Math.ceil(H - r.top) + 12 + 'px'; if (tpStick.style.bottom !== s) tpStick.style.bottom = s; }
+}
+setInterval(acomodar, 300);
+addEventListener('resize', acomodarPronto);
+acomodarPronto();
 
 /* ───────── Brillo (bloom), tono y viñeta ───────── */
 let tonePass = null;
@@ -4848,6 +5137,7 @@ function tick(){
   updaters.forEach(fn => fn(reduceMotion ? dt*.3 : dt, reduceMotion ? t*.3 : t));
 
   const now = performance.now();
+  if (TP.on) tpMover(dt);
   for (const rb of MOVERS) {
     const p = rb.g.position;
     if (rb.pending && now >= rb.reactAt) { const q = rb.pending; rb.pending = null; if (!rb.presenting) routeTo(rb, q.dest, q.estado); }
@@ -4876,7 +5166,7 @@ function tick(){
       rb.path = planPath(null, p, null, corridorPoint());
     }
 
-    const moving = rb.path.length > 0;
+    const moving = rb.path.length > 0 || (rb.isMe && TP.on && TP.moviendo);
     const k = rb.phase + t;
     const salto = rb.hopAt && now > rb.hopAt && now < rb.hopAt + 700 ? Math.sin(Math.PI * (now - rb.hopAt) / 700) * .35 : 0;
     rb.body.position.y = (reduceMotion ? 0 : Math.sin(k*2.4) * 0.012) + (moving ? Math.abs(Math.sin(k*8)) * 0.035 : 0) + salto;
@@ -4923,7 +5213,8 @@ function tick(){
     if (talk && rb.bubble.textContent !== text) rb.bubble.textContent = text;
   }
 
-  if (selected) {
+  if (TP.on) tpCamara(dt);
+  else if (selected) {
     const p = robots[selected].g.position;
     controls.target.lerp(tmp.set(p.x, 0.8, p.z), 0.06);
   } else if (followMe) {
@@ -4943,16 +5234,17 @@ function tick(){
     intro.t = Math.min(1, intro.t + dt/2.6);
     const e = 1 - Math.pow(1 - intro.t, 3);
     camera.position.lerpVectors(intro.from, intro.to, e);
-    if (intro.t >= 1) controls.enabled = true;
+    if (intro.t >= 1) controls.enabled = !TP.on;
   }
-  controls.update();
+  if (TP.pendiente && intro.t >= 1) entrarJuego();          // la última vez saliste en modo juego
+  if (!TP.on) controls.update();
   if (++cuadro % sombraCada === 0) renderer.shadowMap.needsUpdate = true;    // las sombras no hace falta calcularlas en cada cuadro
   if (composer) composer.render(); else renderer.render(scene, camera);
   requestAnimationFrame(tick);
 }
 function shortAngle(a){ return ((a + Math.PI) % (Math.PI*2) + Math.PI*2) % (Math.PI*2) - Math.PI; }
 
-if (/[?&]depurar\b/.test(location.search)) window.__habitat = { robots, avatar, perf, camera, controls, scene, rooms: ROOMS, vida: { simJunta, openMapa, celebrar, cierreDelDia, rutaLead, TEMAS_JUNTA, openFrentes, frentes: () => frentes }, nivel: () => nivel, pr: () => renderer.getPixelRatio() };   // solo para pruebas
+if (/[?&]depurar\b/.test(location.search)) window.__habitat = { robots, avatar, perf, camera, controls, scene, rooms: ROOMS, juego: { entrar: entrarJuego, salir: salirJuego, estado: TP }, vida: { simJunta, openMapa, celebrar, cierreDelDia, rutaLead, TEMAS_JUNTA, openFrentes, frentes: () => frentes }, nivel: () => nivel, pr: () => renderer.getPixelRatio() };   // solo para pruebas
 renderRoster();
 renderApprovals(true);
 drawAprScreen();
