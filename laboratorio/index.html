@@ -4826,6 +4826,7 @@ function entrarJuego(){
   if (TP.on) return;
   TP.on = true; TP.pendiente = false; intro.t = 1;
   TP.obst ||= tpObstaculos();
+  TP.cand ||= tpCandidatos();
   select(null); setFollow(false);
   controls.enabled = false;
   TP.yaw = avatar.g.rotation.y + Math.PI; TP.pitch = .1; TP.dist = 4.2;   // justo detrás, a la altura de la cabeza
@@ -4838,6 +4839,7 @@ function entrarJuego(){
 function salirJuego(){
   if (!TP.on) return;
   TP.on = false; TP.teclas.clear(); TP.stick.x = TP.stick.y = 0; TP.moviendo = false; TP.arrastre = null;
+  tpSinFantasmas();
   const p = avatar.g.position;
   controls.target.set(p.x, 0.8, p.z);
   camera.position.set(p.x + Math.sin(TP.yaw) * 16, 20, p.z + Math.cos(TP.yaw) * 16);
@@ -4912,16 +4914,84 @@ function tpCamara(dt){                                 // cámara baja, detrás 
   tpMira.set(p.x + cy * TP.hombro, p.y + 1.62, p.z - sy * TP.hombro);         // a la altura de la cabeza, a la derecha del personaje
   const hz = Math.cos(TP.pitch) * TP.dist;
   tpDeseo.set(tpMira.x + sy * hz, tpMira.y + Math.sin(TP.pitch) * TP.dist, tpMira.z + cy * hz);
-  for (let t = 0.2; t <= 1.0001; t += 0.1) {                                 // si una máquina queda en medio, la cámara se acerca
-    tpPaso.lerpVectors(tpMira, tpDeseo, t);
-    if (tpChoca(tpPaso.x, tpPaso.z, 0.22, tpPaso.y)) { tpDeseo.lerpVectors(tpMira, tpDeseo, Math.max(0.12, t - 0.1)); break; }
-  }
-  tpDeseo.x = Math.max(-FW/2 + 0.6, Math.min(FW/2 - 0.6, tpDeseo.x));
-  tpDeseo.z = Math.max(-FD/2 + 0.6, Math.min(FD/2 - 0.6, tpDeseo.z));
+  // la cámara nunca se acerca a tu personaje: junto a un muro de la nave se queda detrás de él
+  // (los muros solo se ven desde dentro) y lo que estorba se vuelve transparente
   tpDeseo.y = Math.max(0.35, tpDeseo.y);
   camera.position.lerp(tpDeseo, 1 - Math.exp(-dt * 14));
   camera.lookAt(tpMira);                                                       // mira hacia adelante, por encima del hombro
   controls.target.copy(tpMira);
+  tpFantasmas(dt);                                                             // lo que queda en medio se vuelve transparente
+}
+
+/* Lo que queda entre la cámara y tu personaje (o pegado al lente) se vuelve transparente
+   mientras estorba, y luego vuelve a la normalidad. Cada objeto usa una copia de su
+   material solo mientras está transparente, para no afectar a los demás objetos.      */
+const tpRayo = new THREE.Raycaster(), tpDir = new THREE.Vector3(), tpObj = new THREE.Vector3(), tpFrente = new THREE.Vector3();
+const TP_FANT = new Map();
+let tpFantReloj = 0;
+function tpCandidatos(){                              // lo que puede volverse transparente, con su esfera y su caja
+  const mallas = [], siempre = [], cajas = [], propios = new Set(), moviles = new Set(), tam = new THREE.Vector3();
+  MOVERS.forEach(rb => rb.g.traverse(o => propios.add(o)));
+  scene.traverse(o => { if (o.userData.movil) o.traverse(c => moviles.add(c)); });
+  scene.updateMatrixWorld(true);
+  scene.traverse(o => {
+    if (!(o.isMesh || o.isPoints) || o.userData.suelo || propios.has(o)) return;
+    if (o.isInstancedMesh || moviles.has(o)) { if (o.isMesh) siempre.push(o); return; }   // se revisan siempre (se mueven o son grupos de piezas)
+    const b = new THREE.Box3().setFromObject(o);
+    if (b.isEmpty()) return;
+    if (o.isMesh) mallas.push([o, b.getBoundingSphere(new THREE.Sphere())]);
+    if (!(o.isPoints && b.getSize(tam).length() > 8)) cajas.push([o, b]);
+  });
+  return { mallas, siempre, cajas };
+}
+const tpSegA = new THREE.Vector3(), tpSegD = new THREE.Vector3(), tpSegP = new THREE.Vector3();
+function tpCerca(centro, c, a){                       // distancia de un punto al tramo cámara → personaje
+  tpSegD.subVectors(a, c); const L2 = tpSegD.lengthSq() || 1;
+  const t = Math.max(0, Math.min(1, tpSegP.subVectors(centro, c).dot(tpSegD) / L2));
+  return tpSegP.copy(c).addScaledVector(tpSegD, t).distanceTo(centro);
+}
+function tpFantasmas(dt){
+  tpFantReloj -= dt;
+  if (tpFantReloj <= 0 && TP.cand) {
+    tpFantReloj = 0.06;
+    const t0 = performance.now();
+    const p = avatar.g.position, c = camera.position, visto = new Set(), dentro = new Set();
+    tpSegA.set(p.x, p.y + 1.2, p.z);                                          // solo se revisa lo que está cerca del camino de la vista
+    const cerca = TP.cand.siempre.slice();
+    for (const [o, s] of TP.cand.mallas) if (tpCerca(s.center, c, tpSegA) < s.radius + 1.2) cerca.push(o);
+    camera.getWorldDirection(tpFrente);
+    const lx = -tpFrente.z, lz = tpFrente.x, ln = Math.hypot(lx, lz) || 1;      // hacia los costados de tu personaje, vistos desde la cámara
+    for (const [y, lado] of [[0.4, 0], [1.1, 0], [1.8, 0], [2.3, 0], [0.7, -0.55], [0.7, 0.55], [1.5, -0.6], [1.5, 0.6], [2.1, -0.5], [2.1, 0.5]]) {
+      tpObj.set(p.x + lx / ln * lado, p.y + y, p.z + lz / ln * lado);       // pies, cuerpo, cabeza, corona y sus costados
+      tpDir.subVectors(tpObj, c); const L = tpDir.length(); if (L < 0.3) continue;
+      tpRayo.set(c, tpDir.multiplyScalar(1 / L)); tpRayo.near = 0; tpRayo.far = L - 0.4;
+      for (const hit of tpRayo.intersectObjects(cerca, false)) visto.add(hit.object);
+    }
+    for (const [o, b] of TP.cand.cajas) {                                    // lo que rodea a la cámara o está pegado al lente
+      const d = b.distanceToPoint(c);
+      if (d < 0.5) { visto.add(o); dentro.add(o); }                         // la cámara está dentro o pegada: desaparece
+      else if (d < 1.4) { b.getCenter(tpObj); if (tpObj.sub(c).dot(tpFrente) > 0) visto.add(o); }
+    }
+    for (const m of visto) if (!TP_FANT.has(m)) {
+      const orig = m.material, lista = Array.isArray(orig) ? orig : [orig];
+      const copia = lista.map(x => { const k = x.clone(); k.userData.op0 = x.transparent ? x.opacity : 1; k.transparent = true; return k; });
+      m.material = Array.isArray(orig) ? copia : copia[0];
+      TP_FANT.set(m, { orig, copia, op: 1, vis: m.visible });
+    }
+    TP.visto = visto; TP.dentro = dentro;
+    TP.costo = (TP.costo || 0) * .8 + (performance.now() - t0) * .2;          // milisegundos que toma revisar (para pruebas)
+  }
+  for (const [m, f] of TP_FANT) {
+    const meta = !TP.visto || !TP.visto.has(m) ? 1 : TP.dentro && TP.dentro.has(m) ? 0 : 0.14;
+    f.op += (meta - f.op) * Math.min(1, dt * 10);
+    for (const k of f.copia) k.opacity = k.userData.op0 * f.op;
+    m.visible = f.vis && f.op > 0.03;
+    if (meta === 1 && f.op > 0.97) { m.material = f.orig; m.visible = f.vis; f.copia.forEach(k => k.dispose()); TP_FANT.delete(m); }
+  }
+}
+function tpSinFantasmas(){
+  for (const [m, f] of TP_FANT) { m.material = f.orig; m.visible = f.vis; f.copia.forEach(k => k.dispose()); }
+  TP_FANT.clear(); TP.visto = null; TP.dentro = null;
 }
 
 /* ───────── Paneles que se pliegan ─────────
